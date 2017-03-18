@@ -37,6 +37,8 @@ subjects={...
 % Define the parameters of the analysis of each experiment
 runAverageFlagSet=[true true false]; % Do we average the data across runs?
 
+experimentNames={'flash','retinotopy','pixar movies'};
+
 runNamesSet{1}={...
     'tfMRI_FLASH_AP_run01_response.mat',...
     'tfMRI_FLASH_PA_run02_response.mat'};
@@ -172,5 +174,5 @@ for ee=1:3
         ylabel('% \Delta pupil diameter');
         title(plotTitle{pp},'Interpreter', 'none');
     end % plot the figures in rows
-    
+    figtitle(experimentNames{ee});
 end % loop over experiments
