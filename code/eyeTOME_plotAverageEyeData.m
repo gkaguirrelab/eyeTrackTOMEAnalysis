@@ -123,7 +123,7 @@ for ee=1:3
                 end
                 
             else % check for the existence of the file
-                fprintf('Missing scan\n');
+                fprintf(['Missing: ' subjects{ss} ' - ' runNames{rr} '\n']);
             end
             
         end % loop over runs
