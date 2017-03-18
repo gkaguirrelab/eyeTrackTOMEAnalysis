@@ -52,10 +52,6 @@ for ss=1:length(subjects)
             lastIdx=find(abs(response.timebase-342.1833)<0.001);
             dataLength=length(response.timebase(firstIdx:lastIdx));
             if rr==1
-                pupilSize=nan(length(timebase),length(runNames));
-                gazeX=nan(length(timebase),length(runNames));
-                gazeY=nan(length(timebase),length(runNames));
-                error=nan(length(timebase),length(runNames));
                 if ss==1
                     timebase=response.timebase(firstIdx:lastIdx);
                     if runAverageFlag
@@ -68,6 +64,10 @@ for ss=1:length(subjects)
                         gazeYBySubject=nan(length(timebase),length(subjects),length(runNames));
                     end
                 end
+                pupilSize=nan(length(timebase),length(runNames));
+                gazeX=nan(length(timebase),length(runNames));
+                gazeY=nan(length(timebase),length(runNames));
+                error=nan(length(timebase),length(runNames));
             end
             
             % Load the time-series, mean center, and convert the pupil data
