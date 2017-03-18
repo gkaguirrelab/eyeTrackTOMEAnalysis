@@ -147,6 +147,7 @@ for ee=1:3
     stdGazeX=nanstd(gazeXBySubject,1,2);
     semGazeX=nanstd(gazeXBySubject,1,2)/sqrt(length(subjects));
     avgGazeY=nanmean(gazeYBySubject,2);
+    stdGazeY=nanstd(gazeYBySubject,1,2);
     semGazeY=nanstd(gazeYBySubject,1,2)/sqrt(length(subjects));
     figHandle=figure();
     if runAverageFlag
@@ -159,12 +160,15 @@ for ee=1:3
     for pp=1:plotRows
         subplot(plotRows,2,pp*2-1);
         shadedErrorBar(timebase,medfilt1(avgGazeX(:,1,pp),100,'truncate'),medfilt1(semGazeX(:,1,pp),100,'truncate'),'-k',0.25)
+        hold on
+        shadedErrorBar(timebase,medfilt1(avgGazeY(:,1,pp),100,'truncate'),medfilt1(semGazeY(:,1,pp),100,'truncate'),'-b',0.25)        
         ylim([-300 300]);
         xlim([0 350]);
         xlabel('time [seconds]');
         ylabel('gaze position [mm]');
         title(plotTitle{pp},'Interpreter', 'none');
         pbaspect([2,1,1]);
+        hold off
         subplot(plotRows,2,pp*2);
         shadedErrorBar(timebase,nanfastsmooth(avgPupil(:,1,pp),50,3,1),nanfastsmooth(semPupil(:,1,pp),50,3,1),'-r',0.25)
         pbaspect([2,1,1]);
