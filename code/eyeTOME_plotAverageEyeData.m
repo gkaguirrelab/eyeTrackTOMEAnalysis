@@ -25,9 +25,9 @@ subjects={...
     %      'TOME_3002/082616/',...
     %      'TOME_3003/091616/',...
     %      'TOME_3004/101416/',...
-    %      'TOME_3005/100316/',...
     %      'TOME_3007/101716/',...
     'TOME_3008/103116/',...
+    'TOME_3005/100316/',...
     'TOME_3009/102516/',...
     'TOME_3011/012017/',...
     'TOME_3012/020317/',...
@@ -67,61 +67,64 @@ for ee=1:3
                 load(filename)
                 firstIdx=find(abs(response.timebase)<0.001);
                 lastIdx=find(abs(response.timebase-342.1833)<0.001);
-                dataLength=length(response.timebase(firstIdx:lastIdx));
-                if rr==1
-                    if ss==1
-                        timebase=response.timebase(firstIdx:lastIdx);
-                        if runAverageFlag
-                            pupilSizeBySubject=nan(length(timebase),length(subjects),1);
-                            gazeXBySubject=nan(length(timebase),length(subjects),1);
-                            gazeYBySubject=nan(length(timebase),length(subjects),1);
-                        else
-                            pupilSizeBySubject=nan(length(timebase),length(subjects),length(runNames));
-                            gazeXBySubject=nan(length(timebase),length(subjects),length(runNames));
-                            gazeYBySubject=nan(length(timebase),length(subjects),length(runNames));
+                if ~isempty(firstIdx) && ~ isempty(lastIdx)
+                    dataLength=length(response.timebase(firstIdx:lastIdx));
+                    if rr==1
+                        if ss==1
+                            timebase=response.timebase(firstIdx:lastIdx);
+                            if runAverageFlag
+                                pupilSizeBySubject=nan(length(timebase),length(subjects),1);
+                                gazeXBySubject=nan(length(timebase),length(subjects),1);
+                                gazeYBySubject=nan(length(timebase),length(subjects),1);
+                            else
+                                pupilSizeBySubject=nan(length(timebase),length(subjects),length(runNames));
+                                gazeXBySubject=nan(length(timebase),length(subjects),length(runNames));
+                                gazeYBySubject=nan(length(timebase),length(subjects),length(runNames));
+                            end
                         end
+                        pupilSize=nan(length(timebase),length(runNames));
+                        gazeX=nan(length(timebase),length(runNames));
+                        gazeY=nan(length(timebase),length(runNames));
+                        error=nan(length(timebase),length(runNames));
                     end
-                    pupilSize=nan(length(timebase),length(runNames));
-                    gazeX=nan(length(timebase),length(runNames));
-                    gazeY=nan(length(timebase),length(runNames));
-                    error=nan(length(timebase),length(runNames));
+                    
+                    % Load the time-series, mean center, and convert the pupil data
+                    % to % change units.
+                    tmp=response.pupilSize(firstIdx:lastIdx);
+                    pupilSize(:,rr) = (tmp - nanmean(tmp))/nanmean(tmp);
+                    tmp=response.gazeX(firstIdx:lastIdx);
+                    gazeX(:,rr)=tmp-nanmean(tmp);
+                    tmp=response.gazeY(firstIdx:lastIdx);
+                    gazeY(:,rr)=tmp-nanmean(tmp);
+                    error(:,rr)=response.pupilError(firstIdx:lastIdx);
+                    
+                    % Clean the data to nan values with pupilFit error of greater
+                    % than threshold units
+                    badIdx=error(:,rr)> errorThreshold;
+                    pupilSize(badIdx,rr)=nan;
+                    gazeX(badIdx,rr)=nan;
+                    gazeY(badIdx,rr)=nan;
+                    
+                    % Clean the data within 2 sample units if the absolute gaze
+                    % value is above the badGazeThresold
+                    badIdx=(abs(gazeX(:,rr))> badGazeThreshold) | (abs(gazeY(:,rr))> badGazeThreshold);
+                    for x=-2:1:2
+                        pupilSize(circshift(badIdx,x),rr)=nan;
+                        gazeX(circshift(badIdx,x),rr)=nan;
+                        gazeY(circshift(badIdx,x),rr)=nan;
+                    end
+                    
+                    % Clean the data to nan data values within 5 sample units of a
+                    % blink (detected as a nan value in the raw pupil size series)
+                    badIdx=isnan(pupilSize(:,rr));
+                    for x=-5:1:5
+                        pupilSize(circshift(badIdx,x),rr)=nan;
+                        gazeX(circshift(badIdx,x),rr)=nan;
+                        gazeY(circshift(badIdx,x),rr)=nan;
+                    end
+                else % check for the first and last idx timebase value
+                    fprintf(['Incomplete timebase: ' subjects{ss} ' - ' runNames{rr} '\n']);
                 end
-                
-                % Load the time-series, mean center, and convert the pupil data
-                % to % change units.
-                tmp=response.pupilSize(firstIdx:lastIdx);
-                pupilSize(:,rr) = (tmp - nanmean(tmp))/nanmean(tmp);
-                tmp=response.gazeX(firstIdx:lastIdx);
-                gazeX(:,rr)=tmp-nanmean(tmp);
-                tmp=response.gazeY(firstIdx:lastIdx);
-                gazeY(:,rr)=tmp-nanmean(tmp);
-                error(:,rr)=response.pupilError(firstIdx:lastIdx);
-                
-                % Clean the data to nan values with pupilFit error of greater
-                % than threshold units
-                badIdx=error(:,rr)> errorThreshold;
-                pupilSize(badIdx,rr)=nan;
-                gazeX(badIdx,rr)=nan;
-                gazeY(badIdx,rr)=nan;
-                
-                % Clean the data within 2 sample units if the absolute gaze
-                % value is above the badGazeThresold
-                badIdx=(abs(gazeX(:,rr))> badGazeThreshold) | (abs(gazeY(:,rr))> badGazeThreshold);
-                for x=-2:1:2
-                    pupilSize(circshift(badIdx,x),rr)=nan;
-                    gazeX(circshift(badIdx,x),rr)=nan;
-                    gazeY(circshift(badIdx,x),rr)=nan;
-                end
-                
-                % Clean the data to nan data values within 5 sample units of a
-                % blink (detected as a nan value in the raw pupil size series)
-                badIdx=isnan(pupilSize(:,rr));
-                for x=-5:1:5
-                    pupilSize(circshift(badIdx,x),rr)=nan;
-                    gazeX(circshift(badIdx,x),rr)=nan;
-                    gazeY(circshift(badIdx,x),rr)=nan;
-                end
-                
             else % check for the existence of the file
                 fprintf(['Missing: ' subjects{ss} ' - ' runNames{rr} '\n']);
             end
@@ -161,7 +164,7 @@ for ee=1:3
         subplot(plotRows,2,pp*2-1);
         shadedErrorBar(timebase,medfilt1(avgGazeX(:,1,pp),100,'truncate'),medfilt1(semGazeX(:,1,pp),100,'truncate'),'-k',0.25)
         hold on
-        shadedErrorBar(timebase,medfilt1(avgGazeY(:,1,pp),100,'truncate'),medfilt1(semGazeY(:,1,pp),100,'truncate'),'-b',0.25)        
+        shadedErrorBar(timebase,medfilt1(avgGazeY(:,1,pp),100,'truncate'),medfilt1(semGazeY(:,1,pp),100,'truncate'),'-b',0.25)
         ylim([-300 300]);
         xlim([0 350]);
         xlabel('time [seconds]');
