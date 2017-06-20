@@ -13,12 +13,17 @@ errorThreshold=50; % Discard time points above this pupil fit error
 badGazeThreshold=300; % Discard time points with gaze values above this
 
 % Discover user name and find the Dropbox directory
-[~, userName] = system('whoami');
-userName = strtrim(userName);
-dropBoxRoot = ...
-    fullfile('/Users', userName, ...
-    '/Dropbox (Aguirre-Brainard Lab)/TOME_analysis');
-
+[~,hostname] = system('hostname');
+hostname = strtrim(lower(hostname));
+if strcmp(hostname,'melchior.uphs.upenn.edu')
+    dropBoxRoot = '/Volumes/Bay_2_data/giulia/Dropbox-Aguirre-Brainard-Lab/TOME_analysis';
+else
+    [~, userName] = system('whoami');
+    userName = strtrim(userName);
+    dropBoxRoot = ...
+        fullfile('/Users', userName, ...
+        '/Dropbox (Aguirre-Brainard Lab)/TOME_analysis');
+end
 % List the subjects to be analyzed
 subjects={...
     %      'TOME_3001/081916/',...
