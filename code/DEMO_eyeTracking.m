@@ -74,7 +74,7 @@ if ~exist(processingDir,'dir')
     mkdir(processingDir)
 end
 
-% download the test run from figshare
+%% download the test run from figshare
 outfileName = fullfile(dataDir,[params.runName '_raw.mov']);
 url = 'https://ndownloader.figshare.com/files/8711089?private_link=8279728e507d375541c7';
 system (['curl -L ' sprintf(url) ' > ' sprintf(outfileName)])
@@ -98,13 +98,13 @@ system (['curl -L ' sprintf(url) ' > ' sprintf(outfileName)])
 
 %% DEINTERLACE VIDEO
 
-deinterlaceVideo (params, outputPath, 'Mean')
+deinterlaceVideo (params, sandboxDir, 'Mean')
 
 
 %% build the input video path
 
 % note that this is the default output format for deinterlaced videos.
-inputVideo = fullfile(outputPath,params.outputDir, params.projectSubfolder, ...
+inputVideo = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
         [params.runName '_60hz.avi']);
     
@@ -124,9 +124,9 @@ toc
 disp('Tracking glint...')
 
 tic
-glintFile = fullfile(outputPath,params.outputDir, params.projectSubfolder, ...
+glintFile = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        'glintTEST.mat');
+        [params.runName '_glint.mat']);
 [glint, glintTrackingParams] = trackGlint(grayI, glintFile);
 toc
 
@@ -135,9 +135,9 @@ toc
 disp('Making pupil perimeter video...')
 
 tic
-perimeterVideo = fullfile(outputPath,params.outputDir, params.projectSubfolder, ...
+perimeterVideo = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        'perimeterTEST.avi');
+        [params.runName '_perimeter.avi']);
 pupilCircleThresh = 0.06; 
 pupilEllipseThresh = 0.96;
 perimeterParams = extractPupilPerimeter(grayI, perimeterVideo,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
@@ -185,13 +185,19 @@ framesToCut = guessPupilCuts(perimeterVideo,glintFile,blinkFrames);
 toc
 
 %% make control file
-controlFileName = fullfile(outputPath,params.outputDir, params.projectSubfolder, ...
+controlFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        'controlFileTEST');
+        [params.runName '_controlFile']);
 
 makeControlFile(controlFileName, framesToCut, blinkFrames )
 
-%% main fitting routine
+%% make corrected perimeter video
+correctedPerimeterVideo = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
+        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
+        [params.runName '_correctedPupilPerimeter.avi']);
+    
+correctPupilPerimeterVideo(perimeterVideo,controlFileName,glintFile, correctedPerimeterVideo)
 
-controlFile = [controlFileName '.mat'];
-mainPupilRoutine(controlFile,glintFile);
+%% bayesian fit of the pupil on the corrected perimeter video
+
+pupilBayesianFit(correctedPerimeterVideo);
