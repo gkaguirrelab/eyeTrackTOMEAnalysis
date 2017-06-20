@@ -164,6 +164,22 @@ toc
 %  only necessary and unambiguous inputs are fed to each step.
 
 
+
+%% GENERATE PRELIMINARY CONTROL FILE SECTION BEGINS HERE
+% The control file is a set of formatted instruction to edit on the pupil
+% perimeter video and help the fitting routine with cleaner data. 
+% 
+% The following part of the code produces the computer-generated control
+% file for pupil fitting. This preliminary control file will be later
+% reviewed by an operator, who will make the necessary corrections using a
+% GUI.
+% 
+% In principle, the preliminary control file itself could be used to
+% prepare the perimeter video for fitting, but the fitting results would be
+% less accurate. Therefore, in the final release of the code, we will skip
+% the steps concerning the creation of the preliminary control file and use
+% the more accurate control files generated during data analysis.
+
 %% blink detection
 disp('Finding blinks')
 
@@ -191,7 +207,12 @@ controlFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder,
 
 makeControlFile(controlFileName, framesToCut, blinkFrames )
 
+%% GENERATE PRELIMINARY CONTROL FILE SECTION ENDS HERE
+
 %% make corrected perimeter video
+% for testing purposes we just use the preliminary control file to correct
+% the perimeter video.
+
 correctedPerimeterVideo = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
         [params.runName '_correctedPupilPerimeter.avi']);
