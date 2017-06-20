@@ -76,8 +76,11 @@ end
 
 %% download the test run from figshare
 outfileName = fullfile(dataDir,[params.runName '_raw.mov']);
-url = 'https://ndownloader.figshare.com/files/8711089?private_link=8279728e507d375541c7';
-system (['curl -L ' sprintf(url) ' > ' sprintf(outfileName)])
+
+if ~exist (outfileName,'file')
+    url = 'https://ndownloader.figshare.com/files/8711089?private_link=8279728e507d375541c7';
+    system (['curl -L ' sprintf(url) ' > ' sprintf(outfileName)])
+end
 
 %% NOTE: RUN PARAMS vs CONTROL PARAMS
 
@@ -97,17 +100,14 @@ system (['curl -L ' sprintf(url) ' > ' sprintf(outfileName)])
 
 
 %% DEINTERLACE VIDEO
-
-deinterlaceVideo (params, sandboxDir, 'Mean')
-
-
-%% build the input video path
-
 % note that this is the default output format for deinterlaced videos.
 inputVideo = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
         [params.runName '_60hz.avi']);
     
+if ~exist (inputVideo,'file') 
+    deinterlaceVideo (params, sandboxDir, 'Mean')
+end
 
 %% prepare the video
 disp('Preparing video...')
