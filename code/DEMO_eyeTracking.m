@@ -22,14 +22,6 @@ function DEMO_eyeTracking (varargin)
 % 
 % DEMO_eyeTracking('numberOfFrames', 500)
 % 
-%% clear workspace
-clear
-close all
-clc
-
-%% set TbTb
-tbUse('LiveTrackAnalysisToolbox');
-
 %% Parse the input
 p = inputParser;
 
