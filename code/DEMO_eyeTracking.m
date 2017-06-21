@@ -116,10 +116,10 @@ toc
 disp('Tracking glint...')
 
 tic
-glintFile = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
+glintFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
         [params.runName '_glint.mat']);
-[glint, glintTrackingParams] = trackGlint(grayI, glintFile);
+[glint, glintTrackingParams] = trackGlint(grayI, glintFileName);
 toc
 
 
@@ -127,12 +127,12 @@ toc
 disp('Making pupil perimeter video...')
 
 tic
-perimeterVideo = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
+perimeterVideoName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
         [params.runName '_perimeter.avi']);
 pupilCircleThresh = 0.06; 
 pupilEllipseThresh = 0.96;
-perimeterParams = extractPupilPerimeter(grayI, perimeterVideo,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
+perimeterParams = extractPupilPerimeter(grayI, perimeterVideoName,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
 toc
 
 %% COMMENTS SO FAR
@@ -177,7 +177,7 @@ disp('Finding blinks')
 
 tic
 % find the blinks
-blinkFrames = findBlinks(glintFile);
+blinkFrames = findBlinks(glintFileName);
 toc
 
 % show them on the tracked video (this function is for display only)
@@ -189,7 +189,7 @@ showBlinks(blinkFrames,grayI)
 disp('Computing pupil cuts')
 
 tic
-framesToCut = guessPupilCuts(perimeterVideo,glintFile,blinkFrames);
+framesToCut = guessPupilCuts(perimeterVideo,glintFileName,blinkFrames);
 toc
 
 %% make control file
@@ -205,12 +205,12 @@ makeControlFile(controlFileName, framesToCut, blinkFrames )
 % for testing purposes we just use the preliminary control file to correct
 % the perimeter video.
 
-correctedPerimeterVideo = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
+correctedPerimeterVideoName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
         [params.runName '_correctedPupilPerimeter.avi']);
     
-correctPupilPerimeterVideo(perimeterVideo,controlFileName,glintFile, correctedPerimeterVideo)
+correctPupilPerimeterVideo(perimeterVideo,controlFileName,glintFileName, correctedPerimeterVideoName)
 
 %% bayesian fit of the pupil on the corrected perimeter video
 
-pupilBayesianFit(correctedPerimeterVideo);
+pupilBayesianFit(correctedPerimeterVideoName);
