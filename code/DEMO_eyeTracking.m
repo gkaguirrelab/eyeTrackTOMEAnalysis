@@ -212,5 +212,7 @@ correctedPerimeterVideoName = fullfile(sandboxDir,params.outputDir, params.proje
 correctPupilPerimeterVideo(perimeterVideoName,controlFileName,glintFileName, correctedPerimeterVideoName)
 
 %% bayesian fit of the pupil on the corrected perimeter video
-
-bayesFitPupilPerimeter(correctedPerimeterVideoName,'verbosity','full','display','full');
+pupilFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
+        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
+        [params.runName '_pupil.mat']);
+[pupil] = bayesFitPupilPerimeter(correctedPerimeterVideoName,pupilFileName,'verbosity','full','display','full');
