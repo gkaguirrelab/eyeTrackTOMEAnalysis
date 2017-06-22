@@ -195,9 +195,9 @@ toc
 %% make control file
 controlFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_controlFile']);
+        [params.runName '_controlFile.csv']);
 
-makeControlFile(controlFileName, framesToCut, blinkFrames )
+makePreliminaryControlFile(controlFileName, framesToCut, blinkFrames )
 
 %% GENERATE PRELIMINARY CONTROL FILE SECTION ENDS HERE
 
