@@ -213,4 +213,4 @@ correctPupilPerimeterVideo(perimeterVideo,controlFileName,glintFileName, correct
 
 %% bayesian fit of the pupil on the corrected perimeter video
 
-pupilBayesianFit(correctedPerimeterVideoName);
+bayesFitPupilPerimeter(correctedPerimeterVideoName,'verbosity','full','display','full');
