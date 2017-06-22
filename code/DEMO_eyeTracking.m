@@ -209,7 +209,7 @@ correctedPerimeterVideoName = fullfile(sandboxDir,params.outputDir, params.proje
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
         [params.runName '_correctedPupilPerimeter.avi']);
     
-correctPupilPerimeterVideo(perimeterVideo,controlFileName,glintFileName, correctedPerimeterVideoName)
+correctPupilPerimeterVideo(perimeterVideoName,controlFileName,glintFileName, correctedPerimeterVideoName)
 
 %% bayesian fit of the pupil on the corrected perimeter video
 
