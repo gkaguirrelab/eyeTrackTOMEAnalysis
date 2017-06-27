@@ -225,4 +225,12 @@ finalFitVideoOutFileName = fullfile(sandboxDir,params.outputDir, params.projectS
     'ellipseFitDataFileName',ellipseFitDataFileName,'useParallel',true,...
     'finalFitVideoOutFileName',finalFitVideoOutFileName, 'forceNumFrames',2000);
 
+figure
+plot(ellipseFitData.pInitialFitTransparent(:,3),'-.k');
+hold on
+plot(ellipseFitData.pPosteriorMeanTransparent(:,3),'-r','LineWidth',2)
+plot(ellipseFitData.pPosteriorMeanTransparent(:,3)-ellipseFitData.pPosteriorSDTransparent(:,3),'-b')
+plot(ellipseFitData.pPosteriorMeanTransparent(:,3)+ellipseFitData.pPosteriorSDTransparent(:,3),'-b')
+hold off
+
 foo=foo;
