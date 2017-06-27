@@ -233,4 +233,12 @@ plot(ellipseFitData.pPosteriorMeanTransparent(:,3)-ellipseFitData.pPosteriorSDTr
 plot(ellipseFitData.pPosteriorMeanTransparent(:,3)+ellipseFitData.pPosteriorSDTransparent(:,3),'-b')
 hold off
 
+figure
+plot(ellipseFitData.pInitialFitTransparent(:,1),'-.k');
+hold on
+plot(ellipseFitData.pPosteriorMeanTransparent(:,1),'-r','LineWidth',2)
+plot(ellipseFitData.pPosteriorMeanTransparent(:,1)-ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
+plot(ellipseFitData.pPosteriorMeanTransparent(:,1)+ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
+hold off
+
 foo=foo;
