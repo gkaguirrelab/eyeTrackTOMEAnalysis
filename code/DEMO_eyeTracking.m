@@ -131,7 +131,7 @@ perimeterVideoName = fullfile(sandboxDir,params.outputDir, params.projectSubfold
         params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
         [params.runName '_perimeter.avi']);
 pupilCircleThresh = 0.06; 
-pupilEllipseThresh = 0.96;
+pupilEllipseThresh = 0.945;
 perimeterParams = extractPupilPerimeter(grayI, perimeterVideoName,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
 toc
 
