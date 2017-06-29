@@ -20,11 +20,12 @@
 % DEMO_eyeTracking
 % 
 
+%% ToolboxToolbox configuration
 tbConfigResult=tbUseProject('eyeTOMEAnalysis','reset','full');
 tbSnapshot=tbDeploymentSnapshot(tbConfigResult);
 clear tbConfigResult
 
-% Hard code number of frames (make Inf to do all)
+%%  Hard code number of frames (make Inf to do all)
 numberOfFrames = Inf;
 
 %% set paths and make directories
@@ -36,34 +37,34 @@ if ~exist(sandboxDir,'dir')
 end
 
 % add standard dropbox params
-params.projectFolder = 'TOME_data';
-params.outputDir = 'TOME_processing';
-params.projectSubfolder = 'session2_spatialStimuli';
-params.eyeTrackingDir = 'EyeTracking';
+pathParams.projectFolder = 'TOME_data';
+pathParams.outputDir = 'TOME_processing';
+pathParams.projectSubfolder = 'session2_spatialStimuli';
+pathParams.eyeTrackingDir = 'EyeTracking';
 
-params.subjectName = 'TOME_3020';
-params.sessionDate = '050517';
-params.runName = 'tfMRI_FLASH_AP_run01';
+pathParams.subjectName = 'TOME_3020';
+pathParams.sessionDate = '050517';
+pathParams.runName = 'tfMRI_FLASH_AP_run01';
 
 % create mock TOME folders in sandbox
-dataDir = fullfile(sandboxDir,params.projectFolder, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir);
+dataDir = fullfile(sandboxDir,pathParams.projectFolder, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir);
 if ~exist(dataDir,'dir')
     mkdir(dataDir)
 end
 
-processingDir = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir);
+processingDir = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir);
 if ~exist(processingDir,'dir')
     mkdir(processingDir)
 end
 
 %% download the test run from figshare
-outfileName = fullfile(dataDir,[params.runName '_raw.mov']);
+rawVideoName = fullfile(dataDir,[pathParams.runName '_raw.mov']);
 
-if ~exist (outfileName,'file')
+if ~exist (rawVideoName,'file')
     url = 'https://ndownloader.figshare.com/files/8711089?private_link=8279728e507d375541c7';
-    system (['curl -L ' sprintf(url) ' > ' sprintf(outfileName)])
+    system (['curl -L ' sprintf(url) ' > ' sprintf(rawVideoName)])
 end
 
 %% NOTE: RUN PARAMS vs CONTROL PARAMS
@@ -83,34 +84,23 @@ end
 % matlab's native functions input managment.
 
 
-%% DEINTERLACE VIDEO
-% note that this is the default output format for deinterlaced videos.
-inputVideo = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_60hz.avi']);
-    
-if ~exist (inputVideo,'file') 
-    deinterlaceVideo (params, sandboxDir, 'Mean')
-end
+%% STEP 1: convert raw eye video to 60Hz gray
 
-%% prepare the video
-disp('Preparing video...')
-
+grayVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_gray.avi']);
 tic
-[grayI] = prepareVideo(inputVideo, 'numberOfFrames',numberOfFrames); %just tracking a small portion for testing
+raw2gray(rawVideoName,grayVideoName,'numberOfFrames',numberOfFrames)
 toc
-
-% note: to test on the full video change 1000 to Inf. It won't be possible
-% to change the number of frames analyzed in later steps.
 
 
 %% track the glint
 disp('Tracking glint...')
 
 tic
-glintFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_glint.mat']);
+glintFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_glint.mat']);
 [glint, glintTrackingParams] = trackGlint(grayI, glintFileName);
 toc
 
@@ -119,9 +109,9 @@ toc
 disp('Making pupil perimeter video...')
 
 tic
-perimeterVideoName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_perimeter.avi']);
+perimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_perimeter.avi']);
 pupilCircleThresh = 0.06; 
 pupilEllipseThresh = 0.945;
 perimeterParams = extractPupilPerimeter(grayI, perimeterVideoName,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
@@ -185,9 +175,9 @@ framesToCut = guessPupilCuts(perimeterVideoName,glintFileName,blinkFrames);
 toc
 
 %% make control file
-controlFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_controlFile.csv']);
+controlFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_controlFile.csv']);
 
 makePreliminaryControlFile(controlFileName, framesToCut, blinkFrames )
 
@@ -197,20 +187,21 @@ makePreliminaryControlFile(controlFileName, framesToCut, blinkFrames )
 % for testing purposes we just use the preliminary control file to correct
 % the perimeter video.
 
-correctedPerimeterVideoName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_correctedPupilPerimeter.avi']);
+correctedPerimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_correctedPupilPerimeter.avi']);
+tic
 correctPupilPerimeterVideo(perimeterVideoName,controlFileName,glintFileName, correctedPerimeterVideoName)
-
+toc
 
 %% bayesian fit of the pupil on the corrected perimeter video
-ellipseFitDataFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_pupil.mat']);
+ellipseFitDataFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_pupil.mat']);
 
-finalFitVideoOutFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_fitFitPupilPerimeter.avi']);
+finalFitVideoOutFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_fitFitPupilPerimeter.avi']);
 
 [ellipseFitData] = bayesFitPupilPerimeter(correctedPerimeterVideoName, ...
     'verbosity','full', 'tbSnapshot',tbSnapshot, ...
