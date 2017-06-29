@@ -1,18 +1,15 @@
-
-% this is a demo of the whole eyetracking analysis pipeline.
+% DEMO_eyeTracking
+%
+% Demonstrate the entire eyetracking analysis pipeline.
 % 
-% A sandbox folder named 'eyeTrackingDEMO' will be created on the user's desktop to replicate
-% the dropbox environment of the real routine. All data downloaded and
-% produced by the routine will live in the sandbox folder, that will grow
-% to take 7-8 GB on the hard disk.
+% A local sandbox folder named 'eyeTrackingDEMO' will be created on the 
+% desktop to replicate the dropbox environment of the real routine. Files
+% will be downloaded from figshare and placed in the sandbox (about 7 GB).
 % 
 % Make sure your machine is configured to work with ToolboxToolbox.
-% The function will download an example eye raw video from fig share. Make
-% sure you have an active internet connection.
 % 
-% For a quicker demo, the user has the option to set how many frames of the
-% video they wish to process. As default, the routine will process the
-% whole video.
+% Run-time on an average computer is about XX minutes. For a quicker demo,
+% reduce the hardcoded nFrames to (e.g.) 1000.
 % 
 % Usage examples
 % ==============
@@ -20,16 +17,22 @@
 % DEMO_eyeTracking
 % 
 
-%% ToolboxToolbox configuration
-tbConfigResult=tbUseProject('eyeTOMEAnalysis','reset','full');
-tbSnapshot=tbDeploymentSnapshot(tbConfigResult);
+%% hard code number of frames (make Inf to do all)
+nFrames = 1000;
+verbosity = 'full'; % Set to none to make the demo silent
+
+%% TbTb configuration
+% We will suppress the verbose output, but detect if there are deploy
+% errors and if so stop execution
+tbConfigResult=tbUseProject('eyeTOMEAnalysis','reset','full','verbose',false);
+if sum(cellfun(@sum,extractfield(tbConfigResult, 'isOk')))~=length(tbConfigResult)
+    error('There was a tb deploy error. Check the contents of tbConfigResult');
+end
+tbSnapshot=tbDeploymentSnapshot(tbConfigResult,'verbose',false);
 clear tbConfigResult
 
-%%  Hard code number of frames (make Inf to do all)
-numberOfFrames = Inf;
 
 %% set paths and make directories
-
 % create test sandbox on desktop
 sandboxDir = '~/Desktop/eyeTrackingDEMO';
 if ~exist(sandboxDir,'dir')
@@ -41,65 +44,43 @@ pathParams.projectFolder = 'TOME_data';
 pathParams.outputDir = 'TOME_processing';
 pathParams.projectSubfolder = 'session2_spatialStimuli';
 pathParams.eyeTrackingDir = 'EyeTracking';
-
 pathParams.subjectName = 'TOME_3020';
 pathParams.sessionDate = '050517';
 pathParams.runName = 'tfMRI_FLASH_AP_run01';
 
 % create mock TOME folders in sandbox
 dataDir = fullfile(sandboxDir,pathParams.projectFolder, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir);
+        pathParams.subjectName,pathParams.sessionDate, pathParams.eyeTrackingDir);
 if ~exist(dataDir,'dir')
     mkdir(dataDir)
 end
-
 processingDir = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir);
+        pathParams.subjectName,pathParams.sessionDate, pathParams.eyeTrackingDir);
 if ~exist(processingDir,'dir')
     mkdir(processingDir)
 end
 
-%% download the test run from figshare
+% download the test run from figshare
 rawVideoName = fullfile(dataDir,[pathParams.runName '_raw.mov']);
-
 if ~exist (rawVideoName,'file')
     url = 'https://ndownloader.figshare.com/files/8711089?private_link=8279728e507d375541c7';
     system (['curl -L ' sprintf(url) ' > ' sprintf(rawVideoName)])
 end
 
-%% NOTE: RUN PARAMS vs CONTROL PARAMS
 
-% As we move to a more modular code structure, the overuse of a single
-% params struct to control every aspect of the analysis might lead to
-% errors and confusion, as even the simplest function would receive a
-% massive struct as input variable.
-
-% I suggest we keep using the "params strategy" for metadata-kind of
-% information (or RUN PARAMS), such as: subject name, session, runName... 
-
-% All tracking parameters (or CONTROL PARAMS) will be fed through an input
-% parser into the tracking functions in form of "options" instead. This
-% will allow for easier control of each option (manually or via a control
-% file), easier default values settings, and it is very much in style with
-% matlab's native functions input managment.
-
-
-%% STEP 1: convert raw eye video to 60Hz gray
-
+%% Convert raw video to cropped, resized, 60Hz gray
 grayVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_gray.avi']);
-
-raw2gray(rawVideoName,grayVideoName,'numberOfFrames',numberOfFrames)
-
-
-%% STEP 2: track the glint
+raw2gray(rawVideoName,grayVideoName,'nFrames',nFrames, 'verbosity', verbosity)
 
 
+%% track the glint
 glintFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_glint.mat']);
-trackGlint(grayVideoName, glintFileName);
+trackGlint(grayVideoName, glintFileName, 'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
+
 
 
 
@@ -112,29 +93,13 @@ perimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projec
 % the user needs to set these values!
 pupilCircleThresh = 0.06; 
 pupilEllipseThresh = 0.945;
+perimeterParams = extractPupilPerimeter(grayI, perimeterVideoName, ...
+    'pupilCircleThresh', pupilCircleThresh, ...
+    'pupilEllipseThresh', pupilEllipseThresh, ...
+    'verbosity', verbosity);
 
 extractPupilPerimeter(grayI, perimeterVideoName,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
 
-
-%% COMMENTS SO FAR
-% 
-%  up to this point the routine produces the following output files,
-%  necessary for the subsequent steps:
-%  1. pupil perimeter video
-%  2. glint tracking file (X,Y position frame by frame)
-% 
-% 
-%  The routine also outputs these structs (currently not saved): 
-%  1. glintTrackingParams 
-%  2. perimeterParams 
-%  They include ALL input necessary
-%  to replicate the analysis exactly how it was performed the first time
-%  around (including the grayI frameseries that originated from prepareVideo).
-%  This means that parsing the structs as inputs for the function
-%  trackGlint and extractPupilPerimeter respectively will exactly
-%  replicate their outputs.
-%  The advantage compared to the "params" strategy is again the modularity:
-%  only necessary and unambiguous inputs are fed to each step.
 
 
 
@@ -205,7 +170,7 @@ finalFitVideoOutFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.
 [ellipseFitData] = bayesFitPupilPerimeter(correctedPerimeterVideoName, ...
     'verbosity','full', 'tbSnapshot',tbSnapshot, ...
     'ellipseFitDataFileName',ellipseFitDataFileName,'useParallel',true,...
-    'forceNumFrames',50,'developmentMode',true);
+    'nFrames',50,'developmentMode',true);
 
 figure
 plot(ellipseFitData.pInitialFitTransparent(:,3),'-.k');
