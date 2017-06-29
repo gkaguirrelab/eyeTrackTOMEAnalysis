@@ -21,12 +21,20 @@
 % 
 
 %% ToolboxToolbox configuration
-tbConfigResult=tbUseProject('eyeTOMEAnalysis','reset','full');
-tbSnapshot=tbDeploymentSnapshot(tbConfigResult);
+tbConfigResult=tbUseProject('eyeTOMEAnalysis','reset','full','verbose',false);
+
+% Detect if any element of the toolbox deploy did not return "OK", and if
+% so dump the tbSnapshot to the screen
+if sum(cellfun(@sum,extractfield(tbConfigResult, 'isOk')))==length(tbConfigResult)
+    tbSnapshot=tbDeploymentSnapshot(tbConfigResult,'verbose',false);
+else
+    tbSnapshot=tbDeploymentSnapshot(tbConfigResult,'verbose',true)
+    fprintf('\n');
+end
 clear tbConfigResult
 
 %%  Hard code number of frames (make Inf to do all)
-numberOfFrames = Inf;
+nFrames = Inf;
 
 %% set paths and make directories
 
@@ -90,7 +98,7 @@ grayVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubf
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_gray.avi']);
 tic
-raw2gray(rawVideoName,grayVideoName,'numberOfFrames',numberOfFrames)
+raw2gray(rawVideoName,grayVideoName,'nFrames',nFrames, 'verbosity', 'full')
 toc
 
 
@@ -206,7 +214,7 @@ finalFitVideoOutFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.
 [ellipseFitData] = bayesFitPupilPerimeter(correctedPerimeterVideoName, ...
     'verbosity','full', 'tbSnapshot',tbSnapshot, ...
     'ellipseFitDataFileName',ellipseFitDataFileName,'useParallel',true,...
-    'forceNumFrames',50,'developmentMode',true);
+    'nFrames',50,'developmentMode',true);
 
 figure
 plot(ellipseFitData.pInitialFitTransparent(:,3),'-.k');
