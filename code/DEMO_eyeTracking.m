@@ -82,18 +82,24 @@ glintFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubf
 trackGlint(grayVideoName, glintFileName, 'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
 
 
-%% make pupil perimeter video
-disp('Making pupil perimeter video...')
+
+
+%% STEP 3: make pupil perimeter video
 
 perimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_perimeter.avi']);
+
+% the user needs to set these values!
 pupilCircleThresh = 0.06; 
 pupilEllipseThresh = 0.945;
 perimeterParams = extractPupilPerimeter(grayI, perimeterVideoName, ...
     'pupilCircleThresh', pupilCircleThresh, ...
     'pupilEllipseThresh', pupilEllipseThresh, ...
     'verbosity', verbosity);
+
+extractPupilPerimeter(grayI, perimeterVideoName,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
+
 
 
 
