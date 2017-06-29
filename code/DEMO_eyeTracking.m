@@ -1,4 +1,3 @@
-function DEMO_eyeTracking (varargin)
 
 % this is a demo of the whole eyetracking analysis pipeline.
 % 
@@ -20,20 +19,13 @@ function DEMO_eyeTracking (varargin)
 % 
 % DEMO_eyeTracking
 % 
-% DEMO_eyeTracking('numberOfFrames', 500)
-% 
-%% Parse the input
-p = inputParser;
 
-% optional inputs
-defaultNumFrames = inf;
-p.addParameter('numberOfFrames', defaultNumFrames, @isnumeric);
+tbConfigResult=tbUseProject('eyeTOMEAnalysis','reset','full');
+tbSnapshot=tbDeploymentSnapshot(tbConfigResult);
+clear tbConfigResult
 
-%parse
-p.parse(varargin{:})
-
-% define variables
-numberOfFrames = p.Results.numberOfFrames;
+% Hard code number of frames (make Inf to do all)
+numberOfFrames = Inf;
 
 %% set paths and make directories
 
@@ -221,9 +213,9 @@ finalFitVideoOutFileName = fullfile(sandboxDir,params.outputDir, params.projectS
         [params.runName '_fitFitPupilPerimeter.avi']);
 
 [ellipseFitData] = bayesFitPupilPerimeter(correctedPerimeterVideoName, ...
-    'verbosity','full', ...
+    'verbosity','full', 'tbSnapshot',tbSnapshot, ...
     'ellipseFitDataFileName',ellipseFitDataFileName,'useParallel',true,...
-    'forceNumFrames',[],'developmentMode',true);
+    'forceNumFrames',50,'developmentMode',true);
 
 figure
 plot(ellipseFitData.pInitialFitTransparent(:,3),'-.k');
@@ -240,5 +232,3 @@ plot(ellipseFitData.pPosteriorMeanTransparent(:,1),'-r','LineWidth',2)
 plot(ellipseFitData.pPosteriorMeanTransparent(:,1)-ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
 plot(ellipseFitData.pPosteriorMeanTransparent(:,1)+ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
 hold off
-
-foo=foo;
