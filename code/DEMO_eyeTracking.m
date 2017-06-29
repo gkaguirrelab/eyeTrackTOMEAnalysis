@@ -89,33 +89,32 @@ end
 grayVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_gray.avi']);
-tic
+
 raw2gray(rawVideoName,grayVideoName,'numberOfFrames',numberOfFrames)
-toc
 
 
-%% track the glint
-disp('Tracking glint...')
+%% STEP 2: track the glint
 
-tic
+
 glintFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_glint.mat']);
-[glint, glintTrackingParams] = trackGlint(grayI, glintFileName);
-toc
+trackGlint(grayVideoName, glintFileName);
 
 
-%% make pupil perimeter video
-disp('Making pupil perimeter video...')
 
-tic
+%% STEP 3: make pupil perimeter video
+
 perimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_perimeter.avi']);
+
+% the user needs to set these values!
 pupilCircleThresh = 0.06; 
 pupilEllipseThresh = 0.945;
-perimeterParams = extractPupilPerimeter(grayI, perimeterVideoName,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
-toc
+
+extractPupilPerimeter(grayI, perimeterVideoName,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
+
 
 %% COMMENTS SO FAR
 % 
