@@ -23,16 +23,71 @@
 % glintTrackingWrapper(dropboxDir,params)
 
 
-%% TOME_3001 session1
+%% TOME_3015 session1
 
-dropboxDir = '';
+dropboxDir = '/Users/saguna/Dropbox (Aguirre-Brainard Lab)';
 params.outputDir = 'TOME_processing';
 params.projectFolder = 'TOME_processing';
 
-params.projectSubfolder = 'session2_spatialStimuli';
-params.subjectName = 'TOME_30XX';
-params.sessionDate = 'mmddyy';
+params.projectSubfolder = 'session1_restAndStructure';
+params.subjectName = 'TOME_3015';
+params.sessionDate = '030117';
 
 params.eyeTrackingDir = 'EyeTracking';
 
 glintTrackingWrapper(dropboxDir,params)
+
+%% TOME_3016
+
+dropboxDir = '/Users/saguna/Dropbox (Aguirre-Brainard Lab)';
+params.outputDir = 'TOME_processing';
+params.projectFolder = 'TOME_processing';
+
+params.projectSubfolder = 'session1_restAndStructure';
+params.subjectName = 'TOME_3016';
+params.sessionDate = '031017';
+
+params.eyeTrackingDir = 'EyeTracking';
+
+glintTrackingWrapper(dropboxDir,params)
+
+%% TOME_3017
+
+dropboxDir = '/Users/saguna/Dropbox (Aguirre-Brainard Lab)';
+params.outputDir = 'TOME_processing';
+params.projectFolder = 'TOME_processing';
+
+params.projectSubfolder = 'session1_restAndStructure';
+params.subjectName = 'TOME_3017';
+params.sessionDate = '032917';
+
+params.eyeTrackingDir = 'EyeTracking';
+
+glintTrackingWrapper(dropboxDir,params)
+
+
+%% TOME_3018
+
+dropboxDir = '/Users/saguna/Dropbox (Aguirre-Brainard Lab)';
+params.outputDir = 'TOME_processing';
+params.projectFolder = 'TOME_processing';
+
+params.projectSubfolder = 'session1_restAndStructure';
+params.subjectName = 'TOME_3016';
+params.sessionDate = '031017';
+
+params.eyeTrackingDir = 'EyeTracking';
+
+glintTrackingWrapper(dropboxDir,params)
+
+
+
+
+
+
+
+
+
+
+
+
