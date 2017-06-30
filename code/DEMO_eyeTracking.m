@@ -126,9 +126,6 @@ tic
 blinkFrames = findBlinks(glintFileName);
 toc
 
-% show them on the tracked video (this function is for display only)
-showBlinks(blinkFrames,grayI)
-
 % note: blinkFrames is an array containing the index of the frames marked as
 % blinks.
 %% guess pupil cuts
