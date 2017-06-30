@@ -1,42 +1,38 @@
-function DEMO_eyeTracking (varargin)
-
-% this is a demo of the whole eyetracking analysis pipeline.
+% DEMO_eyeTracking
+%
+% Demonstrate the entire eyetracking analysis pipeline.
 % 
-% A sandbox folder named 'eyeTrackingDEMO' will be created on the user's desktop to replicate
-% the dropbox environment of the real routine. All data downloaded and
-% produced by the routine will live in the sandbox folder, that will grow
-% to take 7-8 GB on the hard disk.
+% A local sandbox folder named 'eyeTrackingDEMO' will be created on the 
+% desktop to replicate the dropbox environment of the real routine. Files
+% will be downloaded from figshare and placed in the sandbox (about 7 GB).
 % 
 % Make sure your machine is configured to work with ToolboxToolbox.
-% The function will download an example eye raw video from fig share. Make
-% sure you have an active internet connection.
 % 
-% For a quicker demo, the user has the option to set how many frames of the
-% video they wish to process. As default, the routine will process the
-% whole video.
+% Run-time on an average computer is about XX minutes. For a quicker demo,
+% reduce the hardcoded nFrames to (e.g.) 1000.
 % 
 % Usage examples
 % ==============
 % 
 % DEMO_eyeTracking
 % 
-% DEMO_eyeTracking('numberOfFrames', 500)
-% 
-%% Parse the input
-p = inputParser;
 
-% optional inputs
-defaultNumFrames = inf;
-p.addParameter('numberOfFrames', defaultNumFrames, @isnumeric);
+%% hard code number of frames (make Inf to do all)
+nFrames = 1000;
+verbosity = 'full'; % Set to none to make the demo silent
 
-%parse
-p.parse(varargin{:})
+%% TbTb configuration
+% We will suppress the verbose output, but detect if there are deploy
+% errors and if so stop execution
+tbConfigResult=tbUseProject('eyeTOMEAnalysis','reset','full','verbose',false);
+if sum(cellfun(@sum,extractfield(tbConfigResult, 'isOk')))~=length(tbConfigResult)
+    error('There was a tb deploy error. Check the contents of tbConfigResult');
+end
+tbSnapshot=tbDeploymentSnapshot(tbConfigResult,'verbose',false);
+clear tbConfigResult
 
-% define variables
-numberOfFrames = p.Results.numberOfFrames;
 
 %% set paths and make directories
-
 % create test sandbox on desktop
 sandboxDir = '~/Desktop/eyeTrackingDEMO';
 if ~exist(sandboxDir,'dir')
@@ -44,116 +40,66 @@ if ~exist(sandboxDir,'dir')
 end
 
 % add standard dropbox params
-params.projectFolder = 'TOME_data';
-params.outputDir = 'TOME_processing';
-params.projectSubfolder = 'session2_spatialStimuli';
-params.eyeTrackingDir = 'EyeTracking';
-
-params.subjectName = 'TOME_3020';
-params.sessionDate = '050517';
-params.runName = 'tfMRI_FLASH_AP_run01';
+pathParams.projectFolder = 'TOME_data';
+pathParams.outputDir = 'TOME_processing';
+pathParams.projectSubfolder = 'session2_spatialStimuli';
+pathParams.eyeTrackingDir = 'EyeTracking';
+pathParams.subjectName = 'TOME_3020';
+pathParams.sessionDate = '050517';
+pathParams.runName = 'tfMRI_FLASH_AP_run01';
 
 % create mock TOME folders in sandbox
-dataDir = fullfile(sandboxDir,params.projectFolder, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir);
+dataDir = fullfile(sandboxDir,pathParams.projectFolder, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate, pathParams.eyeTrackingDir);
 if ~exist(dataDir,'dir')
     mkdir(dataDir)
 end
-
-processingDir = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir);
+processingDir = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate, pathParams.eyeTrackingDir);
 if ~exist(processingDir,'dir')
     mkdir(processingDir)
 end
 
-%% download the test run from figshare
-outfileName = fullfile(dataDir,[params.runName '_raw.mov']);
-
-if ~exist (outfileName,'file')
+% download the test run from figshare
+rawVideoName = fullfile(dataDir,[pathParams.runName '_raw.mov']);
+if ~exist (rawVideoName,'file')
     url = 'https://ndownloader.figshare.com/files/8711089?private_link=8279728e507d375541c7';
-    system (['curl -L ' sprintf(url) ' > ' sprintf(outfileName)])
+    system (['curl -L ' sprintf(url) ' > ' sprintf(rawVideoName)])
 end
 
-%% NOTE: RUN PARAMS vs CONTROL PARAMS
 
-% As we move to a more modular code structure, the overuse of a single
-% params struct to control every aspect of the analysis might lead to
-% errors and confusion, as even the simplest function would receive a
-% massive struct as input variable.
-
-% I suggest we keep using the "params strategy" for metadata-kind of
-% information (or RUN PARAMS), such as: subject name, session, runName... 
-
-% All tracking parameters (or CONTROL PARAMS) will be fed through an input
-% parser into the tracking functions in form of "options" instead. This
-% will allow for easier control of each option (manually or via a control
-% file), easier default values settings, and it is very much in style with
-% matlab's native functions input managment.
-
-
-%% DEINTERLACE VIDEO
-% note that this is the default output format for deinterlaced videos.
-inputVideo = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_60hz.avi']);
-    
-if ~exist (inputVideo,'file') 
-    deinterlaceVideo (params, sandboxDir, 'Mean')
-end
-
-%% prepare the video
-disp('Preparing video...')
-
-tic
-[grayI] = prepareVideo(inputVideo, 'numberOfFrames',numberOfFrames); %just tracking a small portion for testing
-toc
-
-% note: to test on the full video change 1000 to Inf. It won't be possible
-% to change the number of frames analyzed in later steps.
+%% Convert raw video to cropped, resized, 60Hz gray
+grayVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_gray.avi']);
+raw2gray(rawVideoName,grayVideoName,'nFrames',nFrames, 'verbosity', verbosity)
 
 
 %% track the glint
-disp('Tracking glint...')
-
-tic
-glintFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_glint.mat']);
-[glint, glintTrackingParams] = trackGlint(grayI, glintFileName);
-toc
+glintFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_glint.mat']);
+trackGlint(grayVideoName, glintFileName, 'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
 
 
-%% make pupil perimeter video
-disp('Making pupil perimeter video...')
 
-tic
-perimeterVideoName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_perimeter.avi']);
+
+%% STEP 3: make pupil perimeter video
+
+perimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_perimeter.avi']);
+
+% the user needs to set these values!
 pupilCircleThresh = 0.06; 
-pupilEllipseThresh = 0.96;
-perimeterParams = extractPupilPerimeter(grayI, perimeterVideoName,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
-toc
+pupilEllipseThresh = 0.945;
+perimeterParams = extractPupilPerimeter(grayI, perimeterVideoName, ...
+    'pupilCircleThresh', pupilCircleThresh, ...
+    'pupilEllipseThresh', pupilEllipseThresh, ...
+    'verbosity', verbosity);
 
-%% COMMENTS SO FAR
-% 
-%  up to this point the routine produces the following output files,
-%  necessary for the subsequent steps:
-%  1. pupil perimeter video
-%  2. glint tracking file (X,Y position frame by frame)
-% 
-% 
-%  The routine also outputs these structs (currently not saved): 
-%  1. glintTrackingParams 
-%  2. perimeterParams 
-%  They include ALL input necessary
-%  to replicate the analysis exactly how it was performed the first time
-%  around (including the grayI frameseries that originated from prepareVideo).
-%  This means that parsing the structs as inputs for the function
-%  trackGlint and extractPupilPerimeter respectively will exactly
-%  replicate their outputs.
-%  The advantage compared to the "params" strategy is again the modularity:
-%  only necessary and unambiguous inputs are fed to each step.
+extractPupilPerimeter(grayI, perimeterVideoName,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
+
 
 
 
@@ -193,9 +139,9 @@ framesToCut = guessPupilCuts(perimeterVideoName,glintFileName,blinkFrames);
 toc
 
 %% make control file
-controlFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_controlFile.csv']);
+controlFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_controlFile.csv']);
 
 makePreliminaryControlFile(controlFileName, framesToCut, blinkFrames )
 
@@ -205,24 +151,39 @@ makePreliminaryControlFile(controlFileName, framesToCut, blinkFrames )
 % for testing purposes we just use the preliminary control file to correct
 % the perimeter video.
 
-correctedPerimeterVideoName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_correctedPupilPerimeter.avi']);
+correctedPerimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_correctedPupilPerimeter.avi']);
+tic
 correctPupilPerimeterVideo(perimeterVideoName,controlFileName,glintFileName, correctedPerimeterVideoName)
-
+toc
 
 %% bayesian fit of the pupil on the corrected perimeter video
-ellipseFitDataFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_pupil.mat']);
+ellipseFitDataFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_pupil.mat']);
 
-finalFitVideoOutFileName = fullfile(sandboxDir,params.outputDir, params.projectSubfolder, ...
-        params.subjectName,params.sessionDate,params.eyeTrackingDir, ...
-        [params.runName '_fitFitPupilPerimeter.avi']);
+finalFitVideoOutFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
+        [pathParams.runName '_fitFitPupilPerimeter.avi']);
 
 [ellipseFitData] = bayesFitPupilPerimeter(correctedPerimeterVideoName, ...
-    'verbosity','full','display','none', ...
+    'verbosity','full', 'tbSnapshot',tbSnapshot, ...
     'ellipseFitDataFileName',ellipseFitDataFileName,'useParallel',true,...
-    'finalFitVideoOutFileName',finalFitVideoOutFileName, 'forceNumFrames',2000);
+    'nFrames',50,'developmentMode',true);
 
-foo=foo;
+figure
+plot(ellipseFitData.pInitialFitTransparent(:,3),'-.k');
+hold on
+plot(ellipseFitData.pPosteriorMeanTransparent(:,3),'-r','LineWidth',2)
+plot(ellipseFitData.pPosteriorMeanTransparent(:,3)-ellipseFitData.pPosteriorSDTransparent(:,3),'-b')
+plot(ellipseFitData.pPosteriorMeanTransparent(:,3)+ellipseFitData.pPosteriorSDTransparent(:,3),'-b')
+hold off
+
+figure
+plot(ellipseFitData.pInitialFitTransparent(:,1),'-.k');
+hold on
+plot(ellipseFitData.pPosteriorMeanTransparent(:,1),'-r','LineWidth',2)
+plot(ellipseFitData.pPosteriorMeanTransparent(:,1)-ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
+plot(ellipseFitData.pPosteriorMeanTransparent(:,1)+ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
+hold off
