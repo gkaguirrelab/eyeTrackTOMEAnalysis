@@ -17,9 +17,12 @@
 % DEMO_eyeTracking
 % 
 
-%% hard code number of frames (make Inf to do all)
-nFrames = 1000;
+%% hard codeded parameters 
+nFrames = 1000; % number of frames to process (set to Inf to do all)
+pupilCircleThresh = 0.06; % these parameters determine how the gray video
+pupilEllipseThresh = 0.945; % is thresholded to best find the pupil
 verbosity = 'full'; % Set to none to make the demo silent
+
 
 %% TbTb configuration
 % We will suppress the verbose output, but detect if there are deploy
@@ -68,37 +71,29 @@ if ~exist (rawVideoName,'file')
 end
 
 
-%% Convert raw video to cropped, resized, 60Hz gray
+%% process the video
+
+% Convert raw video to cropped, resized, 60Hz gray
 grayVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_gray.avi']);
 raw2gray(rawVideoName,grayVideoName,'nFrames',nFrames, 'verbosity', verbosity)
 
-
-%% track the glint
+% track the glint
 glintFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_glint.mat']);
 trackGlint(grayVideoName, glintFileName, 'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
 
-
-
-
-%% STEP 3: make pupil perimeter video
-
+% extract pupil perimeter
 perimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_perimeter.avi']);
-
-% the user needs to set these values!
-pupilCircleThresh = 0.06; 
-pupilEllipseThresh = 0.945;
-perimeterParams = extractPupilPerimeter(grayI, perimeterVideoName, ...
+extractPupilPerimeter(grayVideoName, perimeterVideoName, ...
     'pupilCircleThresh', pupilCircleThresh, ...
     'pupilEllipseThresh', pupilEllipseThresh, ...
-    'verbosity', verbosity);
+    'verbosity', verbosity, 'tbSnapshot',tbSnapshot,'showTracking',false);
 
-extractPupilPerimeter(grayI, perimeterVideoName,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
 
 
 
