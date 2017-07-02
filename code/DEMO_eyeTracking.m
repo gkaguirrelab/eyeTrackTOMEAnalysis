@@ -71,99 +71,55 @@ if ~exist (rawVideoName,'file')
 end
 
 
-%% process the video
+%% Perform the analysis
 
 % Convert raw video to cropped, resized, 60Hz gray
 grayVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_gray.avi']);
-raw2gray(rawVideoName,grayVideoName,'nFrames',nFrames, 'verbosity', verbosity)
+raw2gray(rawVideoName,grayVideoName,'nFrames',nFrames,...
+    'verbosity', verbosity)
 
 % track the glint
 glintFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_glint.mat']);
-trackGlint(grayVideoName, glintFileName, 'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
+trackGlint(grayVideoName, glintFileName, ...
+    'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
 
 % extract pupil perimeter
-perimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+perimeterFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
-        [pathParams.runName '_perimeter.avi']);
-extractPupilPerimeter(grayVideoName, perimeterVideoName, ...
+        [pathParams.runName '_perimeter.mat']);
+extractPupilPerimeter(grayVideoName, perimeterFileName, ...
     'pupilCircleThresh', pupilCircleThresh, ...
     'pupilEllipseThresh', pupilEllipseThresh, ...
-    'verbosity', verbosity, 'tbSnapshot',tbSnapshot,'showTracking',false);
+    'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
 
-
-
-
-
-%% GENERATE PRELIMINARY CONTROL FILE SECTION BEGINS HERE
-% The control file is a set of formatted instruction to edit on the pupil
-% perimeter video and help the fitting routine with cleaner data. 
-% 
-% The following part of the code produces the computer-generated control
-% file for pupil fitting. This preliminary control file will be later
-% reviewed by an operator, who will make the necessary corrections using a
-% GUI.
-% 
-% In principle, the preliminary control file itself could be used to
-% prepare the perimeter video for fitting, but the fitting results would be
-% less accurate. Therefore, in the final release of the code, we will skip
-% the steps concerning the creation of the preliminary control file and use
-% the more accurate control files generated during data analysis.
-
-%% blink detection
-disp('Finding blinks')
-
-tic
-% find the blinks
-blinkFrames = findBlinks(glintFileName);
-toc
-
-% note: blinkFrames is an array containing the index of the frames marked as
-% blinks.
-%% guess pupil cuts
-disp('Computing pupil cuts')
-
-tic
-framesToCut = guessPupilCuts(perimeterVideoName,glintFileName,blinkFrames);
-toc
-
-%% make control file
+% generate preliminary control file
 controlFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_controlFile.csv']);
+makePreliminaryControlFile(controlFileName, perimeterFileName, glintFileName, ...
+    'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
 
-makePreliminaryControlFile(controlFileName, framesToCut, blinkFrames )
-
-%% GENERATE PRELIMINARY CONTROL FILE SECTION ENDS HERE
-
-%% make corrected perimeter video
-% for testing purposes we just use the preliminary control file to correct
-% the perimeter video.
-
-correctedPerimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
+% correct the perimeter video
+correctedPerimeterFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
-        [pathParams.runName '_correctedPupilPerimeter.avi']);
-tic
-correctPupilPerimeterVideo(perimeterVideoName,controlFileName,glintFileName, correctedPerimeterVideoName)
-toc
+        [pathParams.runName '_correctedPerimeter.mat']);
+correctPupilPerimeter(perimeterFileName,controlFileName,correctedPerimeterFileName, ...
+    'verbosity', verbosity, 'tbSnapshot', tbSnapshot)
 
-%% bayesian fit of the pupil on the corrected perimeter video
+% bayesian fit of the pupil on the corrected perimeter video
 ellipseFitDataFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
         pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
         [pathParams.runName '_pupil.mat']);
+bayesFitPupilPerimeter(correctedPerimeterFileName, ellipseFitDataFileName, ...
+    'useParallel',true, ...
+    'verbosity', verbosity, 'tbSnapshot', tbSnapshot);
 
-finalFitVideoOutFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
-        [pathParams.runName '_fitFitPupilPerimeter.avi']);
 
-[ellipseFitData] = bayesFitPupilPerimeter(correctedPerimeterVideoName, ...
-    'verbosity','full', 'tbSnapshot',tbSnapshot, ...
-    'ellipseFitDataFileName',ellipseFitDataFileName,'useParallel',true,...
-    'nFrames',50,'developmentMode',true);
-
+%% Plot some fits
 figure
 plot(ellipseFitData.pInitialFitTransparent(:,3),'-.k');
 hold on
