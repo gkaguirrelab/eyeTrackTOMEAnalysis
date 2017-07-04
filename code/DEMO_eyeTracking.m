@@ -17,14 +17,17 @@
 % DEMO_eyeTracking
 % 
 
-%% hard code number of frames (make Inf to do all)
-nFrames = 1000;
+%% hard codeded parameters 
+nFrames = Inf; % number of frames to process (set to Inf to do all)
+pupilCircleThresh = 0.06; % these parameters determine how the gray video
+pupilEllipseThresh = 0.945; % is thresholded to best find the pupil
 verbosity = 'full'; % Set to none to make the demo silent
+projectName = 'eyeTOMEAnalysis';
 
 %% TbTb configuration
 % We will suppress the verbose output, but detect if there are deploy
 % errors and if so stop execution
-tbConfigResult=tbUseProject('eyeTOMEAnalysis','reset','full','verbose',false);
+tbConfigResult=tbUseProject(projectName,'reset','full','verbose',false);
 if sum(cellfun(@sum,extractfield(tbConfigResult, 'isOk')))~=length(tbConfigResult)
     error('There was a tb deploy error. Check the contents of tbConfigResult');
 end
@@ -39,9 +42,14 @@ if ~exist(sandboxDir,'dir')
     mkdir(sandboxDir)
 end
 
+% identify the base for the project code directory
+codeBaseDir = tbLocateProject(projectName,'verbose',false);
+codeBaseDir = fullfile(codeBaseDir,'controlFiles');
+
 % add standard dropbox params
 pathParams.projectFolder = 'TOME_data';
 pathParams.outputDir = 'TOME_processing';
+pathParams.codeDir = 'TOME';
 pathParams.projectSubfolder = 'session2_spatialStimuli';
 pathParams.eyeTrackingDir = 'EyeTracking';
 pathParams.subjectName = 'TOME_3020';
@@ -60,6 +68,13 @@ if ~exist(processingDir,'dir')
     mkdir(processingDir)
 end
 
+% create a directory in the project code directory for control files
+controlFileDir = fullfile(codeBaseDir,pathParams.codeDir, pathParams.projectSubfolder, ...
+        pathParams.subjectName,pathParams.sessionDate, pathParams.eyeTrackingDir);
+if ~exist(controlFileDir,'dir')
+    mkdir(controlFileDir)
+end
+
 % download the test run from figshare
 rawVideoName = fullfile(dataDir,[pathParams.runName '_raw.mov']);
 if ~exist (rawVideoName,'file')
@@ -68,106 +83,52 @@ if ~exist (rawVideoName,'file')
 end
 
 
-%% Convert raw video to cropped, resized, 60Hz gray
-grayVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
-        [pathParams.runName '_gray.avi']);
-raw2gray(rawVideoName,grayVideoName,'nFrames',nFrames, 'verbosity', verbosity)
+%% Perform the analysis
 
+% Convert raw video to cropped, resized, 60Hz gray
+grayVideoName = fullfile(processingDir, [pathParams.runName '_gray.avi']);
+raw2gray(rawVideoName,grayVideoName,'nFrames',nFrames,...
+    'verbosity', verbosity)
 
-%% track the glint
-glintFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
-        [pathParams.runName '_glint.mat']);
-trackGlint(grayVideoName, glintFileName, 'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
+% track the glint
+glintFileName = fullfile(processingDir, [pathParams.runName '_glint.mat']);
+trackGlint(grayVideoName, glintFileName, ...
+    'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
 
-
-
-
-%% STEP 3: make pupil perimeter video
-
-perimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
-        [pathParams.runName '_perimeter.avi']);
-
-% the user needs to set these values!
-pupilCircleThresh = 0.06; 
-pupilEllipseThresh = 0.945;
-perimeterParams = extractPupilPerimeter(grayI, perimeterVideoName, ...
+% extract pupil perimeter
+perimeterFileName = fullfile(processingDir, [pathParams.runName '_perimeter.mat']);
+extractPupilPerimeter(grayVideoName, perimeterFileName, ...
     'pupilCircleThresh', pupilCircleThresh, ...
     'pupilEllipseThresh', pupilEllipseThresh, ...
-    'verbosity', verbosity);
+    'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
 
-extractPupilPerimeter(grayI, perimeterVideoName,'pupilCircleThresh', pupilCircleThresh, 'pupilEllipseThresh', pupilEllipseThresh);
+% generate preliminary control file
+controlFileName = fullfile(controlFileDir, [pathParams.runName '_controlFile.csv']);
+makePreliminaryControlFile(controlFileName, perimeterFileName, glintFileName, ...
+    'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
+
+% correct the perimeter video
+correctedPerimeterFileName = fullfile(processingDir, [pathParams.runName '_correctedPerimeter.mat']);
+correctPupilPerimeter(perimeterFileName,controlFileName,correctedPerimeterFileName, ...
+    'verbosity', verbosity, 'tbSnapshot', tbSnapshot)
+
+% bayesian fit of the pupil on the corrected perimeter video
+ellipseFitFileName = fullfile(processingDir, [pathParams.runName '_pupil.mat']);
+bayesFitPupilPerimeter(correctedPerimeterFileName, ellipseFitFileName, ...
+    'useParallel',true, ...
+    'verbosity', verbosity, 'tbSnapshot', tbSnapshot);
+
+finalFitVideoName = fullfile(processingDir, [pathParams.runName '_finalFit.mat']);
+makePupilFitVideo(grayVideoName, finalFitVideoName, ...
+    'glintFileName', glintFileName, 'perimeterFileName', correctedPerimeterFileName,...
+    'ellipseFitFileName', ellipseFitFileName, 'whichFieldToPlot', 'pPosteriorMeanTransparent',...
+    'verbosity', verbosity, 'display', 'full')
 
 
-
-
-%% GENERATE PRELIMINARY CONTROL FILE SECTION BEGINS HERE
-% The control file is a set of formatted instruction to edit on the pupil
-% perimeter video and help the fitting routine with cleaner data. 
-% 
-% The following part of the code produces the computer-generated control
-% file for pupil fitting. This preliminary control file will be later
-% reviewed by an operator, who will make the necessary corrections using a
-% GUI.
-% 
-% In principle, the preliminary control file itself could be used to
-% prepare the perimeter video for fitting, but the fitting results would be
-% less accurate. Therefore, in the final release of the code, we will skip
-% the steps concerning the creation of the preliminary control file and use
-% the more accurate control files generated during data analysis.
-
-%% blink detection
-disp('Finding blinks')
-
-tic
-% find the blinks
-blinkFrames = findBlinks(glintFileName);
-toc
-
-% note: blinkFrames is an array containing the index of the frames marked as
-% blinks.
-%% guess pupil cuts
-disp('Computing pupil cuts')
-
-tic
-framesToCut = guessPupilCuts(perimeterVideoName,glintFileName,blinkFrames);
-toc
-
-%% make control file
-controlFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
-        [pathParams.runName '_controlFile.csv']);
-
-makePreliminaryControlFile(controlFileName, framesToCut, blinkFrames )
-
-%% GENERATE PRELIMINARY CONTROL FILE SECTION ENDS HERE
-
-%% make corrected perimeter video
-% for testing purposes we just use the preliminary control file to correct
-% the perimeter video.
-
-correctedPerimeterVideoName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
-        [pathParams.runName '_correctedPupilPerimeter.avi']);
-tic
-correctPupilPerimeterVideo(perimeterVideoName,controlFileName,glintFileName, correctedPerimeterVideoName)
-toc
-
-%% bayesian fit of the pupil on the corrected perimeter video
-ellipseFitDataFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
-        [pathParams.runName '_pupil.mat']);
-
-finalFitVideoOutFileName = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate,pathParams.eyeTrackingDir, ...
-        [pathParams.runName '_fitFitPupilPerimeter.avi']);
-
-[ellipseFitData] = bayesFitPupilPerimeter(correctedPerimeterVideoName, ...
-    'verbosity','full', 'tbSnapshot',tbSnapshot, ...
-    'ellipseFitDataFileName',ellipseFitDataFileName,'useParallel',true,...
-    'nFrames',50,'developmentMode',true);
+%% Plot some fits
+dataLoad = load(ellipseFitFileName);
+ellipseFitData = dataLoad.ellipseFitData;
+clear dataLoad
 
 figure
 plot(ellipseFitData.pInitialFitTransparent(:,3),'-.k');
