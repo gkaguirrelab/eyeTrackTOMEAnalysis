@@ -17,24 +17,6 @@
 % DEMO_eyeTracking
 % 
 
-%% hard codeded parameters 
-nFrames = Inf; % number of frames to process (set to Inf to do all)
-pupilCircleThresh = 0.06; % these parameters determine how the gray video
-pupilEllipseThresh = 0.945; % is thresholded to best find the pupil
-verbosity = 'full'; % Set to none to make the demo silent
-projectName = 'eyeTOMEAnalysis';
-
-%% TbTb configuration
-% We will suppress the verbose output, but detect if there are deploy
-% errors and if so stop execution
-tbConfigResult=tbUseProject(projectName,'reset','full','verbose',false);
-if sum(cellfun(@sum,extractfield(tbConfigResult, 'isOk')))~=length(tbConfigResult)
-    error('There was a tb deploy error. Check the contents of tbConfigResult');
-end
-tbSnapshot=tbDeploymentSnapshot(tbConfigResult,'verbose',false);
-clear tbConfigResult
-
-
 %% set paths and make directories
 % create test sandbox on desktop
 sandboxDir = '~/Desktop/eyeTrackingDEMO';
@@ -42,41 +24,52 @@ if ~exist(sandboxDir,'dir')
     mkdir(sandboxDir)
 end
 
-% identify the base for the project code directory
-codeBaseDir = tbLocateProject(projectName,'verbose',false);
-codeBaseDir = fullfile(codeBaseDir,'controlFiles');
+%% hard coded parameters 
+nFrames = 100; % number of frames to process (set to Inf to do all)
+verbosity = 'full'; % Set to none to make the demo silent
+TbTbProjectName = 'eyeTOMEAnalysis';
 
-% add standard dropbox params
-pathParams.projectFolder = 'TOME_data';
-pathParams.outputDir = 'TOME_processing';
-pathParams.codeDir = 'TOME';
+% define path parameters
+pathParams.dataSourceDirRoot = fullfile(sandboxDir,'TOME_data');
+pathParams.dataOutputDirRoot = fullfile(sandboxDir,'TOME_processing');
+pathParams.controlFileDirRoot = fullfile(sandboxDir,'controlFies');
 pathParams.projectSubfolder = 'session2_spatialStimuli';
 pathParams.eyeTrackingDir = 'EyeTracking';
-pathParams.subjectName = 'TOME_3020';
+pathParams.subjectID = 'TOME_3020';
 pathParams.sessionDate = '050517';
 pathParams.runName = 'tfMRI_FLASH_AP_run01';
 
-% create mock TOME folders in sandbox
-dataDir = fullfile(sandboxDir,pathParams.projectFolder, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate, pathParams.eyeTrackingDir);
-if ~exist(dataDir,'dir')
-    mkdir(dataDir)
-end
-processingDir = fullfile(sandboxDir,pathParams.outputDir, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate, pathParams.eyeTrackingDir);
-if ~exist(processingDir,'dir')
-    mkdir(processingDir)
-end
 
-% create a directory in the project code directory for control files
-controlFileDir = fullfile(codeBaseDir,pathParams.codeDir, pathParams.projectSubfolder, ...
-        pathParams.subjectName,pathParams.sessionDate, pathParams.eyeTrackingDir);
-if ~exist(controlFileDir,'dir')
-    mkdir(controlFileDir)
+%% TbTb configuration
+% We will suppress the verbose output, but detect if there are deploy
+% errors and if so stop execution
+tbConfigResult=tbUseProject(TbTbProjectName,'reset','full','verbose',false);
+if sum(cellfun(@sum,extractfield(tbConfigResult, 'isOk')))~=length(tbConfigResult)
+    error('There was a tb deploy error. Check the contents of tbConfigResult');
 end
+tbSnapshot=tbDeploymentSnapshot(tbConfigResult,'verbose',false);
+clear tbConfigResult
 
-% download the test run from figshare
-rawVideoName = fullfile(dataDir,[pathParams.runName '_raw.mov']);
+% identify the base for the project code directory
+%  This would normally be used as the location to save the controlFiles
+codeBaseDir = tbLocateProject(TbTbProjectName,'verbose',false);
+
+
+
+% define full paths for input and output
+pathParams.dataSourceDirFull = fullfile(pathParams.dataSourceDirRoot, pathParams.projectSubfolder, ...
+        pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
+pathParams.dataOutputDirFull = fullfile(pathParams.dataOutputDirRoot, pathParams.projectSubfolder, ...
+        pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
+pathParams.controlFileDirFull = fullfile(pathParams.controlFileDirRoot, pathParams.projectSubfolder, ...
+        pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
+
+% Since we are operating in a sandbox, create the data directory
+if ~exist(pathParams.dataSourceDirFull,'dir')
+    mkdir(pathParams.dataSourceDirFull)
+end
+% Download the data if it is not already there
+rawVideoName = fullfile(pathParams.dataSourceDirFull,[pathParams.runName '_raw.mov']);
 if ~exist (rawVideoName,'file')
     url = 'https://ndownloader.figshare.com/files/8711089?private_link=8279728e507d375541c7';
     system (['curl -L ' sprintf(url) ' > ' sprintf(rawVideoName)])
@@ -84,46 +77,8 @@ end
 
 
 %% Perform the analysis
-
-% Convert raw video to cropped, resized, 60Hz gray
-grayVideoName = fullfile(processingDir, [pathParams.runName '_gray.avi']);
-raw2gray(rawVideoName,grayVideoName,'nFrames',nFrames,...
-    'verbosity', verbosity)
-
-% track the glint
-glintFileName = fullfile(processingDir, [pathParams.runName '_glint.mat']);
-trackGlint(grayVideoName, glintFileName, ...
-    'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
-
-% extract pupil perimeter
-perimeterFileName = fullfile(processingDir, [pathParams.runName '_perimeter.mat']);
-extractPupilPerimeter(grayVideoName, perimeterFileName, ...
-    'pupilCircleThresh', pupilCircleThresh, ...
-    'pupilEllipseThresh', pupilEllipseThresh, ...
-    'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
-
-% generate preliminary control file
-controlFileName = fullfile(controlFileDir, [pathParams.runName '_controlFile.csv']);
-makePreliminaryControlFile(controlFileName, perimeterFileName, glintFileName, ...
-    'verbosity', verbosity, 'tbSnapshot',tbSnapshot);
-
-% correct the perimeter video
-correctedPerimeterFileName = fullfile(processingDir, [pathParams.runName '_correctedPerimeter.mat']);
-correctPupilPerimeter(perimeterFileName,controlFileName,correctedPerimeterFileName, ...
-    'verbosity', verbosity, 'tbSnapshot', tbSnapshot)
-
-% bayesian fit of the pupil on the corrected perimeter video
-ellipseFitFileName = fullfile(processingDir, [pathParams.runName '_pupil.mat']);
-bayesFitPupilPerimeter(correctedPerimeterFileName, ellipseFitFileName, ...
-    'useParallel',true, ...
-    'verbosity', verbosity, 'tbSnapshot', tbSnapshot);
-
-finalFitVideoName = fullfile(processingDir, [pathParams.runName '_finalFit.mat']);
-makePupilFitVideo(grayVideoName, finalFitVideoName, ...
-    'glintFileName', glintFileName, 'perimeterFileName', correctedPerimeterFileName,...
-    'ellipseFitFileName', ellipseFitFileName, 'whichFieldToPlot', 'pPosteriorMeanTransparent',...
-    'verbosity', verbosity, 'display', 'full')
-
+processVideoPipeline( pathParams, ...
+    'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true);
 
 %% Plot some fits
 dataLoad = load(ellipseFitFileName);
