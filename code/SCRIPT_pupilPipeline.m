@@ -5,16 +5,11 @@
 % This first step just creates the gray files and then stops
 pupilPipelineWrapper(pathParams, 'lastStage', 'raw2gray')
 
-% This step dumps the list of gray files to the console
-pupilPipelineWrapper(pathParams,'grayFileNameOnly',true)
+% Once you have a processing directory that has some gray files in it, copy
+% and paste the path params for the subject / session to the command
+% window, then issue this command:
 
-% Set the variable grayVideoName equal to the gray file you'd like to
-% examine:
-
-grayVideoName = 'copy_and_past_a_filename_here';
-
-% then issue this command:
-extractPupilPerimeter(grayVideoName, '', 'nFrames', 100, 'displayMode', true, 'pupilRange', [30 90], 'pupilCircleThresh', 0.06, 'gammaCorrection', 1)
+testExtractParams(pathParams, 'nFrames', 100, 'displayMode', true, 'pupilRange', [30 90], 'pupilCircleThresh', 0.06, 'gammaCorrection', 1)
 
 % Re-run the extractPupilPerimeter command with different parameter values
 % for pupilRange, pupilCircleThresh, and gammaCorrection until you find
@@ -30,7 +25,37 @@ pupilPipelineWrapper(pathParams, 'pupilRange', [20 90], 'pupilCircleThresh', 0.0
 %%
 %%   THE FINAL ANALYSIS PARAMETERS ARE BELOW HERE
 
-%% TOME_3021 session2
+%% STARTING SESSION 1 HERE
+
+% TOME_3001 session1
+dropboxDir = '/Users/saguna/Dropbox (Aguirre-Brainard Lab)';
+pathParams.dataSourceDirRoot = fullfile(dropboxDir,'TOME_data');
+pathParams.dataOutputDirRoot = fullfile(dropboxDir,'TOME_processing');
+pathParams.controlFileDirRoot = fullfile(dropboxDir,'TOME_processing');
+pathParams.projectSubfolder = 'session1_restAndStructure';
+pathParams.eyeTrackingDir = 'EyeTracking';
+pathParams.subjectID = 'TOME_3001';
+pathParams.sessionDate = '081916';
+
+pathParams.dataOutputDirRootpupilPipelineWrapper(pathParams, 'pupilRange', [20 90], 'pupilCircleThresh', 0.035, 'gammaCorrection', .50)
+
+
+%% STARTING SESSION 2 HERE
+
+% TOME_3020 session2
+dropboxDir = '/Users/saguna/Dropbox (Aguirre-Brainard Lab)';
+pathParams.dataSourceDirRoot = fullfile(dropboxDir,'TOME_data');
+pathParams.dataOutputDirRoot = fullfile(dropboxDir,'TOME_processing');
+pathParams.controlFileDirRoot = fullfile(dropboxDir,'TOME_processing');
+pathParams.projectSubfolder = 'session2_spatialStimuli';
+pathParams.eyeTrackingDir = 'EyeTracking';
+pathParams.subjectID = 'TOME_3020';
+pathParams.sessionDate = '050517';
+
+% still working on these params as of afternoon July 7.
+pupilPipelineWrapper(pathParams, 'pupilRange', [20 120], 'pupilCircleThresh', 0.04, 'gammaCorrection', 1.5)
+
+% TOME_3021 session2
 dropboxDir = '/Users/saguna/Dropbox (Aguirre-Brainard Lab)';
 pathParams.dataSourceDirRoot = fullfile(dropboxDir,'TOME_data');
 pathParams.dataOutputDirRoot = fullfile(dropboxDir,'TOME_processing');
@@ -42,8 +67,7 @@ pathParams.sessionDate = '060917';
 
 pupilPipelineWrapper(pathParams, 'pupilRange', [20 90], 'pupilCircleThresh', 0.04, 'gammaCorrection', 1.5)
 
-
-%% TOME_3022 session2
+% TOME_3022 session2
 dropboxDir = '/Users/saguna/Dropbox (Aguirre-Brainard Lab)';
 pathParams.dataSourceDirRoot = fullfile(dropboxDir,'TOME_data');
 pathParams.dataOutputDirRoot = fullfile(dropboxDir,'TOME_processing');
@@ -53,7 +77,4 @@ pathParams.eyeTrackingDir = 'EyeTracking';
 pathParams.subjectID = 'TOME_3022';
 pathParams.sessionDate = '061617';
 
-pupilPipelineWrapper(pathParams)
-
-
-
+pupilPipelineWrapper(pathParams, 'pupilRange', [20 90], 'pupilCircleThresh', 0.04, 'gammaCorrection', 1.5)
