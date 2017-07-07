@@ -1,8 +1,21 @@
-function pupilPipelineWrapper(pathParams)
+function pupilPipelineWrapper(pathParams, varargin)
+
+%% Parse input and define variables
+p = inputParser; p.KeepUnmatched = true;
+
+% required input
+p.addRequired('pathParams',@isstruct);
+
+% optional input
+p.addParameter('grayFileNameOnly',false,@islogical);
+
+% parse
+p.parse(pathParams, varargin{:})
+pathParams=p.Results.pathParams;
 
 
-%% hard coded parameters 
-nFrames = 100; % number of frames to process (set to Inf to do all)
+%% hard coded parameters
+nFrames = Inf; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
 TbTbProjectName = 'eyeTOMEAnalysis';
 
@@ -19,27 +32,31 @@ clear tbConfigResult
 
 % define full paths for input and output
 pathParams.dataSourceDirFull = fullfile(pathParams.dataSourceDirRoot, pathParams.projectSubfolder, ...
-        pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
+    pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
 pathParams.dataOutputDirFull = fullfile(pathParams.dataOutputDirRoot, pathParams.projectSubfolder, ...
-        pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
+    pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
 pathParams.controlFileDirFull = fullfile(pathParams.controlFileDirRoot, pathParams.projectSubfolder, ...
-        pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
+    pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
 
 % find raw videos
 rawVideos = dir(fullfile(pathParams.dataSourceDirFull,'*.mov'));
 
-% run the full pipeline on each raw video 
+% run the full pipeline on each raw video
 for rr = 1 :length(rawVideos) %loop in all video files
-    fprintf ('\nProcessing video %d of %d\n',rr,length(rawVideos))
     if regexp(rawVideos(rr).name, regexptranslate('wildcard','*_raw.mov'))
         pathParams.runName = rawVideos(rr).name(1:end-8); %runs
     else
         pathParams.runName = rawVideos(rr).name(1:end-4); %calibrations
     end
     
-    processVideoPipeline( pathParams, ...
-    'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true);
-    
+    if p.Results.grayFileNameOnly
+        grayVideoName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_gray.avi']);
+        fprintf([grayVideoName '\n']);
+    else
+    fprintf ('\nProcessing video %d of %d\n',rr,length(rawVideos))
+        processVideoPipeline( pathParams, varargin{:}, ...
+            'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, 'overwriteControlFile',true);
+    end
 end
 
 end % function
