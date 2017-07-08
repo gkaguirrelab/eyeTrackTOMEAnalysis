@@ -25,7 +25,7 @@ if ~exist(sandboxDir,'dir')
 end
 
 %% hard coded parameters
-nFrames = 1000; % number of frames to process (set to Inf to do all)
+nFrames = 5000; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
 TbTbProjectName = 'eyeTOMEAnalysis';
 
@@ -79,7 +79,8 @@ end
 
 %% Perform the analysis
 processVideoPipeline( pathParams, ...
-    'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true);
+    'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, ...
+    'gammaCorrection', 1.25, 'pupilCircleThresh', 0.04, 'pupilRange', [30 120]);
 
 
 %% Plot some fits
