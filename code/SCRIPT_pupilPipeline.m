@@ -37,10 +37,32 @@ pathParams.eyeTrackingDir = 'EyeTracking';
 pathParams.subjectID = 'TOME_3001';
 pathParams.sessionDate = '081916';
 
-pathParams.dataOutputDirRootpupilPipelineWrapper(pathParams, 'pupilRange', [20 90], 'pupilCircleThresh', 0.035, 'gammaCorrection', .50)
+
+pupilPipelineWrapper(pathParams, 'pupilRange', [20 90], 'pupilCircleThresh', 0.035, 'gammaCorrection', .50)
 
 
 %% STARTING SESSION 2 HERE
+
+%TOME_3018 session2
+dropboxDir = '/Users/saguna/Dropbox (Aguirre-Brainard Lab)';
+pathParams.dataSourceDirRoot = fullfile(dropboxDir,'TOME_data');
+pathParams.dataOutputDirRoot = fullfile(dropboxDir,'TOME_processing');
+pathParams.controlFileDirRoot = fullfile(dropboxDir,'TOME_processing');
+pathParams.projectSubfolder = 'session2_spatialStimuli';
+pathParams.eyeTrackingDir = 'EyeTracking';
+pathParams.subjectID = 'TOME_3018';
+pathParams.sessionDate = '051217';
+
+%TOME_3019 session2
+dropboxDir = '/Users/saguna/Dropbox (Aguirre-Brainard Lab)';
+pathParams.dataSourceDirRoot = fullfile(dropboxDir,'TOME_data');
+pathParams.dataOutputDirRoot = fullfile(dropboxDir,'TOME_processing');
+pathParams.controlFileDirRoot = fullfile(dropboxDir,'TOME_processing');
+pathParams.projectSubfolder = 'session2_spatialStimuli';
+pathParams.eyeTrackingDir = 'EyeTracking';
+pathParams.subjectID = 'TOME_3019';
+pathParams.sessionDate = '050317';
+
 
 % TOME_3020 session2
 dropboxDir = '/Users/saguna/Dropbox (Aguirre-Brainard Lab)';
