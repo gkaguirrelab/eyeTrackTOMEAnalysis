@@ -1,21 +1,21 @@
 % DEMO_eyeTracking
 %
 % Demonstrate the entire eyetracking analysis pipeline.
-% 
-% A local sandbox folder named 'eyeTrackingDEMO' will be created on the 
+%
+% A local sandbox folder named 'eyeTrackingDEMO' will be created on the
 % desktop to replicate the dropbox environment of the real routine. Files
 % will be downloaded from figshare and placed in the sandbox (about 7 GB).
-% 
+%
 % Make sure your machine is configured to work with ToolboxToolbox.
-% 
+%
 % Run-time on an average computer is about XX minutes. For a quicker demo,
 % reduce the hardcoded nFrames to (e.g.) 1000.
-% 
+%
 % Usage examples
 % ==============
-% 
+%
 % DEMO_eyeTracking
-% 
+%
 
 %% set paths and make directories
 % create test sandbox on desktop
@@ -24,8 +24,8 @@ if ~exist(sandboxDir,'dir')
     mkdir(sandboxDir)
 end
 
-%% hard coded parameters 
-nFrames = 100; % number of frames to process (set to Inf to do all)
+%% hard coded parameters
+nFrames = 5000; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
 TbTbProjectName = 'eyeTOMEAnalysis';
 
@@ -55,14 +55,15 @@ clear tbConfigResult
 codeBaseDir = tbLocateProject(TbTbProjectName,'verbose',false);
 
 
+%% Prepare paths and directories
 
 % define full paths for input and output
 pathParams.dataSourceDirFull = fullfile(pathParams.dataSourceDirRoot, pathParams.projectSubfolder, ...
-        pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
+    pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
 pathParams.dataOutputDirFull = fullfile(pathParams.dataOutputDirRoot, pathParams.projectSubfolder, ...
-        pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
+    pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
 pathParams.controlFileDirFull = fullfile(pathParams.controlFileDirRoot, pathParams.projectSubfolder, ...
-        pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
+    pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
 
 % Since we are operating in a sandbox, create the data directory
 if ~exist(pathParams.dataSourceDirFull,'dir')
@@ -78,9 +79,12 @@ end
 
 %% Perform the analysis
 processVideoPipeline( pathParams, ...
-    'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true);
+    'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, ...
+    'pupilCircleThresh', 0.04, 'pupilRange', [30 130]);
+
 
 %% Plot some fits
+ellipseFitFileName = fullfile(pathParams.dataOutputDirFull,[pathParams.runName '_pupil.mat']);
 dataLoad = load(ellipseFitFileName);
 ellipseFitData = dataLoad.ellipseFitData;
 clear dataLoad
