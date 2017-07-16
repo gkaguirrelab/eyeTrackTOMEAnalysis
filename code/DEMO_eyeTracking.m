@@ -25,7 +25,7 @@ if ~exist(sandboxDir,'dir')
 end
 
 %% hard coded parameters
-nFrames = 5000; % number of frames to process (set to Inf to do all)
+nFrames = 8000; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
 TbTbProjectName = 'eyeTOMEAnalysis';
 
@@ -89,18 +89,27 @@ dataLoad = load(ellipseFitFileName);
 ellipseFitData = dataLoad.ellipseFitData;
 clear dataLoad
 
+temporalSupport = 0:1/60.:(size(ellipseFitData.pPosteriorMeanTransparent,1)-1)/60; % seconds
+temporalSupport = temporalSupport / 60; % minutes
+
 figure
-plot(ellipseFitData.pInitialFitTransparent(:,3),'-.k');
+plot(temporalSupport,ellipseFitData.pInitialFitTransparent(:,3),'-.k');
 hold on
-plot(ellipseFitData.pPosteriorMeanTransparent(:,3),'-r','LineWidth',2)
-plot(ellipseFitData.pPosteriorMeanTransparent(:,3)-ellipseFitData.pPosteriorSDTransparent(:,3),'-b')
-plot(ellipseFitData.pPosteriorMeanTransparent(:,3)+ellipseFitData.pPosteriorSDTransparent(:,3),'-b')
+plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,3),'-r','LineWidth',2)
+plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,3)-ellipseFitData.pPosteriorSDTransparent(:,3),'-b')
+plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,3)+ellipseFitData.pPosteriorSDTransparent(:,3),'-b')
+xlim([0 max(temporalSupport)]);
+xlabel('time [mins]');
+ylabel('area [pixels]');
 hold off
 
 figure
-plot(ellipseFitData.pInitialFitTransparent(:,1),'-.k');
+plot(temporalSupport,ellipseFitData.pInitialFitTransparent(:,1),'-.k');
 hold on
-plot(ellipseFitData.pPosteriorMeanTransparent(:,1),'-r','LineWidth',2)
-plot(ellipseFitData.pPosteriorMeanTransparent(:,1)-ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
-plot(ellipseFitData.pPosteriorMeanTransparent(:,1)+ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
+plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,1),'-r','LineWidth',2)
+plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,1)-ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
+plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,1)+ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
+xlim([0 max(temporalSupport)]);
+xlabel('time [mins]');
+ylabel('position [pixels]');
 hold off
