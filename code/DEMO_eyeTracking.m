@@ -25,14 +25,14 @@ if ~exist(sandboxDir,'dir')
 end
 
 %% hard coded parameters
-nFrames = 8000; % number of frames to process (set to Inf to do all)
+nFrames = 200; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
 TbTbProjectName = 'eyeTOMEAnalysis';
 
 % define path parameters
 pathParams.dataSourceDirRoot = fullfile(sandboxDir,'TOME_data');
 pathParams.dataOutputDirRoot = fullfile(sandboxDir,'TOME_processing');
-pathParams.controlFileDirRoot = fullfile(sandboxDir,'controlFies');
+pathParams.controlFileDirRoot = fullfile(sandboxDir,'TOME_processing');
 pathParams.projectSubfolder = 'session2_spatialStimuli';
 pathParams.eyeTrackingDir = 'EyeTracking';
 pathParams.subjectID = 'TOME_3020';
@@ -84,31 +84,31 @@ processVideoPipeline( pathParams, ...
 
 
 %% Plot some fits
-ellipseFitFileName = fullfile(pathParams.dataOutputDirFull,[pathParams.runName '_pupil.mat']);
-dataLoad = load(ellipseFitFileName);
-ellipseFitData = dataLoad.ellipseFitData;
+pupilFileName = fullfile(pathParams.dataOutputDirFull,[pathParams.runName '_pupil.mat']);
+dataLoad = load(pupilFileName);
+pupilData = dataLoad.pupilData;
 clear dataLoad
 
-temporalSupport = 0:1/60.:(size(ellipseFitData.pPosteriorMeanTransparent,1)-1)/60; % seconds
+temporalSupport = 0:1/60.:(size(pupilData.pPosteriorMeanTransparent,1)-1)/60; % seconds
 temporalSupport = temporalSupport / 60; % minutes
 
 figure
-plot(temporalSupport,ellipseFitData.pInitialFitTransparent(:,3),'-.k');
+plot(temporalSupport,pupilData.pInitialFitTransparent(:,3),'-.k');
 hold on
-plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,3),'-r','LineWidth',2)
-plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,3)-ellipseFitData.pPosteriorSDTransparent(:,3),'-b')
-plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,3)+ellipseFitData.pPosteriorSDTransparent(:,3),'-b')
+plot(temporalSupport,pupilData.pPosteriorMeanTransparent(:,3),'-r','LineWidth',2)
+plot(temporalSupport,pupilData.pPosteriorMeanTransparent(:,3)-pupilData.pPosteriorSDTransparent(:,3),'-b')
+plot(temporalSupport,pupilData.pPosteriorMeanTransparent(:,3)+pupilData.pPosteriorSDTransparent(:,3),'-b')
 xlim([0 max(temporalSupport)]);
 xlabel('time [mins]');
 ylabel('area [pixels]');
 hold off
 
 figure
-plot(temporalSupport,ellipseFitData.pInitialFitTransparent(:,1),'-.k');
+plot(temporalSupport,pupilData.pInitialFitTransparent(:,1),'-.k');
 hold on
-plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,1),'-r','LineWidth',2)
-plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,1)-ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
-plot(temporalSupport,ellipseFitData.pPosteriorMeanTransparent(:,1)+ellipseFitData.pPosteriorSDTransparent(:,1),'-b')
+plot(temporalSupport,pupilData.pPosteriorMeanTransparent(:,1),'-r','LineWidth',2)
+plot(temporalSupport,pupilData.pPosteriorMeanTransparent(:,1)-pupilData.pPosteriorSDTransparent(:,1),'-b')
+plot(temporalSupport,pupilData.pPosteriorMeanTransparent(:,1)+pupilData.pPosteriorSDTransparent(:,1),'-b')
 xlim([0 max(temporalSupport)]);
 xlabel('time [mins]');
 ylabel('position [pixels]');
