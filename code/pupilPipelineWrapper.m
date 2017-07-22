@@ -8,6 +8,7 @@ p.addRequired('pathParams',@isstruct);
 
 % optional input
 p.addParameter('grayFileNameOnly',false,@islogical);
+p.addParameter('skipStage',[],@iscell);
 
 % parse
 p.parse(pathParams, varargin{:})
@@ -30,7 +31,7 @@ tbSnapshot=tbDeploymentSnapshot(tbConfigResult,'verbose',false);
 clear tbConfigResult
 
 
-% define full paths for input and output
+%% define full paths for input and output
 pathParams.dataSourceDirFull = fullfile(pathParams.dataSourceDirRoot, pathParams.projectSubfolder, ...
     pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
 pathParams.dataOutputDirFull = fullfile(pathParams.dataOutputDirRoot, pathParams.projectSubfolder, ...
@@ -38,25 +39,41 @@ pathParams.dataOutputDirFull = fullfile(pathParams.dataOutputDirRoot, pathParams
 pathParams.controlFileDirFull = fullfile(pathParams.controlFileDirRoot, pathParams.projectSubfolder, ...
     pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
 
-% find raw videos
-rawVideos = dir(fullfile(pathParams.dataSourceDirFull,'*.mov'));
 
-% run the full pipeline on each raw video
-for rr = 1 :length(rawVideos) %loop in all video files
-    if regexp(rawVideos(rr).name, regexptranslate('wildcard','*_raw.mov'))
-        pathParams.runName = rawVideos(rr).name(1:end-8); %runs
-    else
-        pathParams.runName = rawVideos(rr).name(1:end-4); %calibrations
-    end
-    
-    if p.Results.grayFileNameOnly
-        grayVideoName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_gray.avi']);
-        fprintf([grayVideoName '\n']);
-    else
-    fprintf ('\nProcessing video %d of %d\n',rr,length(rawVideos))
-        processVideoPipeline( pathParams, varargin{:}, ...
-            'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, 'overwriteControlFile',true);
-    end
+% if starting from raw2gray, get the file names from the  raw files in the data
+% folder. If starting from a later step, get the run name from the gray
+% files instead.
+if any(strcmp(p.Results.skipStage,'raw2gray'))
+    sourceVideos = dir(fullfile(pathParams.dataOutputDirFull,'*_gray.avi'));
+    suffixCodes = {'*_gray.avi','GazeCal*gray.avi','RawScaleCal*gray.avi'};
+    suffixToTrim = [9, 9, 9];
+else
+    sourceVideos = dir(fullfile(pathParams.dataSourceDirFull,'*.mov'));
+    suffixCodes = {'*_raw.mov','GazeCal*.mov','RawScaleCal*.mov'};
+    suffixToTrim = [8, 4, 4];
 end
 
+
+% run the full pipeline on each source video
+for rr = 1 :length(sourceVideos) %loop in all video files
+    fprintf ('\nProcessing video %d of %d\n',rr,length(sourceVideos))
+    if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{1}))
+        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(1)); %runs
+        sizeCalFileFlag = false;
+    end
+    if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{2}))
+        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(2)); %gaze calibrations
+        sizeCalFileFlag = false;
+    end
+    if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{3}))
+        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(3)); %scale calibrations
+        sizeCalFileFlag = true;
+    end
+    processVideoPipeline( pathParams, ...
+        'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
+        'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
+        varargin{:});
+end
+
+    
 end % function
