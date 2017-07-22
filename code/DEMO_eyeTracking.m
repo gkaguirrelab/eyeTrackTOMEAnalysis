@@ -80,7 +80,7 @@ end
 %% Perform the analysis
 processVideoPipeline( pathParams, ...
     'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, ...
-    'pupilCircleThresh', 0.04, 'pupilRange', [30 130]);
+    'pupilCircleThresh', 0.04, 'pupilRange', [30 130],'skipStage',{'raw2gray'},'glintOut', 0.15);
 
 
 %% Plot some fits
