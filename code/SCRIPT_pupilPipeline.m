@@ -92,10 +92,11 @@ pupilPipelineWrapper(pathParams, 'pupilRange', [50 150], 'pupilCircleThresh', 0.
 % TOME_3013 session1
 pathParams.subjectID = 'TOME_3013';
 pathParams.sessionDate = '121216';
-%for calibration runs
-pupilPipelineWrapper(pathParams, 'pupilRange', [10 120], 'pupilCircleThresh', 0.03, 'gammaCorrection', .5)
-%for REST runs 
-pupilPipelineWrapper(pathParams, 'pupilRange', [10 200], 'pupilCircleThresh', 0.03, 'gammaCorrection', .75)
+customKeyValue1 = {'GazeCal','pupilRange', [10 120], 'pupilCircleThresh', 0.03, 'gammaCorrection', .5};
+customKeyValue2 = {'rfMRI_REST_*','pupilRange', [10 200], 'pupilCircleThresh', 0.03, 'gammaCorrection', .75};
+customKeyValues = {customKeyValue1; customKeyValue2};
+pupilPipelineWrapper(pathParams, 'skipStage', {'raw2gray'}, 'nFrames', 200, 'customKeyValues', customKeyValues);
+
 
 % TOME_3014 session1
 pathParams.subjectID = 'TOME_3014';

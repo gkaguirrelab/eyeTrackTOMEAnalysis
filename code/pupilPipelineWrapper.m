@@ -7,8 +7,10 @@ p = inputParser; p.KeepUnmatched = true;
 p.addRequired('pathParams',@isstruct);
 
 % optional input
+p.addParameter('useLowResSizeCalVideo',false,@islogical);
 p.addParameter('grayFileNameOnly',false,@islogical);
 p.addParameter('skipStage',[],@iscell);
+p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
 
 % parse
 p.parse(pathParams, varargin{:})
@@ -19,6 +21,7 @@ pathParams=p.Results.pathParams;
 nFrames = Inf; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
 TbTbProjectName = 'eyeTOMEAnalysis';
+
 
 %% TbTb configuration
 % We will suppress the verbose output, but detect if there are deploy
@@ -39,6 +42,24 @@ pathParams.dataOutputDirFull = fullfile(pathParams.dataOutputDirRoot, pathParams
 pathParams.controlFileDirFull = fullfile(pathParams.controlFileDirRoot, pathParams.projectSubfolder, ...
     pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
 
+% for some subjects, the high-res video of the size calibration step was
+% not obtained, only the low-res, LiveTrack "tracked" avi video. If the
+% useLowResSizeCalVideo flag is set to true, we copy this low-res video
+% over to the dataOutputDir and give it a "gray" suffix, so that it can be
+% processed
+if p.Results.useLowResSizeCalVideo
+    scaleCalLowResVideos = dir(fullfile(pathParams.dataSourceDirFull,'ScaleCalibration*.avi'));
+    if ~isempty(scaleCalLowResVideos)
+        for rr = 1: length(scaleCalLowResVideos)            
+            newFileName = ['LowRes' scaleCalLowResVideos(rr).name(1:end-4) '_gray.avi'];
+            scaleCalLowResGrayAVIs(rr).name = newFileName;
+            scaleCalLowResGrayAVIs(rr).path = pathParams.dataOutputDirFull;
+            fullFilePathDestination = fullfile(scaleCalLowResGrayAVIs(rr).path, scaleCalLowResGrayAVIs(rr).name);
+            fullFilePathSource = fullfile(scaleCalLowResVideos(rr).path, scaleCalLowResVideos(rr).name);
+            copyfile fullFilePathSource fullFilePathDestination            
+        end
+    end
+end
 
 % if starting from raw2gray, get the file names from the  raw files in the data
 % folder. If starting from a later step, get the run name from the gray
@@ -53,10 +74,23 @@ else
     suffixToTrim = [8, 4, 4];
 end
 
+% In the event that we both wish to skip the raw2gray stage and we are
+% using the lowResSizeCalVideos, then we need to add these low res videos
+% to the sourceVideo list
+if p.Results.useLowResSizeCalVideo && ~any(strcmp(p.Results.skipStage,'raw2gray'))
+    sourceVideos = [sourceVideos scaleCalLowResGrayAVIs];
+end
+
+if ~isempty(p.Results.customKeyValues)
+    runNamesToCustomize = cellfun(@(x) x{1},p.Results.customKeyValues,'UniformOutput',false);
+else
+    runNamesToCustomize=[];
+end
 
 % run the full pipeline on each source video
 for rr = 1 :length(sourceVideos) %loop in all video files
     fprintf ('\nProcessing video %d of %d\n',rr,length(sourceVideos))
+    
     if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{1}))
         pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(1)); %runs
         sizeCalFileFlag = false;
@@ -69,11 +103,35 @@ for rr = 1 :length(sourceVideos) %loop in all video files
         pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(3)); %scale calibrations
         sizeCalFileFlag = true;
     end
-    processVideoPipeline( pathParams, ...
-        'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
-        'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
-        varargin{:});
-end
+    
+    % Check if we the current runName matches an entry in the
+    % runNamesToCustomize list
+    customArgs=[];
+    if ~isempty(p.Results.customKeyValues)
+        checkForRunNameMatchCell = cellfun(@(x) regexp(pathParams.runName, regexptranslate('wildcard',x)), runNamesToCustomize,'UniformOutput',false);
+        checkForRunNameMatchLogical = cellfun(@(x) ~isempty(x),checkForRunNameMatchCell);
+        if any(checkForRunNameMatchLogical)
+            if length(find(checkForRunNameMatchLogical))==1
+                customArgs=p.Results.customKeyValues{find(checkForRunNameMatchLogical)};
+                customArgs=customArgs(2:end);
+            else
+                error('conflicting customKeyValues are set for a run');
+            end
+        end
+    end
+    
+    if isempty(customArgs)
+        processVideoPipeline( pathParams, ...
+            'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
+            'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
+            varargin{:});
+    else
+        processVideoPipeline( pathParams, ...
+            'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
+            'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
+            varargin{:}, customArgs{:});
+    end % check is there are custom arguments
+end % loop over runs
 
     
 end % function
