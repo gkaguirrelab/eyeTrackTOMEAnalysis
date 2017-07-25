@@ -71,16 +71,23 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3004 session1 A
 pathParams.subjectID = 'TOME_3004';
 pathParams.sessionDate = '091916';
+customKeyValue1 = {'LowResScaleCal*', 'pupilCircleThresh', 0.03, 'gammaCorrection', .5};
+customKeyValue2 = {'rfMRI_REST_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'gammaCorrection', .75};
+customKeyValue3 = {'dMRI_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'gammaCorrection', .75};
+customKeyValues = {customKeyValue1; customKeyValue2, customKeyValue3};
 pupilPipelineWrapper(pathParams, ...
-    'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'gammaCorrection', .75, ...
-    'useLowResSizeCalVideo',true, 'skipStage', {'raw2gray'});
+    'useLowResSizeCalVideo',true, 'skipStage', {'raw2gray'}, ...
+    'customKeyValues', customKeyValues);
 
 % TOME_3004 session1 B
 pathParams.subjectID = 'TOME_3004';
 pathParams.sessionDate = '101416';
+customKeyValue1 = {'LowResScaleCal*', 'pupilCircleThresh', 0.03, 'gammaCorrection', .5};
+customKeyValue2 = {'rfMRI_REST_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'gammaCorrection', .75};
+customKeyValues = {customKeyValue1; customKeyValue2};
 pupilPipelineWrapper(pathParams, ...
-    'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'gammaCorrection', .75, ...
-    'useLowResSizeCalVideo',true, 'skipStage', {'raw2gray'});
+    'useLowResSizeCalVideo',true, 'skipStage', {'raw2gray'}, ...
+    'customKeyValues', customKeyValues);
 
 % TOME_3005 session1
 pathParams.subjectID = 'TOME_3005';
@@ -156,7 +163,7 @@ customKeyValue1 = {'*Cal*', 'pupilRange', [5 180], 'pupilCircleThresh', 0.06, 'g
 customKeyValue2 = {'T*_*', 'pupilRange', [5 180], 'pupilCircleThresh', 0.06, 'gammaCorrection', 1};
 customKeyValue3 = {'dMRI_*', 'pupilRange', [5 180], 'pupilCircleThresh', 0.06, 'gammaCorrection', 1};
 %for rmfri runs (could be better)
-customKeyValue4 = {'rfMRI_REST_*', 'pupilRange', [30 330], 'pupilCircleThresh', 0.06, 'gammaCorrection', 1)
+customKeyValue4 = {'rfMRI_REST_*', 'pupilRange', [30 330], 'pupilCircleThresh', 0.06, 'gammaCorrection', 1};
 customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'raw2gray'}, ...
