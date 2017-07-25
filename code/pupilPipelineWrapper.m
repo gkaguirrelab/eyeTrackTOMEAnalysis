@@ -66,7 +66,7 @@ end
 % files instead.
 if any(strcmp(p.Results.skipStage,'raw2gray'))
     sourceVideos = dir(fullfile(pathParams.dataOutputDirFull,'*_gray.avi'));
-    suffixCodes = {'*_gray.avi','GazeCal*gray.avi','RawScaleCal*gray.avi'};
+    suffixCodes = {'*_gray.avi','GazeCal*gray.avi','*ScaleCal*gray.avi',};
     suffixToTrim = [9, 9, 9];
 else
     sourceVideos = dir(fullfile(pathParams.dataSourceDirFull,'*.mov'));
