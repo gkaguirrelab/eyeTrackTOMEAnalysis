@@ -53,10 +53,10 @@ if p.Results.useLowResSizeCalVideo
         for rr = 1: length(scaleCalLowResVideos)            
             newFileName = ['LowRes' scaleCalLowResVideos(rr).name(1:end-4) '_gray.avi'];
             scaleCalLowResGrayAVIs(rr).name = newFileName;
-            scaleCalLowResGrayAVIs(rr).path = pathParams.dataOutputDirFull;
-            fullFilePathDestination = fullfile(scaleCalLowResGrayAVIs(rr).path, scaleCalLowResGrayAVIs(rr).name);
-            fullFilePathSource = fullfile(scaleCalLowResVideos(rr).path, scaleCalLowResVideos(rr).name);
-            copyfile fullFilePathSource fullFilePathDestination            
+            scaleCalLowResGrayAVIs(rr).folder = pathParams.dataOutputDirFull;
+            fullFilePathDestination = fullfile(scaleCalLowResGrayAVIs(rr).folder, scaleCalLowResGrayAVIs(rr).name);
+            fullFilePathSource = fullfile(scaleCalLowResVideos(rr).folder, scaleCalLowResVideos(rr).name);
+            copyfile (fullFilePathSource, fullFilePathDestination)            
         end
     end
 end
