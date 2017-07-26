@@ -10,7 +10,6 @@ p.addRequired('pathParams',@isstruct);
 p.addParameter('useLowResSizeCalVideo',false,@islogical);
 p.addParameter('grayFileNameOnly',false,@islogical);
 p.addParameter('skipStage',[],@iscell);
-p.addParameter('skipStage',[],@iscell);
 p.addParameter('skipRun',[],@islogical);
 p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
 
