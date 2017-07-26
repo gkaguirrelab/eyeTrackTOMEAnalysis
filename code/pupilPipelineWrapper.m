@@ -10,6 +10,8 @@ p.addRequired('pathParams',@isstruct);
 p.addParameter('useLowResSizeCalVideo',false,@islogical);
 p.addParameter('grayFileNameOnly',false,@islogical);
 p.addParameter('skipStage',[],@iscell);
+p.addParameter('skipStage',[],@iscell);
+p.addParameter('skipRun',[],@islogical);
 p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
 
 % parse
@@ -121,15 +123,27 @@ for rr = 1 :length(sourceVideos) %loop in all video files
     end
     
     if isempty(customArgs)
-        processVideoPipeline( pathParams, ...
-            'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
-            'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
-            varargin{:});
+        % check the high level skipRun flag
+        if ~ p.Results.skipRun
+            processVideoPipeline( pathParams, ...
+                'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
+                'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
+                varargin{:});
+        else
+            continue
+        end
     else
-        processVideoPipeline( pathParams, ...
-            'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
-            'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
-            varargin{:}, customArgs{:});
+        % get skipRun flag in customArgs
+        srFlag = strcmp(customArgs,'skipRun');
+        % check skipRun flag in customArgs
+        if any(srFlag) && customArgs{find(srFlag)+1}
+            processVideoPipeline( pathParams, ...
+                'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
+                'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
+                varargin{:}, customArgs{:});
+        else
+            continue
+        end % check skipRun flag in customArgs
     end % check is there are custom arguments
 end % loop over runs
 
