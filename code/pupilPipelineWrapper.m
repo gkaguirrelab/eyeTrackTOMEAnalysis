@@ -136,12 +136,12 @@ for rr = 1 :length(sourceVideos) %loop in all video files
         srFlag = strcmp(customArgs,'skipRun');
         % check skipRun flag in customArgs
         if any(srFlag) && customArgs{find(srFlag)+1}
-            processVideoPipeline( pathParams, ...
+            continue
+        else
+             processVideoPipeline( pathParams, ...
                 'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
                 'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
                 varargin{:}, customArgs{:});
-        else
-            continue
         end % check skipRun flag in customArgs
     end % check is there are custom arguments
 end % loop over runs
