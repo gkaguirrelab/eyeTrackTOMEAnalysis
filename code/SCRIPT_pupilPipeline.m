@@ -307,7 +307,7 @@ pupilPipelineWrapper(pathParams, ...
 pathParams.subjectID = 'TOME_3008';
 pathParams.sessionDate = '103116';
 customKeyValue1 = {'RawScaleCal*', 'pupilRange', [10 100], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .75, 'ellipseTransparentLB',[0, 0, 500, 0, -0.5*pi],'perimeterColor','r'};
-customKeyValue2 = {'GazeCal*', 'pupilRange', [30 260], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 0.75, 'glintCircleThresh', 0.999, 'dilateGlint', 6,'glintRange', [10 40]};
+customKeyValue2 = {'GazeCal*', 'pupilRange', [30 260], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 0.75, 'glintGammaCorrection', 2.5,'glintRange', [10 40]};
 customKeyValue3 = {'tfMRI_*', 'pupilRange', [30 260], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .75,'skipRun',true};
 customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3};
 pupilPipelineWrapper(pathParams, ...
