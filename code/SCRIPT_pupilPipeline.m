@@ -71,10 +71,11 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3004 session1 A
 pathParams.subjectID = 'TOME_3004';
 pathParams.sessionDate = '091916';
-customKeyValue1 = {'LowResScaleCal*', 'pupilCircleThresh', 0.03, 'gammaCorrection', .5};
+customKeyValue1 = {'LowResScaleCal*', 'pupilCircleThresh', 0.02, 'pupilRange', [10 60], 'gammaCorrection', .75,'ellipseTransparentLB',[0, 0, 500, 0, -0.5*pi], 'frameMask', [60 40],'perimeterColor','r'};
 customKeyValue2 = {'rfMRI_REST_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'gammaCorrection', .75};
-customKeyValue3 = {'dMRI_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'gammaCorrection', .75};
-customKeyValues = {customKeyValue1; customKeyValue2, customKeyValue3};
+customKeyValue3 = {'dMRI_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'gammaCorrection', .75 ,'ellipseTransparentLB',[0, 0, 500, 0, -0.5*pi]};
+customKeyValue4 = {'T*_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'gammaCorrection', .75 ,'ellipseTransparentLB',[0, 0, 500, 0, -0.5*pi]};
+customKeyValues = {customKeyValue1; customKeyValue2, customKeyValue3,customKeyValue4};
 pupilPipelineWrapper(pathParams, ...
     'useLowResSizeCalVideo',true, 'skipStage', {'raw2gray'}, ...
     'customKeyValues', customKeyValues);
@@ -82,7 +83,7 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3004 session1 B
 pathParams.subjectID = 'TOME_3004';
 pathParams.sessionDate = '101416';
-customKeyValue1 = {'LowResScaleCal*', 'pupilCircleThresh', 0.03, 'gammaCorrection', .5,'ellipseTransparentLB',[0, 0, 500, 0, -0.5*pi],'perimeterColor','b'};
+customKeyValue1 = {'LowResScaleCal*', 'pupilCircleThresh', 0.02,'pupilRange', [10 60], 'gammaCorrection', .75,'ellipseTransparentLB',[0, 0, 500, 0, -0.5*pi], 'frameMask', [60 40],'perimeterColor','r'};
 customKeyValue2 = {'rfMRI_REST_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'gammaCorrection', .75,'skipRun', true};
 customKeyValue3 = {'GazeCal*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'gammaCorrection', .75,'ellipseTransparentLB',[0, 0, 500, 0, -0.5*pi], 'skipRun', true};
 customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3};
