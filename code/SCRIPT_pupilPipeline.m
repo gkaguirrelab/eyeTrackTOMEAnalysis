@@ -72,7 +72,7 @@ pupilPipelineWrapper(pathParams, ...
 pathParams.subjectID = 'TOME_3004';
 pathParams.sessionDate = '091916';
 customKeyValue1 = {'LowResScaleCal*', 'pupilCircleThresh', 0.02, 'pupilRange', [10 60], 'pupilGammaCorrection', .75,'ellipseTransparentLB',[0, 0, 500, 0, -0.5*pi], 'frameMask', [60 40],'perimeterColor','r'};
-customKeyValue2 = {'rfMRI_REST_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'pupilGammaCorrection', .75,'skipRun', true};
+customKeyValue2 = {'rfMRI_REST_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'pupilGammaCorrection', .75};
 customKeyValue3 = {'dMRI_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'pupilGammaCorrection', .75 ,'ellipseTransparentLB',[0, 0, 500, 0, -0.5*pi]};
 customKeyValue4 = {'T*_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'pupilGammaCorrection', .75 ,'ellipseTransparentLB',[0, 0, 500, 0, -0.5*pi]};
 customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3;customKeyValue4};
