@@ -53,7 +53,9 @@ if p.Results.saveLog
     end
     logFileName = ['LOG_' datestr(now,'yyyymmdd_HHMMSS.txt')];
     diary (fullfile(pathParams.logsDirFull,logFileName))
+    display (pathParams)
     display (p.Results)
+    display(p.Results.customKeyValues)
 end
 
 
