@@ -48,10 +48,10 @@ pathParams.controlFileDirFull = fullfile(pathParams.controlFileDirRoot, pathPara
 if p.Results.saveLog
     pathParams.logsDirFull = fullfile(pathParams.dataOutputDirRoot, pathParams.projectSubfolder, ...
         pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir,'logs');
-    if ~exist(saveLog, 'dir')
-        mkdir(saveLog)
+    if ~exist(pathParams.logsDirFull, 'dir')
+        mkdir(pathParams.logsDirFull)
     end
-    logFileName = ['LOG_' datestr(now,'yyyymmdd_HHMMSS')];
+    logFileName = ['LOG_' datestr(now,'yyyymmdd_HHMMSS.txt')];
     diary (fullfile(pathParams.logsDirFull,logFileName))
     display (p.Results)
 end
@@ -104,7 +104,11 @@ end
 
 % run the full pipeline on each source video
 if p.Results.saveLog
-    display(sourceVideos)
+    fprintf('\nProcessing the following videos:\n')
+    for rr=1:length(sourceVideos)
+        runName=['\t' num2str(rr) '. ' sourceVideos(rr).name '\n'];
+        fprintf(runName);
+    end
 end
 for rr = 1 :length(sourceVideos) %loop in all video files
     fprintf ('\nProcessing video %d of %d\n',rr,length(sourceVideos))
