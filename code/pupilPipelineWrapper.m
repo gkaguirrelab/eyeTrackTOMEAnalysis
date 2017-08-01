@@ -10,7 +10,7 @@ p.addRequired('pathParams',@isstruct);
 p.addParameter('useLowResSizeCalVideo',false,@islogical);
 p.addParameter('grayFileNameOnly',false,@islogical);
 p.addParameter('skipStage',[],@iscell);
-p.addParameter('skipRun',[],@islogical);
+p.addParameter('skipRun',false,@islogical);
 p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
 
 % parse
@@ -123,7 +123,7 @@ for rr = 1 :length(sourceVideos) %loop in all video files
     
     if isempty(customArgs)
         % check the high level skipRun flag
-        if ~ p.Results.skipRun
+        if ~p.Results.skipRun
             processVideoPipeline( pathParams, ...
                 'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
                 'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
