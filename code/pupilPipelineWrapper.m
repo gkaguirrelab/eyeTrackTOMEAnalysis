@@ -55,7 +55,7 @@ if p.Results.saveLog
     diary (fullfile(pathParams.logsDirFull,logFileName))
     display (p.Results)
 end
-    
+
 
 % for some subjects, the high-res video of the size calibration step was
 % not obtained, only the low-res, LiveTrack "tracked" avi video. If the
@@ -65,13 +65,13 @@ end
 if p.Results.useLowResSizeCalVideo
     scaleCalLowResVideos = dir(fullfile(pathParams.dataSourceDirFull,'ScaleCalibration*.avi'));
     if ~isempty(scaleCalLowResVideos)
-        for rr = 1: length(scaleCalLowResVideos)            
+        for rr = 1: length(scaleCalLowResVideos)
             newFileName = ['LowRes' scaleCalLowResVideos(rr).name(1:end-4) '_gray.avi'];
             scaleCalLowResGrayAVIs(rr).name = newFileName;
             scaleCalLowResGrayAVIs(rr).folder = pathParams.dataOutputDirFull;
             fullFilePathDestination = fullfile(scaleCalLowResGrayAVIs(rr).folder, scaleCalLowResGrayAVIs(rr).name);
             fullFilePathSource = fullfile(scaleCalLowResVideos(rr).folder, scaleCalLowResVideos(rr).name);
-            copyfile (fullFilePathSource, fullFilePathDestination)            
+            copyfile (fullFilePathSource, fullFilePathDestination)
         end
     end
 end
@@ -110,7 +110,15 @@ if p.Results.saveLog
         fprintf(runName);
     end
 end
+% toggle diary
+if p.Results.saveLog
+    diary OFF
+end
 for rr = 1 :length(sourceVideos) %loop in all video files
+    %     toggle diary (so that the file gets updated every run is completed)
+    if p.Results.saveLog
+        diary ON
+    end
     fprintf ('\nProcessing video %d of %d\n',rr,length(sourceVideos))
     
     if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{1}))
@@ -159,16 +167,15 @@ for rr = 1 :length(sourceVideos) %loop in all video files
         if any(srFlag) && customArgs{find(srFlag)+1}
             continue
         else
-             processVideoPipeline( pathParams, ...
+            processVideoPipeline( pathParams, ...
                 'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
                 'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
                 varargin{:}, customArgs{:});
         end % check skipRun flag in customArgs
     end % check is there are custom arguments
+    % toggle diary
+    if p.Results.saveLog
+        diary OFF
+    end
 end % loop over runs
-
-% stop logging
-if p.Results.saveLog
-    diary OFF
-end
 end % function
