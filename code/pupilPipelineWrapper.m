@@ -12,6 +12,7 @@ p.addParameter('grayFileNameOnly',false,@islogical);
 p.addParameter('skipStage',[],@iscell);
 p.addParameter('skipRun',false,@islogical);
 p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
+p.addParameter('saveLog',true,@islogical);
 
 % parse
 p.parse(pathParams, varargin{:})
@@ -42,6 +43,19 @@ pathParams.dataOutputDirFull = fullfile(pathParams.dataOutputDirRoot, pathParams
     pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
 pathParams.controlFileDirFull = fullfile(pathParams.controlFileDirRoot, pathParams.projectSubfolder, ...
     pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
+
+% define logs directory, log file and start logging
+if p.Results.saveLog
+    pathParams.logsDirFull = fullfile(pathParams.dataOutputDirRoot, pathParams.projectSubfolder, ...
+        pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir,'logs');
+    if ~exist(saveLog, 'dir')
+        mkdir(saveLog)
+    end
+    logFileName = ['LOG_' datestr(now,'yyyymmdd_HHMMSS')];
+    diary (fullfile(pathParams.logsDirFull,logFileName))
+    display (p.Results)
+end
+    
 
 % for some subjects, the high-res video of the size calibration step was
 % not obtained, only the low-res, LiveTrack "tracked" avi video. If the
@@ -89,6 +103,9 @@ else
 end
 
 % run the full pipeline on each source video
+if p.Results.saveLog
+    display(sourceVideos)
+end
 for rr = 1 :length(sourceVideos) %loop in all video files
     fprintf ('\nProcessing video %d of %d\n',rr,length(sourceVideos))
     
@@ -146,5 +163,8 @@ for rr = 1 :length(sourceVideos) %loop in all video files
     end % check is there are custom arguments
 end % loop over runs
 
-    
+% stop logging
+if p.Results.saveLog
+    diary OFF
+end
 end % function
