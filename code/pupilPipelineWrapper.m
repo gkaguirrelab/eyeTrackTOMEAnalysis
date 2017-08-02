@@ -1,4 +1,7 @@
 function pupilPipelineWrapper(pathParams, varargin)
+% pupilPipelineWrapper(pathParams, varargin)
+%
+%  NEED COMMENTS HERE
 
 %% Parse input and define variables
 p = inputParser; p.KeepUnmatched = true;
@@ -8,7 +11,6 @@ p.addRequired('pathParams',@isstruct);
 
 % optional input
 p.addParameter('useLowResSizeCalVideo',false,@islogical);
-p.addParameter('grayFileNameOnly',false,@islogical);
 p.addParameter('skipStage',[],@iscell);
 p.addParameter('skipRun',false,@islogical);
 p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
@@ -83,10 +85,10 @@ if p.Results.useLowResSizeCalVideo
     end
 end
 
-% if starting from raw2gray, get the file names from the  raw files in the data
+% if starting from convertRawToGray, get the file names from the  raw files in the data
 % folder. If starting from a later step, get the run name from the gray
 % files instead.
-if any(strcmp(p.Results.skipStage,'raw2gray'))
+if any(strcmp(p.Results.skipStage,'convertRawToGray'))
     sourceVideos = dir(fullfile(pathParams.dataOutputDirFull,'*_gray.avi'));
     suffixCodes = {'*_gray.avi','GazeCal*gray.avi','*ScaleCal*gray.avi',};
     suffixToTrim = [9, 9, 9];
@@ -96,10 +98,10 @@ else
     suffixToTrim = [8, 4, 4];
 end
 
-% In the event that we both wish to skip the raw2gray stage and we are
+% In the event that we both wish to skip the convertRawToGray stage and we are
 % using the lowResSizeCalVideos, then we need to add these low res videos
 % to the sourceVideo list
-if p.Results.useLowResSizeCalVideo && ~any(strcmp(p.Results.skipStage,'raw2gray'))
+if p.Results.useLowResSizeCalVideo && ~any(strcmp(p.Results.skipStage,'convertRawToGray'))
     sourceVideos = [sourceVideos scaleCalLowResGrayAVIs];
 end
 
@@ -121,7 +123,7 @@ end
 if p.Results.saveLog
     diary OFF
 end
-for rr = 1 :length(sourceVideos) %loop in all video files
+for rr = 1 :length(sourceVideos) % loop over video files
     %     toggle diary (so that the file gets updated every run is completed)
     if p.Results.saveLog
         diary ON
@@ -130,15 +132,15 @@ for rr = 1 :length(sourceVideos) %loop in all video files
     
     if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{1}))
         pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(1)); %runs
-        sizeCalFileFlag = false;
+        videoTypeChoice = 'LiveTrackWithVTOP_eye';
     end
     if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{2}))
         pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(2)); %gaze calibrations
-        sizeCalFileFlag = false;
+        videoTypeChoice = 'LiveTrackWithVTOP_eye';
     end
     if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{3}))
         pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(3)); %scale calibrations
-        sizeCalFileFlag = true;
+        videoTypeChoice = 'LiveTrackWithVTOP_sizeCal';
     end
     
     % Check if we the current runName matches an entry in the
@@ -160,9 +162,9 @@ for rr = 1 :length(sourceVideos) %loop in all video files
     if isempty(customArgs)
         % check the high level skipRun flag
         if ~p.Results.skipRun
-            processVideoPipeline( pathParams, ...
+            runVideoPipeline( pathParams, ...
                 'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
-                'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
+                'useParallel',true, 'overwriteControlFile',true, 'videoTypeChoice', videoTypeChoice, ...
                 varargin{:});
         else
             continue
@@ -174,9 +176,9 @@ for rr = 1 :length(sourceVideos) %loop in all video files
         if any(srFlag) && customArgs{find(srFlag)+1}
             continue
         else
-            processVideoPipeline( pathParams, ...
+            runVideoPipeline( pathParams, ...
                 'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
-                'useParallel',true, 'overwriteControlFile',true, 'sizeCalFileFlag', sizeCalFileFlag, ...
+                'useParallel',true, 'overwriteControlFile',true, 'videoTypeChoice', videoTypeChoice, ...
                 varargin{:}, customArgs{:});
         end % check skipRun flag in customArgs
     end % check is there are custom arguments
@@ -185,4 +187,5 @@ for rr = 1 :length(sourceVideos) %loop in all video files
         diary OFF
     end
 end % loop over runs
+
 end % function
