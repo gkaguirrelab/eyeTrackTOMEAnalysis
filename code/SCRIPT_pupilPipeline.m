@@ -162,12 +162,12 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3016 session1
 pathParams.subjectID = 'TOME_3016';
 pathParams.sessionDate = '031017';
-customKeyValue1 = {'RawScaleCal*', 'pupilRange', [5 150], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', 1,'smallObjThresh', 200};
-customKeyValue2 = {'GazeCal*', 'pupilRange', [5 150], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', 1,'glintGammaCorrection', 5.5,'smallObjThresh', 200};
-customKeyValue3 = {'T*_*', 'pupilRange', [5 180], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', 1,'glintGammaCorrection', 5.5,'smallObjThresh', 200};
-customKeyValue4 = {'dMRI_*', 'pupilRange', [5 180], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', 1,'glintGammaCorrection', 5.5,'smallObjThresh', 200};
+customKeyValue1 = {'RawScaleCal*', 'pupilRange', [10 150], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', .7,'frameMask', [60 40]};
+customKeyValue2 = {'GazeCal*', 'pupilRange', [10 150], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', .7,'cutErrorThreshold', 35,'skipRun',true};
+customKeyValue3 = {'T*_*', 'pupilRange', [10 180], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', 1,'glintGammaCorrection', 5.5,'smallObjThresh', 200,'cutErrorThreshold', 25};
+customKeyValue4 = {'dMRI_*', 'pupilRange', [10 180], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', 1,'glintGammaCorrection', 5.5,'smallObjThresh', 200,'cutErrorThreshold', 25};
 %for rmfri runs (could be better)
-customKeyValue5 = {'rfMRI_REST_*', 'pupilRange', [30 330], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', 1,'glintGammaCorrection', 5.5};
+customKeyValue5 = {'rfMRI_REST_*', 'pupilRange', [30 330], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', 1,'glintGammaCorrection', 5.5,'cutErrorThreshold', 25};
 customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4;customKeyValue5};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
