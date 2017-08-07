@@ -177,10 +177,10 @@ pupilPipelineWrapper(pathParams, ...
 pathParams.subjectID = 'TOME_3017';
 pathParams.sessionDate = '032917';
 %for cal (very bad could be better)
-customKeyValue1 = {'*Cal*', 'pupilRange', [5 120], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1,'cutErrorThreshold',40};
-customKeyValue2 = {'T*_*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'cutErrorThreshold',30};
+customKeyValue1 = {'*Cal*', 'pupilRange', [5 120], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1,'cutErrorThreshold',40,'skipRun',true};
+customKeyValue2 = {'T1*_*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'cutErrorThreshold',30,'skipRun',true};
 customKeyValue3 = {'rfMRI_REST_*', 'pupilRange', [30 180], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75};
-customKeyValue4 = {'dMRI_*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03,'cutErrorThreshold',30 };
+customKeyValue4 = {'dMRI_*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03,'cutErrorThreshold',30,'skipRun',true };
 customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3;customKeyValue4};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
