@@ -54,7 +54,7 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3002 session1
 pathParams.subjectID = 'TOME_3002';
 pathParams.sessionDate = '082616';
-customKeyValue1 = {'T1','pupilRange', [30 90], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .5};
+customKeyValue1 = {'T1*','pupilRange', [30 90], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .5};
 customKeyValue2 = {'rfMRI_REST_*','pupilRange', [30 200], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .1};
 customKeyValues = {customKeyValue1; customKeyValue2};
 pupilPipelineWrapper(pathParams, ...
@@ -178,11 +178,12 @@ pupilPipelineWrapper(pathParams, ...
 pathParams.subjectID = 'TOME_3017';
 pathParams.sessionDate = '032917';
 %for cal (very bad could be better)
-customKeyValue1 = {'*Cal*', 'pupilRange', [5 120], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1,'cutErrorThreshold',40,'skipRun',true};
-customKeyValue2 = {'T1*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'cutErrorThreshold',30,'skipRun',true};
-customKeyValue3 = {'T2*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'cutErrorThreshold',30,'skipRun',true};
-customKeyValue4 = {'rfMRI_REST_*', 'pupilRange', [30 180], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75};
-customKeyValue5 = {'dMRI_*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03,'cutErrorThreshold',30,'skipRun',true };
+customKeyValue1 = {'*ScaleCal*', 'pupilRange', [20 100], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1.3,'frameMask', [2 30],'exponentialTauParams',[100 100 100 100 100]};
+customKeyValue2 = {'GazeCal*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .7,'cutErrorThreshold', 40};
+customKeyValue3 = {'T1*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'cutErrorThreshold',30,'skipRun',true};
+customKeyValue4 = {'T2*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'cutErrorThreshold',30,'skipRun',true};
+customKeyValue5 = {'rfMRI_REST_*', 'pupilRange', [30 180], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'frameMask', [2 40],'cutErrorThreshold',30,'exponentialTauParams',[.25 .25 20 1 1]};
+customKeyValue6 = {'dMRI_*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03,'cutErrorThreshold',30,'skipRun',true };
 customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3;customKeyValue4;customKeyValue5};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
