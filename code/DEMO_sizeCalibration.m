@@ -76,11 +76,11 @@ sizeDataFilesNames = { ...
     fullfile(calRunNames(3).folder, calRunNames(3).name) ...
     };
 
-% define ground truth
+% define ground truth (in case of manual input)
 sizeGroundTruths = [4 5 6];
 
 % define output file name
-sizeFactorsFileName = fullfile(pathParams.dataOutputDirFull, 'sizeConversion.mat');
+sizeFactorsFileName = fullfile(pathParams.dataOutputDirFull, 'sizeFactors.mat');
 
 % get size calibration values
 calcSizeFactors(sizeDataFilesNames, sizeFactorsFileName)
