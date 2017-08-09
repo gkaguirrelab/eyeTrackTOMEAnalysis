@@ -350,7 +350,7 @@ pathParams.subjectID = 'TOME_3013';
 pathParams.sessionDate = '011117';
 customKeyValue1 = {'RawScaleCal*', 'pupilRange', [10 200], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .7};
 customKeyValue2 = {'GazeCal*', 'pupilRange', [20 250], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75};
-customKeyValue3 = {'tfMRI_*', 'pupilRange', [10 250], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75};
+customKeyValue3 = {'tfMRI_*', 'pupilRange', [20 250], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75};
 customKeyValues = {customKeyValue1; customKeyValue2;customKeyValue3};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
