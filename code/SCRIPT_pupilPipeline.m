@@ -178,13 +178,14 @@ pupilPipelineWrapper(pathParams, ...
 pathParams.subjectID = 'TOME_3017';
 pathParams.sessionDate = '032917';
 %for cal (very bad could be better)
-customKeyValue1 = {'*ScaleCal*', 'pupilRange', [20 100], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1.3,'frameMask', [2 30],'exponentialTauParams',[100 100 100 100 100]};
-customKeyValue2 = {'GazeCal*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .7,'cutErrorThreshold', 40};
+customKeyValue1 = {'*ScaleCal*', 'pupilRange', [20 100], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1.3,'frameMask', [2 30],'exponentialTauParams',[100 100 100 100 100],'skipRun',true};
+customKeyValue2 = {'GazeCal*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .7,'cutErrorThreshold', 40,'skipRun',true};
 customKeyValue3 = {'T1*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'cutErrorThreshold',30,'skipRun',true};
 customKeyValue4 = {'T2*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'cutErrorThreshold',30,'skipRun',true};
-customKeyValue5 = {'rfMRI_REST_*', 'pupilRange', [30 180], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'frameMask', [2 40],'cutErrorThreshold',30,'exponentialTauParams',[.25 .25 20 1 1]};
+customKeyValue5 = {'rfMRI_REST_*', 'pupilRange', [30 180], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'frameMask', [2 40],'cutErrorThreshold',30, ...
+    'exponentialTauParams',[.25 .25 20 1 1],'likelihoodErrorExponent',2.0, 'ellipseTransparentUB', [320 240 10000 0.35 0.5*pi],'constrainEccen_x_Theta', [0.35 0.35]};
 customKeyValue6 = {'dMRI_*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03,'cutErrorThreshold',30,'skipRun',true };
-customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3;customKeyValue4;customKeyValue5};
+customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3;customKeyValue4;customKeyValue5;customKeyValue6};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
     'customKeyValues', customKeyValues);
