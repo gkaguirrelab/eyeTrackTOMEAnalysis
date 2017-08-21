@@ -25,7 +25,7 @@ if ~exist(sandboxDir,'dir')
 end
 
 %% hard coded parameters
-nFrames = 200; % number of frames to process (set to Inf to do all)
+nFrames = 2000; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
 TbTbProjectName = 'eyeTOMEAnalysis';
 
@@ -89,7 +89,7 @@ runVideoPipeline( pathParams, ...
     'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, ...
     'pupilRange', [20 120], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1.5, ...
     'overwriteControlFile', true, 'skipPupilBayes', true, ...
-    'skipStage', {'convertRawToGray', 'fitIrisPerimeter', 'makeFitVideo' });
+    'skipStage', {'convertRawToGray','fitIrisPerimeter', 'makeFitVideo' });
 
 %% Define some file names
 grayVideoName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_gray.avi']);
@@ -124,7 +124,7 @@ runVideoPipeline( pathParams, ...
     'whichFieldToPlot','pInitialFitTransparent',...
     'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, ...
     'skipInitialPupilFit', true, ...
-    'skipStage', {'convertRawToGray', 'trackGlint', 'findPupilPerimeter', 'makeControlFile', 'applyControlFile', 'makeFitVideo' });
+    'skipStage', {'convertRawToGray', 'findGlint', 'findPupilPerimeter', 'makeControlFile', 'applyControlFile', 'makeFitVideo' });
 
 %% Create some more videos
 exampleFitVideoName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_Stage5.avi']);
