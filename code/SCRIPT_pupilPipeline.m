@@ -48,7 +48,8 @@ pathParams.projectSubfolder = 'session1_restAndStructure';
 pathParams.subjectID = 'TOME_3001';
 pathParams.sessionDate = '081916';
 customKeyValue1 = {'rfMRI_REST_*','exponentialTauParams', [.25, .25, 10, 1, 1]};
-customKeyValues = {customKeyValue1};
+customKeyValue2 = {'LowResScaleCal*', 'frameMask', [40 40]};
+customKeyValues = {customKeyValue1; customKeyValue2};
 pupilPipelineWrapper(pathParams, ...
     'pupilRange', [20 90], 'pupilCircleThresh', 0.035, 'pupilGammaCorrection', .50, ...
     'useLowResSizeCalVideo',true,'skipStage', {'convertRawToGray'}, ...
