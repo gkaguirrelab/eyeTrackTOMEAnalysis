@@ -289,21 +289,21 @@ pathParams.subjectID = 'TOME_3001';
 pathParams.sessionDate = '081916';
 pupilPipelineWrapper(pathParams, ...
     'pupilRange', [30 200], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .75, ...
-    'useLowResSizeCalVideo',true,'skipStage', {'convertRawToGray'});
+    'useLowResSizeCalVideo',true,'skipStage', {'convertRawToGray','findGlint','findPupilPerimeter'});
 
 %TOME_3002 session2
 pathParams.subjectID = 'TOME_3002';
 pathParams.sessionDate = '082616';
 pupilPipelineWrapper(pathParams, ...
     'pupilRange', [30 200], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .75, ...
-    'useLowResSizeCalVideo',true,'skipStage', {'convertRawToGray'});
+    'useLowResSizeCalVideo',true,'skipStage', {'convertRawToGray','findGlint','findPupilPerimeter'});
 
 %TOME_3003 session2
 pathParams.subjectID = 'TOME_3003';
 pathParams.sessionDate = '091616';
 pupilPipelineWrapper(pathParams, ...
     'pupilRange', [30 200], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .75, ...
-    'useLowResSizeCalVideo',true,'skipStage', {'convertRawToGray'});
+    'useLowResSizeCalVideo',true,'skipStage', {'convertRawToGray','findGlint','findPupilPerimeter'});
 
 %TOME_3004 session2
 pathParams.subjectID = 'TOME_3004';
@@ -312,7 +312,7 @@ customKeyValue1 = {'*Cal*', 'pupilRange', [20 200], 'pupilCircleThresh', 0.04, '
 customKeyValue2 = {'tfMRI_*', 'pupilRange', [20 180], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .5};
 customKeyValues = {customKeyValue1; customKeyValue2};
 pupilPipelineWrapper(pathParams, ...
-    'useLowResSizeCalVideo',true, 'skipStage', {'convertRawToGray'}, ...
+    'useLowResSizeCalVideo',true, 'skipStage', {'convertRawToGray','findGlint','findPupilPerimeter'}, ...
     'customKeyValues', customKeyValues);
 
 %TOME_3005 session2
@@ -320,7 +320,7 @@ pathParams.subjectID = 'TOME_3005';
 pathParams.sessionDate = '100316';
 pupilPipelineWrapper(pathParams, ...
     'pupilRange', [20 180], 'pupilCircleThresh', 0.07, 'pupilGammaCorrection', .5, ...
-    'useLowResSizeCalVideo',true,'skipStage', {'convertRawToGray'});
+    'useLowResSizeCalVideo',true,'skipStage', {'convertRawToGray','findGlint','findPupilPerimeter'});
 
 %TOME_3007 session2
 pathParams.subjectID = 'TOME_3007';
