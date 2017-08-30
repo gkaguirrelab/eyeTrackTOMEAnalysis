@@ -9,8 +9,8 @@
 pupilPipelineWrapper(pathParams, 'lastStage', 'convertRawToGray')
 
 % 2. an operator predetermined the optimal keyValuesPairs for the analysis
-% using this function:
-testExtractParams(pathParams, 'nFrames', 100, 'displayMode', true, 'pupilRange', [30 90], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', 1)
+% using this function
+testParams(pathParams, 'nFrames', 300, 'glintFrameMask', [100 100 70 100])
 
 % 3. some sessions will require custom keyValuePairs for different runs.
 % This custom key values will be explicitely declared within the script.
@@ -47,6 +47,7 @@ pathParams.projectSubfolder = 'session1_restAndStructure';
 % TOME_3001 session1
 pathParams.subjectID = 'TOME_3001';
 pathParams.sessionDate = '081916';
+glintFrameMask = [100 100 70 100];
 customKeyValue1 = {'rfMRI_REST_*','exponentialTauParams', [.25, .25, 10, 1, 1]};
 customKeyValue2 = {'LowResScaleCal*', 'pupilFrameMask', [40 40]};
 customKeyValues = {customKeyValue1; customKeyValue2};
