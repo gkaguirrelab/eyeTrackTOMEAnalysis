@@ -288,8 +288,10 @@ pathParams.projectSubfolder = 'session2_spatialStimuli';
 %TOME_3001 session2
 pathParams.subjectID = 'TOME_3001';
 pathParams.sessionDate = '081916';
+glintFrameMask = [70 100 70 100];
 pupilPipelineWrapper(pathParams, ...
     'pupilRange', [30 200], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .75, ...
+    'glintFrameMask',glintFrameMask, ...
     'useLowResSizeCalVideo',true,'skipStage', {'convertRawToGray'});
 
 %TOME_3002 session2
