@@ -119,6 +119,10 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3005 session1
 pathParams.subjectID = 'TOME_3005';
 pathParams.sessionDate = '092316';
+%for rfmri
+glintFrameMask = [20 120 80 80];
+%for T1 and dmri
+glintFrameMask = [90 110 50 100]];
 customKeyValue1 = {'rfMRI_REST_*','exponentialTauParams', [.25, .25, 10, 1, 1]};
 customKeyValues = {customKeyValue1};
 pupilPipelineWrapper(pathParams, ...
@@ -129,6 +133,10 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3007 session1
 pathParams.subjectID = 'TOME_3007';
 pathParams.sessionDate = '101116';
+%for rfmri
+glintFrameMask = [30 80 80 70];
+%for T1 and dmri
+glintFrameMask = [10 70 110 100]];
 customKeyValue1 = {'rfMRI_REST_*','exponentialTauParams', [.25, .25, 10, 1, 1]};
 customKeyValues = {customKeyValue1};
 pupilPipelineWrapper(pathParams, ...
@@ -139,6 +147,7 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3008 session1
 pathParams.subjectID = 'TOME_3008';
 pathParams.sessionDate = '102116';
+
 customKeyValue1 = {'rfMRI_REST_*','exponentialTauParams', [.25, .25, 10, 1, 1]};
 customKeyValues = {customKeyValue1};
 pupilPipelineWrapper(pathParams, ...
