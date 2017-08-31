@@ -70,9 +70,9 @@ end
 
 %% Define some file names
 % run
-grayVideoName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_gray.avi']);
 glintFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_glint.mat']);
 pupilFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_pupil.mat']);
+calibratedGazeFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_gaze.mat']);
 
 % calibration
 grayVideoNameCAL = fullfile(pathParams.dataOutputDirFull, [pathParams.gazeCalName '_gray.avi']);
@@ -84,7 +84,7 @@ LTdatFileName = fullfile(pathParams.dataSourceDirRoot, ...
     [pathParams.gazeCalName '_LTdat.mat']);
 gazeDataFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.gazeCalName '_gazeCalData.mat']);
 gazeCalParamsFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.gazeCalName '_gazeCalParams.mat']);
-calibratedGazeFileNameCAL = fullfile(pathParams.dataOutputDirFull, [pathParams.gazeCalName '_gaze.mat']);
+
 
 %% Pull calibration data
 
@@ -121,5 +121,25 @@ title('Apparent Gaze location on screen')
 
 %% calc gaze calibration params using the raw data
 
-calcGazeCalibrationParams (gazeDataFileName,gazeCalParamsFileName)
+calcGazeCalibrationParams (gazeDataFileName,gazeCalParamsFileName, 'verbosity', 'none')
+
+%% apply the calibration to the raw data
+
+applyGazeCalibration(pupilFileName,glintFileName,gazeCalParamsFileName,calibratedGazeFileName)
+
+%% plot the calibrated data in screen and polar coordinates
+
+% load gaze data
+
+tmpData = load(calibratedGazeFileName);
+
+% extract coordinates of pupil center
+gazeStruct.X = tmpData.calibratedGaze.X;
+gazeStruct.Y = tmpData.calibratedGaze.Y;
+gazeStruct.ecc = tmpData.calibratedGaze.ecc;
+gazeStruct.pol = tmpData.calibratedGaze.pol;
+
+clear tmpData
+
+plotCalibratedGaze(gazeStruct)
 

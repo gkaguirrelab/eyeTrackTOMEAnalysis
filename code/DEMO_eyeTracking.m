@@ -25,7 +25,7 @@ if ~exist(sandboxDir,'dir')
 end
 
 %% hard coded parameters
-nFrames = 2000; % number of frames to process (set to Inf to do all)
+nFrames = Inf; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
 TbTbProjectName = 'eyeTOMEAnalysis';
 
@@ -37,7 +37,7 @@ pathParams.projectSubfolder = 'session2_spatialStimuli';
 pathParams.eyeTrackingDir = 'EyeTracking';
 pathParams.subjectID = 'TOME_3020';
 pathParams.sessionDate = '050517';
-pathParams.runName = 'tfMRI_FLASH_AP_run01';
+pathParams.runName = 'tfMRI_RETINO_PA_run01';
 
 
 %% TbTb configuration
@@ -88,7 +88,7 @@ end
 runVideoPipeline( pathParams, ...
     'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, ...
     'pupilRange', [20 120], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1.5, ...
-    'overwriteControlFile', true, 'skipPupilBayes', true, ...
+    'overwriteControlFile', true, 'skipPupilBayes', false, ...
     'skipStage', {'convertRawToGray','fitIrisPerimeter', 'makeFitVideo' });
 
 %% Define some file names
