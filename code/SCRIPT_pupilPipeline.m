@@ -211,17 +211,20 @@ pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
     'customKeyValues', customKeyValues);
 
-%%%%%%% MISSING GLINT FRAME MASK FROM HERE ON
 % TOME_3016 session1
 pathParams.subjectID = 'TOME_3016';
 pathParams.sessionDate = '031017';
-customKeyValue1 = {'RawScaleCal*', 'pupilGammaCorrection', .7,'pupilFrameMask', [60 40]};
+customKeyValue1 = {'RawScaleCal*', 'pupilGammaCorrection', .7,'pupilFrameMask', [60 40],'glintFrameMask', [70 60 80 150]};
 customKeyValue2 = {'GazeCal*', 'pupilGammaCorrection', .7,'cutErrorThreshold', 35};
-customKeyValue3 = {'T1*', 'pupilGammaCorrection', 1,'glintGammaCorrection', 5.5,'cutErrorThreshold', 25};
-customKeyValue4 = {'T2*', 'pupilGammaCorrection', 1,'glintGammaCorrection', 5.5,'cutErrorThreshold', 25};
-customKeyValue5 = {'dMRI_*', 'pupilGammaCorrection', 1,'glintGammaCorrection', 5.5,'cutErrorThreshold', 25};
-customKeyValue6 = {'rfMRI_REST_*', 'pupilRange', [30 330], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', 1,'glintGammaCorrection', 5.5,'cutErrorThreshold', 27, ...
-    'exponentialTauParams',[.25 .25 10 1 1],'likelihoodErrorExponent',[1.25 1.25 2 2 2], 'ellipseTransparentUB', [320 240 10000 0.35 0.5*pi],'constrainEccen_x_Theta', [0.35 0.35]};
+customKeyValue3 = {'T1*', 'pupilGammaCorrection', 1,'glintFrameMask', [70 60 80 150],'cutErrorThreshold', 25};
+customKeyValue4 = {'T2*', 'pupilGammaCorrection', 1,'glintFrameMask', [70 60 80 150],'cutErrorThreshold', 25};
+customKeyValue5 = {'dMRI_*', 'pupilGammaCorrection', 1,'glintFrameMask', [70 60 80 150],'cutErrorThreshold', 25};
+customKeyValue6 = {'rfMRI_REST_*', ...
+    'pupilRange', [30 330], 'pupilCircleThresh', 0.06, 'pupilGammaCorrection', 1,...
+    'glintFrameMask',[70 80 70 120], ...
+    'cutErrorThreshold', 27,  'exponentialTauParams',[.25 .25 10 1 1],...
+    'likelihoodErrorExponent',[1.25 1.25 2 2 2], 'ellipseTransparentUB', [320 240 10000 0.35 0.5*pi], ...
+    'constrainEccen_x_Theta', [0.35 0.35]};
 customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4; customKeyValue5; customKeyValue6};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
@@ -231,12 +234,12 @@ pupilPipelineWrapper(pathParams, ...
 pathParams.subjectID = 'TOME_3017';
 pathParams.sessionDate = '032917';
 customKeyValue1 = {'*ScaleCal*', 'pupilRange', [20 100], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1.3,'pupilFrameMask', [2 30]};
-customKeyValue2 = {'GazeCal*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .7,'cutErrorThreshold', 40};
-customKeyValue3 = {'T1*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03,'cutErrorThreshold',30};
-customKeyValue4 = {'T2*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03, 'cutErrorThreshold',30};
-customKeyValue5 = {'rfMRI_REST_*', 'pupilRange', [30 180], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'pupilFrameMask', [2 40],'glintFrameMask', [2 40],'cutErrorThreshold',30, ...
+customKeyValue2 = {'GazeCal*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .7,'cutErrorThreshold', 40, 'glintFrameMask', [20 50 110 160]};
+customKeyValue3 = {'T1*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03,'cutErrorThreshold',30, 'glintFrameMask', [20 50 110 160]};
+customKeyValue4 = {'T2*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03, 'cutErrorThreshold',30, 'glintFrameMask', [20 50 110 160]};
+customKeyValue5 = {'rfMRI_REST_*', 'pupilRange', [30 180], 'pupilCircleThresh', 0.03, 'pupilGammaCorrection', .75,'pupilFrameMask', [2 40],'glintFrameMask', [10 80 90 100],'cutErrorThreshold',30, ...
     'exponentialTauParams',[.25 .25 10 1 1],'likelihoodErrorExponent',[1.25 1.25 2 2 2], 'ellipseTransparentUB', [320 240 10000 0.35 0.5*pi],'constrainEccen_x_Theta', [0.35 0.35]};
-customKeyValue6 = {'dMRI_*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03,'cutErrorThreshold',30 };
+customKeyValue6 = {'dMRI_*', 'pupilRange', [30 150], 'pupilCircleThresh', 0.03,'cutErrorThreshold',30, 'glintFrameMask', [20 50 110 160] };
 customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4; customKeyValue5; customKeyValue6};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
@@ -245,10 +248,14 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3018 session1 -- first date
 pathParams.subjectID = 'TOME_3018';
 pathParams.sessionDate = '040717';
-customKeyValue1 = {'*Cal*', 'pupilRange', [15 100], 'pupilCircleThresh', 0.03};
-customKeyValue2 = {'dMRI_*', 'pupilRange', [15 100], 'pupilCircleThresh', 0.03};
-customKeyValue3 = {'rfMRI_REST_*', 'pupilRange', [15 200], 'pupilCircleThresh', 0.05,'exponentialTauParams', [.25, .25, 10, 1, 1]};
-customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3};
+customKeyValue1 = {'*Cal*', 'pupilRange', [15 100], 'pupilCircleThresh', 0.03, 'glintFrameMask', [40 80 60 100]};
+customKeyValue2 = {'dMRI_*', 'pupilRange', [15 100], 'pupilCircleThresh', 0.03,'glintFrameMask', [40 80 60 100]};
+customKeyValue3 = {'rfMRI_REST_*', 'glintFrameMask', [40 80 60 80],...
+    'pupilRange', [15 200], 'pupilCircleThresh', 0.05,...
+    'exponentialTauParams', [.25, .25, 10, 1, 1]};
+customKeyValue4 = {'T1*', 'glintFrameMask', [40 80 60 100]};
+customKeyValue5 = {'T2*', 'glintFrameMask', [40 80 60 100]};
+customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4; customKeyValue5};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
     'customKeyValues', customKeyValues);
@@ -256,10 +263,13 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3018 session1 -- second date
 pathParams.subjectID = 'TOME_3018';
 pathParams.sessionDate = '041817';
-customKeyValue1 = {'*Cal*', 'pupilRange', [10 100], 'pupilCircleThresh', 0.03};
-customKeyValue2 = {'dMRI_*', 'pupilRange', [10 100], 'pupilCircleThresh', 0.03};
-customKeyValue3 = {'rfMRI_REST_*', 'pupilRange', [10 140], 'pupilCircleThresh', 0.04, 'exponentialTauParams', [.25, .25, 10, 1, 1]};
-customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3};
+customKeyValue1 = {'*Cal*', 'pupilRange', [10 100], 'pupilCircleThresh', 0.03, 'glintFrameMask', [40 60 60 110]};
+customKeyValue2 = {'dMRI_*', 'pupilRange', [10 100], 'pupilCircleThresh', 0.03, 'glintFrameMask', [40 60 60 110]};
+customKeyValue3 = {'rfMRI_REST_*', 'glintFrameMask', [40 60 60 110] ...
+    'pupilRange', [10 140], 'pupilCircleThresh', 0.04, 'exponentialTauParams', [.25, .25, 10, 1, 1]};
+customKeyValue4 = {'T1*', 'glintFrameMask', [40 70 80 100]};
+customKeyValue5 = {'T2*', 'glintFrameMask', [40 60 60 110]};
+customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4; customKeyValue5};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
     'customKeyValues', customKeyValues);
@@ -271,17 +281,20 @@ customKeyValue1 = {'rfMRI_REST_*','exponentialTauParams', [.25, .25, 10, 1, 1]};
 customKeyValues = {customKeyValue1};
 pupilPipelineWrapper(pathParams, ...
     'pupilCircleThresh', 0.04, ...
+    'glintFrameMask', [60 40 50 130], ...
     'skipStage', {'convertRawToGray'}, ...
     'customKeyValues', customKeyValues);
 
 % TOME_3020 session1
 pathParams.subjectID = 'TOME_3020';
 pathParams.sessionDate = '042817';
-customKeyValue1 = {'*Cal*', 'pupilRange', [15 180], 'pupilCircleThresh', 0.05};
-customKeyValue2 = {'T1*', 'pupilRange', [15 180], 'pupilCircleThresh', 0.05};
-customKeyValue3 = {'dMRI_*', 'pupilRange', [15 180], 'pupilCircleThresh', 0.05};
-customKeyValue4 = {'rfMRI_REST_*', 'pupilRange', [40 300], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .5,'exponentialTauParams', [.25, .25, 10, 1, 1]};
-customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4};
+customKeyValue1 = {'*Cal*', 'pupilRange', [15 180], 'pupilCircleThresh', 0.05, 'glintFrameMask', [70 60 40 110]};
+customKeyValue2 = {'T1*', 'pupilRange', [15 180], 'pupilCircleThresh', 0.05, 'glintFrameMask', [70 60 40 110]};
+customKeyValue3 = {'T2*', 'pupilRange', [15 180], 'pupilCircleThresh', 0.05, 'glintFrameMask', [70 60 40 110]};
+customKeyValue4 = {'dMRI_*', 'pupilRange', [15 180], 'pupilCircleThresh', 0.05, 'glintFrameMask', [70 60 40 110]};
+customKeyValue5 = {'rfMRI_REST_*', 'glintFrameMask', [70 60 40 110], ...
+    'pupilRange', [40 300], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', .5,'exponentialTauParams', [.25, .25, 10, 1, 1]};
+customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4; customKeyValue5};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
     'customKeyValues', customKeyValues);
@@ -289,8 +302,9 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3021 session1
 pathParams.subjectID = 'TOME_3021';
 pathParams.sessionDate = '060717';
-customKeyValue1 = {'*Cal*', 'pupilCircleThresh', 0.04};
-customKeyValue2 = {'rfMRI_REST_*', 'pupilCircleThresh', 0.04, 'likelihoodErrorExponent', [1.25 1.25 2 2 2],'exponentialTauParams', [.25, .25, 10, 1, 1]};
+customKeyValue1 = {'*Cal*', 'pupilCircleThresh', 0.04, 'glintFrameMask', [80 80 10 90]};
+customKeyValue2 = {'rfMRI_REST_*', 'glintFrameMask',  [70 110 40 70], ...
+    'pupilCircleThresh', 0.04, 'likelihoodErrorExponent', [1.25 1.25 2 2 2],'exponentialTauParams', [.25, .25, 10, 1, 1]};
 customKeyValues = {customKeyValue1; customKeyValue2};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
@@ -299,12 +313,14 @@ pupilPipelineWrapper(pathParams, ...
 % TOME_3022 session1
 pathParams.subjectID = 'TOME_3022';
 pathParams.sessionDate = '061417';
-customKeyValue1 = {'*Cal*', 'pupilCircleThresh', 0.04};
-customKeyValue2 = {'T1*', 'pupilCircleThresh', 0.03};
-customKeyValue3 = {'dMRI_*', 'pupilCircleThresh', 0.03};
-customKeyValue4 = {'rfMRI_REST_*', 'pupilRange', [30 400], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1,...
+customKeyValue1 = {'*Cal*', 'pupilCircleThresh', 0.04, 'glintFrameMask',  [80 60 50 130]};
+customKeyValue2 = {'T1*', 'pupilCircleThresh', 0.03, 'glintFrameMask',  [80 60 50 130]};
+customKeyValue3 = {'T2*', 'pupilCircleThresh', 0.03, 'glintFrameMask',  [80 60 50 130]};
+customKeyValue4 = {'dMRI_*', 'pupilCircleThresh', 0.03, 'glintFrameMask',  [80 60 50 130]};
+customKeyValue5 = {'rfMRI_REST_*', 'glintFrameMask',  [30 60 50 110], ...
+    'pupilRange', [30 400], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1,...
     'exponentialTauParams', [.25, .25, 10, 1, 1], 'likelihoodErrorExponent', [1.25 1.25 2 2 2]};
-customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4};
+customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4; customKeyValue5};
 pupilPipelineWrapper(pathParams, ...
     'skipStage', {'convertRawToGray'}, ...
     'customKeyValues', customKeyValues);
