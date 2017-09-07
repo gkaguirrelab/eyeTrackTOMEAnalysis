@@ -1,4 +1,4 @@
-function DEMO_gazeCalibration
+
 % DEMO_eyeTracking
 %
 % Demonstrate the sizeCalibration function.
@@ -88,10 +88,10 @@ gazeCalFactorsFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.gaze
 % 1. just pull out LT calibration data (example for those runs that do not
 % have a raw video for gaze calibration)
 LTgazeDataFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.gazeCalName '_LTgazeCalData.mat']);
-prepareLTGazeCalibrationData (LTdatFileName,LTgazeDataFileName,'useLiveTrackGazeData',true)
+prepareLTGazeCalibrationData(LTdatFileName,LTgazeDataFileName,'useLiveTrackGazeData',true,'showFigures',true)
 
 %2. now pull out the gaze data from the raw video
-prepareLTGazeCalibrationData (LTdatFileName,gazeDataFileName,'useLiveTrackGazeData',false)
+prepareLTGazeCalibrationData(LTdatFileName,gazeDataFileName,'useLiveTrackGazeData',false,'showFigures',true)
 
 %% compare calibration data from LT and raw video
 % here we just plot the apparent gaze location in pixels to see how the
@@ -118,7 +118,7 @@ title('Apparent Gaze location on screen')
 
 %% calc gaze calibration params using the raw data
 
-calcGazeCalFactors(gazeDataFileName,gazeCalFactorsFileName,'verbosity','full')
+calcGazeCalFactors(gazeDataFileName,gazeCalFactorsFileName,'verbosity','full','showFigures',true)
 
 %% apply the calibration to the raw data
 
@@ -128,21 +128,13 @@ applyGazeCalibration(pupilFileName,glintFileName,gazeCalFactorsFileName,calibrat
 
 % load gaze data
 
-tmpData = load(calibratedGazeFileName);
-
-% extract coordinates of pupil center
-gazeStruct.X = tmpData.calibratedGaze.X;
-gazeStruct.Y = tmpData.calibratedGaze.Y;
-gazeStruct.ecc = tmpData.calibratedGaze.ecc;
-gazeStruct.pol = tmpData.calibratedGaze.pol;
-
-clear tmpData
+load(calibratedGazeFileName);
 
 % scatter plots
-plotCalibratedGaze(gazeStruct,'whichCoordSystem','screen','plotType','scatter')
-plotCalibratedGaze(gazeStruct,'whichCoordSystem','polar','plotType','scatter')
+plotCalibratedGaze(calibratedGaze,'whichCoordSystem','screen','plotType','scatter')
+plotCalibratedGaze(calibratedGaze,'whichCoordSystem','polar','plotType','scatter')
 
 % timeseries
-plotCalibratedGaze(gazeStruct,'whichCoordSystem','screen','plotType','timeseries')
-plotCalibratedGaze(gazeStruct,'whichCoordSystem','polar','plotType','timeseries')
+plotCalibratedGaze(calibratedGaze,'whichCoordSystem','screen','plotType','timeseries')
+plotCalibratedGaze(calibratedGaze,'whichCoordSystem','polar','plotType','timeseries')
 
