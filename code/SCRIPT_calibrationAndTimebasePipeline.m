@@ -26,9 +26,41 @@ pathParams.eyeTrackingDir = 'EyeTracking';
 pathParams.projectSubfolder = 'session1_restAndStructure';
 
 % TOME_3001 session1
+% no gaze calibration collected
 pathParams.subjectID = 'TOME_3001';
 pathParams.sessionDate = '081916';
 customKeyValue1 = {'T2*','skipStage',{'deriveTimebaseFromLTData'}}; % there is no report for this run
 customKeyValues = {customKeyValue1};
 calibrationAndTimebasePipelineWrapper(pathParams,'reportSanityCheck',false, ...
     'customKeyValues', customKeyValues);
+
+% TOME_3002 session1 SKIPPED
+% no gaze calibration collected
+% need to process sizeCal Videos
+pathParams.subjectID = 'TOME_3002';
+pathParams.sessionDate = '082616';
+calibrationAndTimebasePipelineWrapper(pathParams,'reportSanityCheck',false);
+
+% TOME_3003 session1 SKIPPED
+% no gaze calibration collected
+% need to process sizeCal Videos
+pathParams.subjectID = 'TOME_3003';
+pathParams.sessionDate = '090216';
+calibrationAndTimebasePipelineWrapper(pathParams,'reportSanityCheck',false);
+
+% TOME_3004 session1 A
+pathParams.subjectID = 'TOME_3004';
+pathParams.sessionDate = '091916';
+calibrationAndTimebasePipelineWrapper(pathParams,'reportSanityCheck',false);
+
+
+
+
+
+% TOME_3016 session1
+pathParams.subjectID = 'TOME_3016';
+pathParams.sessionDate = '031017';
+calibrationAndTimebasePipelineWrapper(pathParams,'reportSanityCheck',false);
+
+
+
