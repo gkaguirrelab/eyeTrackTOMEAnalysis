@@ -118,7 +118,7 @@ title('Apparent Gaze location on screen')
 
 %% calc gaze calibration params using the raw data
 
-calcGazeCalFactors (gazeDataFileName,gazeCalFactorsFileName,'verbosity','full')
+calcGazeCalFactors(gazeDataFileName,gazeCalFactorsFileName,'verbosity','full')
 
 %% apply the calibration to the raw data
 
