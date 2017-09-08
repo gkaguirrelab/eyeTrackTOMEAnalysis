@@ -75,7 +75,7 @@ pupilFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_pup
 calibratedGazeFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_calibratedGaze.mat']);
 
 % calibration
-grayVideoNameCAL = fullfile(pathParams.dataOutputDirFull, [pathParams.gazeCalName '_gray.avi']);
+targetsFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.gazeCalName '_targets.mat']);
 glintFileNameCAL = fullfile(pathParams.dataOutputDirFull, [pathParams.gazeCalName '_glint.mat']);
 pupilFileNameCAL = fullfile(pathParams.dataOutputDirFull, [pathParams.gazeCalName '_pupil.mat']);
 LTdatFileName = fullfile(pathParams.dataOutputDirFull,[pathParams.gazeCalName '_LTdat.mat']);
@@ -88,11 +88,12 @@ gazeCalFactorsFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.gaze
 % 1. just pull out LT calibration data (example for those runs that do not
 % have a raw video for gaze calibration)
 LTgazeDataFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.gazeCalName '_LTgazeCalData.mat']);
-prepareLTGazeCalibrationData(LTdatFileName,LTgazeDataFileName,'useLiveTrackGazeData',true,'showFigures',true)
+copyLTdatToGazeData(LTdatFileName,LTgazeDataFileName)
 
-%2. now pull out the gaze data from the raw video
-prepareLTGazeCalibrationData(LTdatFileName,gazeDataFileName,'useLiveTrackGazeData',false,'showFigures',true)
-
+%2. calibrate using the raw video
+targetInfoFile = LTdatFileName;
+makeTargetsFile(targetInfoFile,targetsFileName,'targetsInfoFileType','LiveTrack','targetsLayout','3x3grid','viewingDistance', 1065)
+calcGazeCalData(pupilFileNameCAL,glintFileNameCAL,targetsFileName,gazeDataFileName)
 %% compare calibration data from LT and raw video
 % here we just plot the apparent gaze location in pixels to see how the
 % LiveTrack data compares to the bayesian tracked data.
