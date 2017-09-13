@@ -148,7 +148,14 @@ for rr = 1 :length(sourceVideos) % loop over video files
     customArgs=[];
     if ~isempty(p.Results.customKeyValues)
         checkForRunNameMatchCell = cellfun(@(x) regexp(pathParams.runName, regexptranslate('wildcard',x)), runNamesToCustomize,'UniformOutput',false);
-        checkForRunNameMatchLogical = cellfun(@(x) ~isempty(x),checkForRunNameMatchCell);
+        % loop and sum each line
+        for jj = 1:length(checkForRunNameMatchCell)
+            if isnumeric(checkForRunNameMatchCell{jj})
+                checkForRunNameMatchLogical(jj) = any(checkForRunNameMatchCell{jj});
+            elseif iscell(checkForRunNameMatchCell{jj})
+                checkForRunNameMatchLogical(jj) = sum(cellfun(@(x) ~isempty(x), checkForRunNameMatchCell{jj}),2);
+            end
+        end
         if any(checkForRunNameMatchLogical)
             if length(find(checkForRunNameMatchLogical))==1
                 customArgs=p.Results.customKeyValues{find(checkForRunNameMatchLogical)};
