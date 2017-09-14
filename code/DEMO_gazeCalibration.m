@@ -1,7 +1,7 @@
 
 % DEMO_eyeTracking
 %
-% Demonstrate the sizeCalibration function.
+% Demonstrate the gazeCalibration function.
 %
 % This function will work in the same sandbox folder as the one created by
 % DEMO_eyetracking.
@@ -60,7 +60,7 @@ end
 % Download and unzip the calibration data if it is not already there
 calData = fullfile(pathParams.dataOutputDirFull,'gazeCalData.zip');
 if ~exist (calData,'file')
-    url = 'https://ndownloader.figshare.com/files/9262546?private_link=0f7b4fcc973c34f88a24';
+    url = 'https://ndownloader.figshare.com/files/9326233?private_link=0f7b4fcc973c34f88a24';
     system (['curl -L ' sprintf(url) ' > ' sprintf(calData)])
     currentDir = pwd;
     cd (pathParams.dataOutputDirFull)
@@ -73,6 +73,8 @@ end
 glintFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_glint.mat']);
 pupilFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_pupil.mat']);
 calibratedGazeFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_calibratedGaze.mat']);
+ltReportFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_report.mat']);
+timebaseFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_timebase.mat']);
 
 % calibration
 targetsFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.gazeCalName '_targets.mat']);
@@ -139,3 +141,6 @@ plotCalibratedGaze(calibratedGaze,'whichCoordSystem','polar','plotType','scatter
 plotCalibratedGaze(calibratedGaze,'whichCoordSystem','screen','plotType','timeseries')
 plotCalibratedGaze(calibratedGaze,'whichCoordSystem','polar','plotType','timeseries')
 
+
+%% derive timebase
+deriveTimebaseFromLTData(glintFileName,ltReportFileName,timebaseFileName, 'plotAlignment',true)
