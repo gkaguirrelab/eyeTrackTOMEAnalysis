@@ -47,7 +47,7 @@ pathParams.projectSubfolder = 'session1_restAndStructure';
 % TOME_3001 session1
 pathParams.subjectID = 'TOME_3001';
 pathParams.sessionDate = '081916';
-customKeyValue1 = {'rfMRI_REST_*','exponentialTauParams', [.25, .25, 10, 1, 1],'glintFrameMask',[60 100 90 80],'likelihoodErrorExponent',[1.25 1.25 2 2 2],};
+customKeyValue1 = {'rfMRI_REST_*','exponentialTauParams', [.25, .25, 10, 1, 1],'glintFrameMask',[60 100 90 80],'likelihoodErrorExponent',[1.25 1.25 2 2 2]};
 customKeyValue2 = {'LowResScaleCal*', 'pupilFrameMask', [40 40]};
 customKeyValue3 = {{'dMRI_dir99_PA*','dMRI_dir98*','T1*','T2*'}, 'glintFrameMask',[110 100 70 100] };
 customKeyValue4 = {'dMRI_dir99_AP','glintFrameMask',[130 100 70 100]};
@@ -85,11 +85,10 @@ pupilPipelineWrapper(pathParams, ...
 pathParams.subjectID = 'TOME_3004';
 pathParams.sessionDate = '091916';
 customKeyValue1 = {'LowResScaleCal*', 'pupilCircleThresh', 0.02, 'pupilRange', [20 60], 'pupilFrameMask', [60 40],'perimeterColor','r'};
-customKeyValue2 = {'rfMRI_REST_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05,'exponentialTauParams', [.25, .25, 10, 1, 1],'glintFrameMask',[30 80 90 90]};
-customKeyValue3 = {'dMRI_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'glintFrameMask', [10 100 120 100]};
-customKeyValue4 = {'T1_', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05,'glintFrameMask', [10 100 120 100]};
-customKeyValue5 = {'T2_', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05,'glintFrameMask', [10 100 120 100]};
-customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4; customKeyValue5};
+customKeyValue2 = {'rfMRI_REST_*', 'pupilRange', [30 100], 'pupilGammaCorrection', 1.8,'exponentialTauParams', [.25, .25, 10, 1, 1], 'likelihoodErrorExponent',[1.25 1.25 2 2 2], 'glintFrameMask',[40 100 110 130]};
+customKeyValue3 = {'dMRI_*', 'pupilRange', [30 100], 'pupilCircleThresh', 0.05, 'glintFrameMask', [30 110 140 130]};
+customKeyValue4 = {{'T1_*','T2_*'}, 'pupilRange', [30 100], 'pupilCircleThresh', 0.05,'glintFrameMask', [25 110 150 130]};
+customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4};
 pupilPipelineWrapper(pathParams, ...
     'useLowResSizeCalVideo',true, 'skipStage', {'convertRawToGray'}, ...
     'customKeyValues', customKeyValues);
