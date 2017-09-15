@@ -60,7 +60,7 @@ end
 % Download and unzip the calibration data if it is not already there
 calData = fullfile(pathParams.dataOutputDirFull,'gazeCalData.zip');
 if ~exist (calData,'file')
-    url = 'https://ndownloader.figshare.com/files/9326233?private_link=0f7b4fcc973c34f88a24';
+    url = 'https://ndownloader.figshare.com/files/9329932?private_link=0f7b4fcc973c34f88a24';
     system (['curl -L ' sprintf(url) ' > ' sprintf(calData)])
     currentDir = pwd;
     cd (pathParams.dataOutputDirFull)
