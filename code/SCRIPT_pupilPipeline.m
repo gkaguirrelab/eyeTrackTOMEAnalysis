@@ -48,8 +48,8 @@ pathParams.projectSubfolder = 'session1_restAndStructure';
 pathParams.subjectID = 'TOME_3001';
 pathParams.sessionDate = '081916';
 customKeyValue1 = {'rfMRI_REST_*','exponentialTauParams', [.25, .25, 10, 1, 1],'glintFrameMask',[60 100 90 80],'likelihoodErrorExponent',[1.25 1.25 2 2 2]};
-customKeyValue2 = {'LowResScaleCal*', 'pupilFrameMask', [40 40]};
-customKeyValue3 = {{'dMRI_dir99_PA*','dMRI_dir98*','T1*','T2*'}, 'glintFrameMask',[110 100 70 100] };
+customKeyValue2 = {'LowResScaleCal*', 'pupilFrameMask', [70 50 70 100]};
+customKeyValue3 = {{'dMRI_dir99_PA*','dMRI_dir98*','T1*','T2*'}, 'glintFrameMask',[110 100 70 100]};
 customKeyValue4 = {'dMRI_dir99_AP','glintFrameMask',[130 100 70 100]};
 customKeyValues = {customKeyValue1; customKeyValue2; customKeyValue3; customKeyValue4};
 pupilPipelineWrapper(pathParams, ...
