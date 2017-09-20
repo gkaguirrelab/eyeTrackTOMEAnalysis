@@ -18,29 +18,6 @@ testParams(pathParams, 'nFrames', 3000, 'glintFrameMask', [100 100 70 100])
 % 4. session for which only LowRes Size calibration videos are available are 
 % properly flagged.
 
-
-%% Common to all script lines to define the dropbox directories
-
-% set dropbox directory
-[~,hostname] = system('hostname');
-hostname = strtrim(lower(hostname));
-if strcmp(hostname,'melchior.uphs.upenn.edu') %melchior has some special dropbox folder settings
-    dropboxDir = '/Volumes/Bay_2_data/giulia/Dropbox-Aguirre-Brainard-Lab';
-else % other machines use the standard dropbox location
-    [~, userName] = system('whoami');
-    userName = strtrim(userName);
-    dropboxDir = ...
-        fullfile('/Users', userName, ...
-        '/Dropbox (Aguirre-Brainard Lab)');
-end
-
-% set common path params
-pathParams.dataSourceDirRoot = fullfile(dropboxDir,'TOME_data');
-pathParams.dataOutputDirRoot = fullfile(dropboxDir,'TOME_processing');
-pathParams.controlFileDirRoot = fullfile(dropboxDir,'TOME_processing');
-pathParams.eyeTrackingDir = 'EyeTracking';
-
-
 %% Formatting convention for the custom keyValues
 %  To make the script easier to read, we follow this convention for adding
 %  customKeyValues.
@@ -65,6 +42,29 @@ pathParams.eyeTrackingDir = 'EyeTracking';
 %           'skipStage', {'convertRawToGray'}, ...
 %           'customKeyValues', customKeyValues);
 % 
+
+%% Common to all script lines to define the dropbox directories
+
+% set dropbox directory
+[~,hostname] = system('hostname');
+hostname = strtrim(lower(hostname));
+if strcmp(hostname,'melchior.uphs.upenn.edu') %melchior has some special dropbox folder settings
+    dropboxDir = '/Volumes/Bay_2_data/giulia/Dropbox-Aguirre-Brainard-Lab';
+else % other machines use the standard dropbox location
+    [~, userName] = system('whoami');
+    userName = strtrim(userName);
+    dropboxDir = ...
+        fullfile('/Users', userName, ...
+        '/Dropbox (Aguirre-Brainard Lab)');
+end
+
+% set common path params
+pathParams.dataSourceDirRoot = fullfile(dropboxDir,'TOME_data');
+pathParams.dataOutputDirRoot = fullfile(dropboxDir,'TOME_processing');
+pathParams.controlFileDirRoot = fullfile(dropboxDir,'TOME_processing');
+pathParams.eyeTrackingDir = 'EyeTracking';
+
+
 %% SESSION 1 HERE
 pathParams.projectSubfolder = 'session1_restAndStructure';
 
