@@ -25,7 +25,7 @@ if ~exist(sandboxDir,'dir')
 end
 
 %% hard coded parameters
-nFrames = Inf; % number of frames to process (set to Inf to do all)
+nFrames = 500; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
 TbTbProjectName = 'eyeTOMEAnalysis';
 
@@ -37,7 +37,8 @@ pathParams.projectSubfolder = 'session2_spatialStimuli';
 pathParams.eyeTrackingDir = 'EyeTracking';
 pathParams.subjectID = 'TOME_3020';
 pathParams.sessionDate = '050517';
-pathParams.runName = 'tfMRI_RETINO_PA_run01';
+pathParams.runName = 'GazeCal01';
+% pathParams.runName = 'tfMRI_RETINO_PA_run01';
 
 
 %% TbTb configuration
@@ -65,15 +66,15 @@ pathParams.dataOutputDirFull = fullfile(pathParams.dataOutputDirRoot, pathParams
 pathParams.controlFileDirFull = fullfile(pathParams.controlFileDirRoot, pathParams.projectSubfolder, ...
     pathParams.subjectID, pathParams.sessionDate, pathParams.eyeTrackingDir);
 
-% Since we are operating in a sandbox, create the data directory
-if ~exist(pathParams.dataSourceDirFull,'dir')
-    mkdir(pathParams.dataSourceDirFull)
-end
 % Download the data if it is not already there
-rawVideoName = fullfile(pathParams.dataSourceDirFull,[pathParams.runName '_raw.mov']);
-if ~exist (rawVideoName,'file')
-    url = 'https://ndownloader.figshare.com/files/8711089?private_link=8279728e507d375541c7';
-    system (['curl -L ' sprintf(url) ' > ' sprintf(rawVideoName)])
+demoPackage = fullfile(sandboxDir,'eyeTrackingDEMO.zip');
+if ~exist (demoPackage,'file')
+    url = 'https://ndownloader.figshare.com/files/9355459?private_link=011191afe46841d2c2f5';
+    system (['curl -L ' sprintf(url) ' > ' sprintf(demoPackage)])
+    currentDir = pwd;
+    cd (sandboxDir)
+    unzip(demoPackage)
+    cd (currentDir)
 end
 
 
@@ -83,13 +84,12 @@ end
 %     'pupilRange', [20 120], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1.5, ...
 %     'overwriteControlFile', true);
 
-
 %% Perform the analysis up to initial pupil fit
 runVideoPipeline( pathParams, ...
     'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, ...
     'pupilRange', [20 120], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1.5, ...
-    'overwriteControlFile', true, 'skipPupilBayes', false, ...
-    'skipStage', {'convertRawToGray','fitIrisPerimeter', 'makeFitVideo' });
+    'overwriteControlFile', true, 'skipPupilBayes', true, ...
+    'skipStage', {'fitIrisPerimeter', 'makeFitVideo' });
 
 %% Define some file names
 grayVideoName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_gray.avi']);
