@@ -71,7 +71,7 @@ pupilFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_pup
 calibratedGazeFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_calibratedGaze.mat']);
 ltReportFileName = fullfile(pathParams.dataSourceDirFull, [pathParams.runName '_report.mat']);
 timebaseFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_timebase.mat']);
-
+eyeResponseFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_eyeResponse.mat']);
 % size calibration
 sizeCalFactorsFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_sizeCalFactors.mat']);
 
@@ -168,4 +168,5 @@ plotCalibratedGaze(calibratedGaze,'whichCoordSystem','polar','plotType','timeser
 
 
 %% make eyeResponse struct
-% coming soon
+
+makeEyeResponse(timebase,calibratedPupil,calibratedGaze,eyeResponseFileName)
