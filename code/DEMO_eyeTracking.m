@@ -27,7 +27,7 @@ end
 %% hard coded parameters
 nFrames = 500; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
-TbTbProjectName = 'eyeTOMEAnalysis';
+TbTbProjectName = 'eyeTrackTOMEAnalysis';
 
 % define path parameters
 pathParams.dataSourceDirRoot = fullfile(sandboxDir,'TOME_data');

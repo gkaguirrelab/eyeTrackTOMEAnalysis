@@ -16,7 +16,7 @@ end
 
 %% hard coded parameters
 verbosity = 'full'; % Set to none to make the demo silent
-TbTbProjectName = 'eyeTOMEAnalysis';
+TbTbProjectName = 'eyeTrackTOMEAnalysis';
 
 % define path parameters
 pathParams.dataSourceDirRoot = fullfile(sandboxDir,'TOME_data');
