@@ -1,4 +1,4 @@
-function eyeTOMEAnalysisLocalHook
+function eyeTrackTOMEAnalysisLocalHook
 %
 % For use with the ToolboxToolbox.  Copy this into your
 % ToolboxToolbox localToolboxHooks directory (by defalut,
@@ -12,13 +12,13 @@ function eyeTOMEAnalysisLocalHook
 % to match what is true on your computer.
 
 %% Say hello
-fprintf('* Running eyeTOMEAnalysisLocalHook...');
+fprintf('* Running eyeTrackTOMEAnalysisLocalHook...');
 
 %% Set preferences
 
 % Find the project directory, add it to the path, save this as a
 %  pref, and then make this the current directory
-projectDir = fullfile(tbLocateProject('eyeTOMEAnalysis'));
+projectDir = fullfile(tbLocateProject('eyeTrackTOMEAnalysis'));
 addpath(genpath(projectDir));
-setpref('eyeTOMEAnalysis', 'projectDir', projectDir);
+setpref('eyeTrackTOMEAnalysis', 'projectDir', projectDir);
 
