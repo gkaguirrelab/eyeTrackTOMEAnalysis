@@ -8,8 +8,8 @@
 %
 % Make sure your machine is configured to work with ToolboxToolbox.
 %
-% Run-time on an average computer is about XX minutes. For a quicker demo,
-% reduce the hardcoded nFrames to (e.g.) 1000.
+% Run-time on an average computer is about 5 minutes for 500 frames.
+% Set nFrames to 'Inf' to process the entire video, which will take longer.
 %
 % Usage examples
 % ==============
@@ -25,7 +25,7 @@ if ~exist(sandboxDir,'dir')
 end
 
 %% hard coded parameters
-nFrames = 500; % number of frames to process (set to Inf to do all)
+nFrames = 100; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
 TbTbProjectName = 'eyeTrackTOMEAnalysis';
 
@@ -80,16 +80,17 @@ end
 
 %% Perform the entire analysis with one call
 % runVideoPipeline( pathParams, ...
-%     'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, ...
+%     'nFrames',nFrames,'verbosity', verbosity, 'tbSnapshot',tbSnapshot, 'useParallel',true, ...
 %     'pupilRange', [20 120], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1.5, ...
-%     'overwriteControlFile', true);
+%     'overwriteControlFile', true, 'catchErrors', false);
 
 %% Perform the analysis up to initial pupil fit
 runVideoPipeline( pathParams, ...
     'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, ...
     'pupilRange', [20 120], 'pupilCircleThresh', 0.04, 'pupilGammaCorrection', 1.5, ...
     'overwriteControlFile', true, 'skipPupilBayes', true, ...
-    'skipStage', {'fitIrisPerimeter', 'makeFitVideo' });
+    'skipStage', {'fitIrisPerimeter', 'makeFitVideo' }, ...
+    'catchErrors', false);
 
 %% Define some file names
 grayVideoName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_gray.avi']);
@@ -124,7 +125,8 @@ runVideoPipeline( pathParams, ...
     'whichFieldToPlot','pInitialFitTransparent',...
     'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, 'useParallel',true, ...
     'skipInitialPupilFit', true, ...
-    'skipStage', {'convertRawToGray', 'findGlint', 'findPupilPerimeter', 'makeControlFile', 'applyControlFile', 'makeFitVideo' });
+    'skipStage', {'convertRawToGray', 'findGlint', 'findPupilPerimeter', 'makeControlFile', 'applyControlFile', 'makeFitVideo' }, ...
+    'catchErrors', false);
 
 %% Create some more videos
 exampleFitVideoName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_Stage5.avi']);
