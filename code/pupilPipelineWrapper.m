@@ -88,7 +88,7 @@ end
 % if starting from convertRawToGray, get the file names from the  raw files in the data
 % folder. If starting from a later step, get the run name from the gray
 % files instead.
-if any(strcmp(p.Results.skipStage,'convertRawToGray'))
+if any(strcmp(p.Results.skipStage,'deinterlaceVideo'))
     sourceVideos = dir(fullfile(pathParams.dataOutputDirFull,'*_gray.avi'));
     suffixCodes = {'*_gray.avi','GazeCal*gray.avi','*ScaleCal*gray.avi',};
     suffixToTrim = [9, 9, 9];
@@ -98,12 +98,14 @@ else
     suffixToTrim = [8, 4, 4];
 end
 
-% In the event that we both wish to skip the convertRawToGray stage and we are
-% using the lowResSizeCalVideos, then we need to add these low res videos
-% to the sourceVideo list
-if p.Results.useLowResSizeCalVideo && ~any(strcmp(p.Results.skipStage,'convertRawToGray'))
-    sourceVideos = [sourceVideos scaleCalLowResGrayAVIs];
-end
+% THE FOLLOWING SHALL BE CHANGED, AS NOW WE ARE ANALYZING VIDEOS AT A
+% DIFFERENT RESOLUTION THAN THE LIVETRACK.
+% % In the event that we both wish to skip the convertRawToGray stage and we are
+% % using the lowResSizeCalVideos, then we need to add these low res videos
+% % to the sourceVideo list
+% if p.Results.useLowResSizeCalVideo && ~any(strcmp(p.Results.skipStage,'deinterlaceVideo'))
+%     sourceVideos = [sourceVideos scaleCalLowResGrayAVIs];
+% end
 
 if ~isempty(p.Results.customKeyValues)
     runNamesToCustomize = cellfun(@(x) x{1},p.Results.customKeyValues,'UniformOutput',false);
