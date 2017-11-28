@@ -134,7 +134,7 @@ for rr = 1 :length(sourceVideos) % loop over video files
     
     if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{1}))
         pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(1)); %runs
-        videoTypeChoice = 'LiveTrackWithVTOP_eyeNoIris';
+        videoTypeChoice = 'LiveTrackWithVTOP_eye';
     end
     if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{2}))
         pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(2)); %gaze calibrations
