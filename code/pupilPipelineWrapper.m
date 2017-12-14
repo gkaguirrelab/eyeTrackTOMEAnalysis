@@ -11,7 +11,8 @@ p.addRequired('pathParams',@isstruct);
 
 % optional input
 p.addParameter('useLowResSizeCalVideo',false,@islogical);
-p.addParameter('skipStage',[],@iscell);
+p.addParameter('skipStageByNumber',[],@isnumeric);
+p.addParameter('skipStageByName',[],@iscell);
 p.addParameter('skipRun',false,@islogical);
 p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
 p.addParameter('saveLog',true,@islogical);
@@ -88,7 +89,7 @@ end
 % if starting from convertRawToGray, get the file names from the  raw files in the data
 % folder. If starting from a later step, get the run name from the gray
 % files instead.
-if any(strcmp(p.Results.skipStage,'deinterlaceVideo'))
+if  any(strcmp(p.Results.skipStageByName,'deinterlaceVideo')) || any(find(p.Results.skipStageByNumber,1))
     sourceVideos = dir(fullfile(pathParams.dataOutputDirFull,'*_gray.avi'));
     suffixCodes = {'*_gray.avi','GazeCal*gray.avi','*ScaleCal*gray.avi',};
     suffixToTrim = [9, 9, 9];
