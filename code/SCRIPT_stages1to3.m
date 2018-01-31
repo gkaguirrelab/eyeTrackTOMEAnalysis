@@ -652,7 +652,12 @@ pupilPipelineWrapper(pathParams, ...
     'lastStage', 'findPupilPerimeter', ...
     'makeFitVideoByName', {'findPupilPerimeter'});
 
-
+% TOME_3031 session1
+pathParams.subjectID = 'TOME_3031';
+pathParams.sessionDate = '013118';
+pupilPipelineWrapper(pathParams, ...
+    'lastStage', 'findPupilPerimeter', ...
+    'makeFitVideoByName', {'findPupilPerimeter'});
 
 %% SESSION 2 HERE
 pathParams.projectSubfolder = 'session2_spatialStimuli';
