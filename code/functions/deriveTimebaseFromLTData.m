@@ -72,7 +72,7 @@ p.addParameter('numTRs',420, @isnumerical);
 p.addParameter('rawVidFrameRate',60, @isnumeric);
 p.addParameter('ltDataThreshold',0.1, @isnumeric);
 p.addParameter('reportSanityCheck',true, @islogical);
-p.addParameter('plotAlignment',false, @islogical);
+p.addParameter('plotAlignment',true, @islogical);
 
 % Optional display and I/O parameters
 p.addParameter('verbosity','none', @ischar);
@@ -211,27 +211,49 @@ liveTrackTimebase = liveTrackTimebase * 1000;
 timebase.timebase = timebase.timebase * 1000;
 %% If so requested, plot the cross correlation results for quick review
 if p.Results.plotAlignment
-    figure;
+    
+    figH = figure('visible','off');
+    set(gcf,'PaperOrientation','landscape');
+    set(figH, 'Units','inches')
+    height = 6;
+    width = 18;
+    set(figH, 'Position',[25 5 width height],...
+    'PaperSize',[width height],...
+    'PaperPositionMode','auto',...
+    'Color','w',...
+    'Renderer','painters'...
+    );
+
     % before alignment
     subplot(2,1,1)
-    plot(ltSignal, 'LineWidth',2);
+    plot(ltSignal - nanmedian(ltSignal), 'b', 'LineWidth',1);
     hold on;
-    plot(glintSignal, 'LineWidth',2)
+    plot(glintSignal - nanmedian(glintSignal), 'r', 'LineWidth',1)
     grid on
-    ylabel('glint X (different resolutions)')
-    xlabel('Frames')
-    legend ('liveTrack','glint tracked on raw video')
+    ylabel('glint X (zero centered)')
+    xlabel('Frames (first quarter of the video)')
+    ylim([-50 50])
+    xlim([0 length(ltSignal)/4])
+    legend ('liveTrack','transparentTrack')
     title ('Before alignment')
     % after alignment
     subplot(2,1,2);
-    plot(ltAligned, 'LineWidth',2);
+    plot(ltAligned - nanmedian(ltAligned), 'b', 'LineWidth',1);
     hold on;
-    plot(glintAligned, 'LineWidth',2)
+    plot(glintAligned - nanmedian(glintAligned), 'r','LineWidth',1)
     grid on
-    ylabel('glint X (different resolutions)')
-    xlabel('Frames')
-    legend ('liveTrack','glint tracked on raw video')
+    ylabel('glint X (zero centered)')
+    xlabel('Frames (first quarter of the video)')
+    ylim([-50 50])
+    xlim([0 length(ltSignal)/4])
+    legend ('liveTrack','transparentTrack')
     title(['After alignment (shift = ' num2str(delay) ' frames)']);
+    
+    % save figure
+    timebasePlotName = [p.Results.timebaseFileName(1:end-4) 'QA.pdf'];
+    saveas(figH,timebasePlotName)
+    close(figH)
+    
 end
 
 
