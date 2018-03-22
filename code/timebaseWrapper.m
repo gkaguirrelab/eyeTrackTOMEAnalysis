@@ -23,7 +23,7 @@ pathParams=p.Results.pathParams;
 %% hard coded parameters
 nFrames = Inf; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
-TbTbProjectName = 'eyeTOMEAnalysis';
+TbTbProjectName = 'eyeTrackTOMEAnalysis';
 
 
 %% TbTb configuration
@@ -89,10 +89,17 @@ for rr = 1 :length(sourceVideos) % loop over video files
     fprintf ('\nProcessing video %d of %d\n',rr,length(sourceVideos))
     
     % locate and skip calibrations, process MRI runs
-    if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{2})) || regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{3}))
+    if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{2})) 
+        continue
+    elseif regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{3}))
         continue
     elseif regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{1}))
         pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(1)); %runs
+        
+        % define input and output filenames
+        glintFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_glint.mat']);
+        ltReportFileName = fullfile(pathParams.dataSourceDirFull, [pathParams.runName '_report.mat']);
+        timebaseFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_timebase.mat']);
         
         % check if we the current runName matches an entry in the
         % runNamesToCustomize list
@@ -118,9 +125,8 @@ for rr = 1 :length(sourceVideos) % loop over video files
         if isempty(customArgs)
             % check the high level skipRun flag
             if ~p.Results.skipRun
-                runCalibrationAndTimebasePipeline( pathParams, ...
+                deriveTimebaseFromLTData(glintFileName,ltReportFileName, 'timebaseFileName', timebaseFileName, ...
                     'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
-                    'videoTypeChoice', videoTypeChoice, ...
                     varargin{:});
             else
                 continue
@@ -132,14 +138,10 @@ for rr = 1 :length(sourceVideos) % loop over video files
             if any(srFlag) && customArgs{find(srFlag)+1}
                 continue
             else
-                
-                % define input and output filenames
-                glintFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_glint.mat']);
-                ltReportFileName = fullfile(pathParams.dataSourceDirFull, [pathParams.runName '_report.mat']);
-                timebaseFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_timebase.mat']);
-                
                 % derive timebase
-                deriveTimebaseFromLTData(glintFileName,ltReportFileName,timebaseFileName, varargin{:});
+                deriveTimebaseFromLTData(glintFileName,ltReportFileName,'timebaseFileName', timebaseFileName, ...
+                    'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
+                    varargin{:});
             end % check skipRun flag in customArgs
         end % check is there are custom arguments
     end  % locate and skip calibrations, process MRI runs
@@ -147,7 +149,7 @@ for rr = 1 :length(sourceVideos) % loop over video files
     % toggle diary
     if p.Results.saveLog
         diary OFF
-    end    
+    end
 end % loop over runs
 
 end % function
