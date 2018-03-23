@@ -200,3 +200,141 @@ timebaseWrapper(pathParams,'reportSanityCheck',false);
 
 
 
+
+%% SESSION 2 HERE
+pathParams.projectSubfolder = 'session2_spatialStimuli';
+
+%TOME_3001 session2
+pathParams.subjectID = 'TOME_3001';
+pathParams.sessionDate = '081916';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3002 session2
+pathParams.subjectID = 'TOME_3002';
+pathParams.sessionDate = '082616';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3003 session2
+pathParams.subjectID = 'TOME_3003';
+pathParams.sessionDate = '091616';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3004 session2
+pathParams.subjectID = 'TOME_3004';
+pathParams.sessionDate = '101416';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3005 session2
+pathParams.subjectID = 'TOME_3005';
+pathParams.sessionDate = '100316';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3007 session2
+pathParams.subjectID = 'TOME_3007';
+pathParams.sessionDate = '101716';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3008 session2
+pathParams.subjectID = 'TOME_3008';
+pathParams.sessionDate = '103116';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3009 session2
+pathParams.subjectID = 'TOME_3009';
+pathParams.sessionDate = '102516';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3011 session2
+pathParams.subjectID = 'TOME_3011';
+pathParams.sessionDate = '012017';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3012 session2
+pathParams.subjectID = 'TOME_3012';
+pathParams.sessionDate = '020317';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3013 session2
+pathParams.subjectID = 'TOME_3013';
+pathParams.sessionDate = '011117';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3014 session2
+pathParams.subjectID = 'TOME_3014';
+pathParams.sessionDate = '021717';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3015 session2
+pathParams.subjectID = 'TOME_3015';
+pathParams.sessionDate = '032417';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3016 session2
+pathParams.subjectID = 'TOME_3016';
+pathParams.sessionDate = '032017';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3017 session2
+pathParams.subjectID = 'TOME_3017';
+pathParams.sessionDate = '033117';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+%TOME_3019 session2
+pathParams.subjectID = 'TOME_3019';
+pathParams.sessionDate = '050317';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+% TOME_3020 session2
+pathParams.subjectID = 'TOME_3020';
+pathParams.sessionDate = '050517';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+% TOME_3021 session2
+pathParams.subjectID = 'TOME_3021';
+pathParams.sessionDate = '060917';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+% TOME_3022 session2
+pathParams.subjectID = 'TOME_3022';
+pathParams.sessionDate = '061617';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+
+% TOME_3023 session2
+pathParams.subjectID = 'TOME_3023';
+pathParams.sessionDate = '081117';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+% TOME_3023 session2
+pathParams.subjectID = 'TOME_3023';
+pathParams.sessionDate = '081117b';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+% TOME_3024 session2
+pathParams.subjectID = 'TOME_3024';
+pathParams.sessionDate = '090817';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+% TOME_3025 session2
+pathParams.subjectID = 'TOME_3025';
+pathParams.sessionDate = '091517';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+% TOME_3026 session2
+pathParams.subjectID = 'TOME_3026';
+pathParams.sessionDate = '100617';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+% TOME_3027 excluded from study
+
+% TOME_3028 session2
+pathParams.subjectID = 'TOME_3028';
+pathParams.sessionDate = '111517';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+% TOME_3029 session2
+pathParams.subjectID = 'TOME_3029';
+pathParams.sessionDate = '120617';
+timebaseWrapper(pathParams,'reportSanityCheck',true);
+
+
