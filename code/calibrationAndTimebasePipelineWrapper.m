@@ -1,5 +1,5 @@
 function calibrationAndTimebasePipelineWrapper(pathParams,varargin)
-% gazePipelineWrapper(pathParams,varargin)
+% calibrationAndTimebasePipelineWrapper(pathParams,varargin)
 
 % header
 
