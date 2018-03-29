@@ -103,6 +103,7 @@ p.addRequired('targetsFileName',@ischar);
 p.addRequired('gazeDataFileName',@ischar);
 
 % Optional analysis parameters
+p.addParameter('whichFitToCalibrate','radiusSmooted',@ischar)
 p.addParameter('units', 'mm', @ischar)
 p.addParameter('dataIsAligned',false, @islogical);
 p.addParameter('frameRate', 60, @isnumeric)
@@ -143,8 +144,8 @@ clear targetData
 
 % pupil
 pupilData = load(pupilFileName);
-pupil.X = pupilData.pupilData.pPosteriorMeanTransparent(:,1);
-pupil.Y = pupilData.pupilData.pPosteriorMeanTransparent(:,2);
+pupil.X = pupilData.pupilData.(p.Results.whichFitToCalibrate).ellipses.values(:,1);
+pupil.Y = pupilData.pupilData.(p.Results.whichFitToCalibrate).ellipses.values(:,2);
 clear pupilData
 
 % glint
