@@ -222,7 +222,8 @@ timebaseWrapper(pathParams,'reportSanityCheck',true);
 %TOME_3004 session2
 pathParams.subjectID = 'TOME_3004';
 pathParams.sessionDate = '101416';
-timebaseWrapper(pathParams,'reportSanityCheck',true);
+timebaseWrapper(pathParams,'reportSanityCheck',false);
+% error in processing video #17. See readme file
 
 %TOME_3005 session2
 pathParams.subjectID = 'TOME_3005';
