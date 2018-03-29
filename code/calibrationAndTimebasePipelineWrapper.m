@@ -24,7 +24,7 @@ pathParams=p.Results.pathParams;
 %% hard coded parameters
 nFrames = Inf; % number of frames to process (set to Inf to do all)
 verbosity = 'full'; % Set to none to make the demo silent
-TbTbProjectName = 'eyeTOMEAnalysis';
+TbTbProjectName = 'eyeTrackTOMEAnalysis';
 
 
 %% TbTb configuration
