@@ -24,7 +24,7 @@ pathParams=p.Results.pathParams;
 
 %% hard coded parameters
 nFrames = Inf; % number of frames to process (set to Inf to do all)
-verbosity = 'full'; % Set to none to make the demo silent
+verbose = true; % Set to none to make the analysis silent
 TbTbProjectName = 'eyeTrackTOMEAnalysis';
 
 
@@ -173,7 +173,7 @@ for rr = 1 :length(sourceVideos) % loop over video files
         % check the high level skipRun flag
         if ~p.Results.skipRun
             runVideoPipeline( pathParams, ...
-                'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
+                'nFrames',nFrames,'verbose', verbose,'tbSnapshot',tbSnapshot, ...
                 'useParallel',true, 'overwriteControlFile',true, 'videoTypeChoice', videoTypeChoice, ...
                 varargin{:});
         else
@@ -187,7 +187,7 @@ for rr = 1 :length(sourceVideos) % loop over video files
             continue
         else
             runVideoPipeline( pathParams, ...
-                'nFrames',nFrames,'verbosity', verbosity,'tbSnapshot',tbSnapshot, ...
+                'nFrames',nFrames,'verbose', verbose,'tbSnapshot',tbSnapshot, ...
                 'useParallel',true, 'overwriteControlFile',true, 'videoTypeChoice', videoTypeChoice, ...
                 varargin{:}, customArgs{:});
         end % check skipRun flag in customArgs
