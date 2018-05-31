@@ -68,7 +68,7 @@ p.addRequired('ltReportFileName',@ischar);
 % Optional analysis parameters
 p.addParameter('timebaseFileName', '', @ischar);
 p.addParameter('maxLag',500, @isnumeric);
-p.addParameter('numTRs',420, @isnumerical);
+p.addParameter('numTRs',[],@(x)(isempty(x) | isnumeric(x)));
 p.addParameter('rawVidFrameRate',60, @isnumeric);
 p.addParameter('ltDataThreshold',0.1, @isnumeric);
 p.addParameter('reportSanityCheck',true, @islogical);
@@ -95,9 +95,12 @@ liveTrack = load(ltReportFileName);
 %% Perform some sanity checks on the LiveTrack report
 if p.Results.reportSanityCheck
     % check if the frameCount is progressive
-    frameCountDiff = unique(diff([liveTrack.Report.frameCount]));
-    if numel(frameCountDiff)==1
-        warning('LiveTrack frame Count is not progressive!');
+    tmpFrameCountFieldIdx = strcmp(fieldnames(liveTrack.Report),'frameCount');
+    tmpCell = struct2cell(liveTrack.Report);
+    tmpFrameCount = squeeze(cell2mat(tmpCell(tmpFrameCountFieldIdx,1,:)));
+    frameCountDiff = unique(diff(tmpFrameCount));
+    if numel(frameCountDiff)~=1
+        warning('LiveTrack frame Count is not progressive.');
     end
     % verify that the correct amount of TTLs has been recorded (for fMRI runs)
     if ~isempty(p.Results.numTRs)
@@ -115,7 +118,9 @@ if p.Results.reportSanityCheck
             end
             TTLPulses = length (allPulses) - length (find(adjacent));
         end
-        assert(TTLPulses==p.Results.numTRs,'LiveTrack TTLs do not match TRs!');
+        if TTLPulses~=p.Results.numTRs
+            warning('LiveTrack TTLs do not match TRs!');
+        end
     end
 else
     warning ('No sanity check is being performed on the LiveTrack report.')
@@ -194,21 +199,21 @@ else
 end
 timebaseGlintTMP = liveTrackTimebase + delay * (1/p.Results.rawVidFrameRate); %pupilTrack timeBase in [sec]
 
-% make timebase.timebase as long as ptSignal
+% make timebase.values as long as ptSignal
 if length(timebaseGlintTMP)<length(glintData.glintData.X)
     %add missing values
     glintPadding = timebaseGlintTMP(end)+(1/p.Results.rawVidFrameRate): (1/p.Results.rawVidFrameRate) :timebaseGlintTMP(end)+((length(glintData.glintData.X)-length(timebaseGlintTMP)*(1/p.Results.rawVidFrameRate)));
-    timebase.timebase = [timebaseGlintTMP glintPadding];
+    timebase.values = [timebaseGlintTMP glintPadding];
 elseif length(timebaseGlintTMP)>length(glintData.glintData.X)
     %trim timeBase.rawVid
-    timebase.timebase = timebaseGlintTMP(1:length(glintData.glintData.X));
+    timebase.values = timebaseGlintTMP(1:length(glintData.glintData.X));
 else
-    timebase.timebase = timebaseGlintTMP;
+    timebase.values = timebaseGlintTMP;
 end
 
 % convert in milliseconds
 liveTrackTimebase = liveTrackTimebase * 1000;
-timebase.timebase = timebase.timebase * 1000;
+timebase.values = timebase.values * 1000;
 %% If so requested, plot the cross correlation results for quick review
 if p.Results.plotAlignment
     

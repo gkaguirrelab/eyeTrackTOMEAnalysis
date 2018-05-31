@@ -65,8 +65,8 @@ end
 
 %% get all runs available
 sourceVideos = dir(fullfile(pathParams.dataOutputDirFull,'*_gray.avi'));
-suffixCodes = {'*_gray.avi','GazeCal*gray.avi','*ScaleCal*gray.avi',};
-suffixToTrim = [9, 9, 9];
+nonFMRInames = {'T1','T2','GazeCal','ScaleCal'};
+suffixToTrim = 9;
 
 % derive timebase on each source video, excluding the calibrations
 if p.Results.saveLog
@@ -82,19 +82,20 @@ if p.Results.saveLog
 end
 for rr = 1 :length(sourceVideos) % loop over video files
     
-    %     toggle diary (so that the file gets updated every run is completed)
+    % toggle diary (so that the file gets updated every run is completed)
     if p.Results.saveLog
         diary ON
     end
     fprintf ('\nProcessing video %d of %d\n',rr,length(sourceVideos))
     
-    % locate and skip calibrations, process MRI runs
-    if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{2})) 
+    % process only the fMRI runs
+    if any(contains(sourceVideos(rr).name,nonFMRInames))
+        if p.Results.saveLog
+            fprintf('\tNot an fMRI run. Skipping.\n');
+        end
         continue
-    elseif regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{3}))
-        continue
-    elseif regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{1}))
-        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(1)); %runs
+    else
+        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim); %runs
         
         % define input and output filenames
         glintFileName = fullfile(pathParams.dataOutputDirFull, [pathParams.runName '_glint.mat']);
