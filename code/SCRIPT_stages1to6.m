@@ -46,7 +46,7 @@ projectList = projectList(~strcmp(projectList,''));
 % Ask the operator which project they would like to process
 clc
 choiceList = projectList;
-fprintf('\nProcess subjects from project:\n')
+fprintf('\Select a project:\n')
 for pp=1:length(choiceList)
     optionName=['\t' char(pp+96) '. ' choiceList{pp} '\n'];
     fprintf(optionName);
@@ -78,7 +78,7 @@ subjectIndexList = eval(choice);
 for ss = 1:length(subjectIndexList)
     
     % Assign this subject ID to the path params
-    pathParams.subjectID = subjectList{ss};
+    pathParams.subjectID = subjectList{subjectIndexList(ss)};
     
     % Find all the sessions for this project and subject
     projectSubjectIntersection = find(strcmp(paramsTable.projectSubfolder, pathParams.projectSubfolder) .* ...
