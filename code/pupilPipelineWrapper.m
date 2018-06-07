@@ -56,14 +56,6 @@ if p.Results.saveLog
     end
     logFileName = ['LOG_' datestr(now,'yyyymmdd_HHMMSS.txt')];
     diary (fullfile(pathParams.logsDirFull,logFileName))
-    % display some useful header information
-    [~,hostname] = system('hostname');
-    hostname = strtrim(lower(hostname));
-    display (hostname)
-    display (version)
-    display (pathParams)
-    display (p.Results)
-    display(p.Results.customKeyValues)
 end
 
 
@@ -117,6 +109,7 @@ end
 % run the full pipeline on each source video
 if p.Results.saveLog
     fprintf('\nProcessing the following videos:\n')
+    fprintf([pathParams.projectSubfolder ' - ' pathParams.subjectID ' - ' pathParams.sessionDate '/n']);
     for rr=1:length(sourceVideos)
         runName=['\t' num2str(rr) '. ' sourceVideos(rr).name '\n'];
         fprintf(runName);
