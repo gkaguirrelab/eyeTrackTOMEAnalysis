@@ -46,15 +46,23 @@ testParams(pathParams, 'nFrames', 3000, 'glintFrameMask', [100 100 70 100])
 % set dropbox directory
 [~,hostname] = system('hostname');
 hostname = strtrim(lower(hostname));
-if strcmp(hostname,'melchior.uphs.upenn.edu') %melchior has some special dropbox folder settings
-    dropboxDir = '/Volumes/Bay_2_data/giulia/Dropbox-Aguirre-Brainard-Lab';
-else % other machines use the standard dropbox location
+
+
+switch hostname
+    case 'seele.psych.upenn.edu'
+        dropboxDir = '/Volumes/seeleExternalDrive/Dropbox (Aguirre-Brainard Lab)';
+    case 'magi-1-melchior.psych.upenn.edu'
+        dropboxDir = '/Volumes/seeleExternalDrive/Dropbox (Aguirre-Brainard Lab)';
+    case 'magi-2-balthasar.psych.upenn.edu'
+        dropboxDir = '/Volumes/seeleExternalDrive/Dropbox (Aguirre-Brainard Lab)';
+    otherwise
     [~, userName] = system('whoami');
     userName = strtrim(userName);
     dropboxDir = ...
         fullfile('/Users', userName, ...
         '/Dropbox (Aguirre-Brainard Lab)');
 end
+
 
 % set common path params
 pathParams.dataSourceDirRoot = fullfile(dropboxDir,'TOME_data');
