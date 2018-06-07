@@ -1,5 +1,10 @@
-%% SCRIPT performing processing of the entire pupil video.
-
+%% Stages 1 - 6
+%
+% This script allows the user to select a project (i.e., Session 1 or
+% Session 2 of the TOME study), then a set of subjects, and then submits
+% that set of projects / subjects / sessions to analysis from the stage of
+% initial de-interlacing of the pupil video to "stage 6", which is the
+% initial ellipse fit.
 
 
 % set dropbox directory
@@ -11,9 +16,9 @@ switch hostname
     case 'seele.psych.upenn.edu'
         dropboxDir = '/Volumes/seeleExternalDrive/Dropbox (Aguirre-Brainard Lab)';
     case 'magi-1-melchior.psych.upenn.edu'
-        dropboxDir = '/Volumes/seeleExternalDrive/Dropbox (Aguirre-Brainard Lab)';
+        dropboxDir = '/Volumes/melchiorExternalDrive/Dropbox (Aguirre-Brainard Lab)';
     case 'magi-2-balthasar.psych.upenn.edu'
-        dropboxDir = '/Volumes/seeleExternalDrive/Dropbox (Aguirre-Brainard Lab)';
+        dropboxDir = '/Volumes/balthasarExternalDrive/Dropbox (Aguirre-Brainard Lab)';
     otherwise
         [~, userName] = system('whoami');
         userName = strtrim(userName);
@@ -63,7 +68,7 @@ for pp=1:length(choiceList)
     optionName=['\t' num2str(pp) '. ' choiceList{pp} '\n'];
     fprintf(optionName);
 end
-fprintf('\nYou can enter a single subject number (e.g. 4),\n  a range defined with a colon (e.g. 4:7),\n  or a list with commas (e.g., 4,5,7):\n')
+fprintf('\nYou can enter a single subject number (e.g. 4),\n  a range defined with a colon (e.g. 4:7),\n  or a list within square brackets (e.g., [4 5 7]):\n')
 choice = input('\nYour choice: ','s');
 
 % This is an array of indices that refer back to the subjectList
@@ -71,16 +76,18 @@ subjectIndexList = eval(choice);
 
 % Loop through the selected subjects
 for ss = 1:length(subjectIndexList)
-
+    
     % Assign this subject ID to the path params
     pathParams.subjectID = subjectList{ss};
     
     % Find all the sessions for this project and subject
-    sessionDateList = unique(paramsTable{strcmp(paramsTable.projectSubfolder, pathParams.projectSubfolder) .* strcmp(paramsTable.subjectID, pathParams.subjectID),3});
+    projectSubjectIntersection = find(strcmp(paramsTable.projectSubfolder, pathParams.projectSubfolder) .* ...
+        strcmp(paramsTable.subjectID, pathParams.subjectID));
+    sessionDateList = unique(paramsTable{projectSubjectIntersection,3});
     
-    % Loop through the session dates    
+    % Loop through the session dates
     for dd = 1: length(sessionDateList)
-
+        
         % Assign this session date to the path params
         pathParams.sessionDate = sessionDateList{dd};
         
@@ -89,13 +96,13 @@ for ss = 1:length(subjectIndexList)
         rowList = find(strcmp(paramsTable.projectSubfolder, pathParams.projectSubfolder) .* ...
             strcmp(paramsTable.subjectID, pathParams.subjectID) .* ...
             strcmp(paramsTable.sessionDate, pathParams.sessionDate));
-
+        
         % Define some variables that will hold global and
         % acquisition-specific, custom key values for the analysis of the
         % videos from this session
         globalKeyValues = {};
         customKeyValues = {};
-
+        
         % Loop through the list of entries in the params table
         for ii = 1:length(rowList)
             % If the acqusition field for this row is empty, then the
