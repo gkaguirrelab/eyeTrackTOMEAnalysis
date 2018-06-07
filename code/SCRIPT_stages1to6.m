@@ -46,7 +46,7 @@ projectList = projectList(~strcmp(projectList,''));
 % Ask the operator which project they would like to process
 clc
 choiceList = projectList;
-fprintf('\Select a project:\n')
+fprintf('Select a project:\n')
 for pp=1:length(choiceList)
     optionName=['\t' char(pp+96) '. ' choiceList{pp} '\n'];
     fprintf(optionName);
