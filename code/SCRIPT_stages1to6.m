@@ -111,7 +111,7 @@ for ss = 1:length(subjectIndexList)
                 theseGlobalKeyValues = {};
                 for keys = 5:length(paramsTable.Properties.VariableNames)-1
                     if ~strcmp(paramsTable{rowList(ii),keys},'')
-                        theseGlobalKeyValues = {theseGlobalKeyValues{:} paramsTable.Properties.VariableNames{keys} cell2mat(paramsTable{rowList(ii),keys})};
+                        theseGlobalKeyValues = {theseGlobalKeyValues{:} paramsTable.Properties.VariableNames{keys} eval(cell2mat(paramsTable{rowList(ii),keys}))};
                     end
                 end
                 globalKeyValues = {globalKeyValues{:} theseGlobalKeyValues{:}};
@@ -124,7 +124,7 @@ for ss = 1:length(subjectIndexList)
                 theseAcqKeyValues{1} = paramsTable.acquisition{rowList(ii)};
                 for keys = 5:length(paramsTable.Properties.VariableNames)-1
                     if ~strcmp(paramsTable{rowList(ii),keys},'')
-                        theseAcqKeyValues = {theseAcqKeyValues{:} paramsTable.Properties.VariableNames{keys} cell2mat(paramsTable{rowList(ii),keys})};
+                        theseAcqKeyValues = {theseAcqKeyValues{:} paramsTable.Properties.VariableNames{keys} eval(cell2mat(paramsTable{rowList(ii),keys}))};
                     end
                 end
                 customKeyValues{end+1,1}=theseAcqKeyValues;
