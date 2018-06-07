@@ -18,7 +18,7 @@ p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
 p.addParameter('saveLog',true,@islogical);
 
 % parse
-p.parse(pathParams, varargin{:})
+p.parse(pathParams, varargin{:});
 pathParams=p.Results.pathParams;
 
 
