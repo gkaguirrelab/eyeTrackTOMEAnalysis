@@ -102,6 +102,7 @@ end
 
 if ~isempty(p.Results.customKeyValues)
     runNamesToCustomize = cellfun(@(x) x{1},p.Results.customKeyValues,'UniformOutput',false);
+    runNamesToCustomize = eval(runNamesToCustomize{:});
 else
     runNamesToCustomize=[];
 end
@@ -143,7 +144,7 @@ for rr = 1 :length(sourceVideos) % loop over video files
     % runNamesToCustomize list
     customArgs=[];
     if ~isempty(p.Results.customKeyValues)
-        checkForRunNameMatchCell = cellfun(@(x) regexp(pathParams.runName, regexptranslate('wildcard',x)), runNamesToCustomize,'UniformOutput',false);
+        checkForRunNameMatchCell = cellfun(@(x) regexp(pathParams.runName, regexptranslate('wildcard',x)), runNamesToCustomize, 'UniformOutput',false);
         % loop and sum each line
         for jj = 1:length(checkForRunNameMatchCell)
             if isnumeric(checkForRunNameMatchCell{jj})
@@ -170,6 +171,9 @@ for rr = 1 :length(sourceVideos) % loop over video files
                 'useParallel',true, 'overwriteControlFile',true, 'videoTypeChoice', videoTypeChoice, ...
                 varargin{:});
         else
+            if p.Results.saveLog
+                fprintf('Instructed to skip processing.\n')
+            end
             continue
         end
     else
@@ -177,6 +181,9 @@ for rr = 1 :length(sourceVideos) % loop over video files
         srFlag = strcmp(customArgs,'skipRun');
         % check skipRun flag in customArgs
         if any(srFlag) && customArgs{find(srFlag)+1}
+            if p.Results.saveLog
+                fprintf('Instructed to skip processing.\n')
+            end
             continue
         else
             runVideoPipeline( pathParams, ...
