@@ -108,8 +108,8 @@ end
 
 % run the full pipeline on each source video
 if p.Results.saveLog
+    fprintf(['\n' pathParams.projectSubfolder ' - ' pathParams.subjectID ' - ' pathParams.sessionDate '\n']);
     fprintf('\nProcessing the following videos:\n')
-    fprintf([pathParams.projectSubfolder ' - ' pathParams.subjectID ' - ' pathParams.sessionDate '/n']);
     for rr=1:length(sourceVideos)
         runName=['\t' num2str(rr) '. ' sourceVideos(rr).name '\n'];
         fprintf(runName);
