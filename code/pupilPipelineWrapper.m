@@ -120,22 +120,22 @@ if p.Results.saveLog
     diary OFF
 end
 for rr = 1 :length(sourceVideos) % loop over video files
-    %     toggle diary (so that the file gets updated every run is completed)
+    % Toggle diary (so that the file gets updated every run is completed)
     if p.Results.saveLog
         diary ON
     end
     fprintf ('\nProcessing video %d of %d\n',rr,length(sourceVideos))
     
     if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{1}))
-        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(1)); %runs
+        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(1)); % runs
         videoTypeChoice = 'LiveTrackWithVTOP_eye';
     end
     if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{2}))
-        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(2)); %gaze calibrations
+        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(2)); % gaze calibrations
         videoTypeChoice = 'LiveTrackWithVTOP_eye';
     end
     if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{3}))
-        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(3)); %scale calibrations
+        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(3)); % scale calibrations
         videoTypeChoice = 'LiveTrackWithVTOP_sizeCal';
     end
     
