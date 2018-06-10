@@ -102,7 +102,7 @@ end
 
 if ~isempty(p.Results.customKeyValues)
     runNamesToCustomize = cellfun(@(x) x{1},p.Results.customKeyValues,'UniformOutput',false);
-    runNamesToCustomize = eval(runNamesToCustomize{:});
+    runNamesToCustomize = cellfun(@(x) eval(x), runNamesToCustomize,'UniformOutput',false);
 else
     runNamesToCustomize=[];
 end
