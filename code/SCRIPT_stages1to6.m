@@ -24,7 +24,7 @@ switch hostname
         userName = strtrim(userName);
         dropboxDir = ...
             fullfile('/Users', userName, ...
-            'Dropbox\ \(Aguirre-Brainard\ Lab\)');
+            'Dropbox (Aguirre-Brainard Lab)');
 end
 
 % set common path params
