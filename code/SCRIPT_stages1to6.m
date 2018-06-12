@@ -63,12 +63,13 @@ subjectList = unique(paramsTable{strcmp(paramsTable.projectSubfolder, pathParams
 
 % Ask the operator which subject(s) they would like to process
 choiceList = subjectList;
-fprintf('\n\nSelect the subjects to process (all sessions for the subject will be run):\n')
+fprintf('\n\nSelect the subjects to process:\n')
 for pp=1:length(choiceList)
     optionName=['\t' num2str(pp) '. ' choiceList{pp} '\n'];
     fprintf(optionName);
 end
 fprintf('\nYou can enter a single subject number (e.g. 4),\n  a range defined with a colon (e.g. 4:7),\n  or a list within square brackets (e.g., [4 5 7]):\n')
+fprintf('If you select multiple subjects, all sessions and acquisitions will be run.\n');
 choice = input('\nYour choice: ','s');
 
 % This is an array of indices that refer back to the subjectList
@@ -85,6 +86,19 @@ for ss = 1:length(subjectIndexList)
         strcmp(paramsTable.subjectID, pathParams.subjectID));
     sessionDateList = unique(paramsTable{projectSubjectIntersection,3});
     
+    if length(subjectIndexList)==1 && length(sessionDateList)>1
+        choiceList = {sessionDateList};
+        fprintf('\n\nSelect the sessions to process:\n')
+        for pp=1:length(choiceList)
+            optionName=['\t' num2str(pp) '. ' choiceList{pp} '\n'];
+            fprintf(optionName);
+        end
+        fprintf('\nYou can enter a single session number (e.g. 1),\n  a range defined with a colon (e.g. 1:2),\n  or a list within square brackets (e.g., [1 2]):\n')
+        fprintf('If you select multiple sessions, all acquisitions will be run.\n');
+        choice = input('\nYour choice: ','s');
+        sessionDateList = sessionDateList(eval(choice));
+    end
+
     % Loop through the session dates
     for dd = 1: length(sessionDateList)
         
@@ -131,13 +145,22 @@ for ss = 1:length(subjectIndexList)
             end
         end
         
+        % If there is only one subject and one session, give the user the
+        % option to select acquisitions to process. This is implemented by
+        % setting a flag here that is passed to the pipeline wrapper.
+        if length(subjectIndexList)==1 && length(sessionDateList)==1
+            consoleSelectAcquisition = true;
+        else
+            consoleSelectAcquisition = false;
+        end
+        
         % Execute the pipeline for this project / session / subject, using
         % the global and custom key values
         pupilPipelineWrapper(pathParams, ...
             globalKeyValues{:}, ...
-            'skipStageByName', {'deinterlaceVideo'}, ...
             'lastStageByNumber', 6, ...
             'useLowResSizeCalVideo',true, ...
+            'consoleSelectAcquisition',consoleSelectAcquisition, ...
             'customKeyValues', customKeyValues);
         
     end % loop over session dates

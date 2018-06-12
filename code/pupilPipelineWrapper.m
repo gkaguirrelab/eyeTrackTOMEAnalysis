@@ -16,6 +16,7 @@ p.addParameter('skipStageByName',[],@iscell);
 p.addParameter('skipRun',false,@islogical);
 p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
 p.addParameter('saveLog',true,@islogical);
+p.addParameter('consoleSelectAcquisition',false,@islogical);
 
 % parse
 p.parse(pathParams, varargin{:});
@@ -89,6 +90,21 @@ else
     sourceVideos = dir(fullfile(pathParams.dataSourceDirFull,'*.mov'));
     suffixCodes = {'*_raw.mov','GazeCal*.mov','RawScaleCal*.mov'};
     suffixToTrim = [8, 4, 4];
+end
+
+% If the consoleSelectAcquisition flag is set, give the user the option to
+% select which acquisition to process
+if p.Results.consoleSelectAcquisition
+    tmpList = struct2cell(sourceVideos);
+    choiceList = tmpList(1,:);
+    fprintf('\n\nSelect the acquisitions to process:\n')
+    for pp=1:length(choiceList)
+        optionName=['\t' num2str(pp) '. ' choiceList{pp} '\n'];
+        fprintf(optionName);
+    end
+    fprintf('\nYou can enter a single acquisition number (e.g. 4),\n  a range defined with a colon (e.g. 4:7),\n  or a list within square brackets (e.g., [4 5 7]):\n')
+    choice = input('\nYour choice: ','s');
+    sourceVideos = sourceVideos(eval(choice));
 end
 
 % THE FOLLOWING SHALL BE CHANGED, AS NOW WE ARE ANALYZING VIDEOS AT A
