@@ -17,6 +17,7 @@ p.addParameter('skipRun',false,@islogical);
 p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
 p.addParameter('saveLog',true,@islogical);
 p.addParameter('consoleSelectAcquisition',false,@islogical);
+p.addParameter('stopOnTbDeployError',false,@islogical);
 
 % parse
 p.parse(pathParams, varargin{:});
@@ -34,7 +35,11 @@ TbTbProjectName = 'eyeTrackTOMEAnalysis';
 % errors and if so stop execution
 tbConfigResult=tbUseProject(TbTbProjectName,'reset','full','verbose',false);
 if sum(cellfun(@sum,extractfield(tbConfigResult, 'isOk')))~=length(tbConfigResult)
-    error('There was a tb deploy error. Check the contents of tbConfigResult');
+    if p.Results.stopOnTbDeployError
+        error('There was a tb deploy error. Check the contents of tbConfigResult');
+    else
+        warning('There was a tb deploy error. Check the contents of tbConfigResult');
+    end
 end
 tbSnapshot=tbDeploymentSnapshot(tbConfigResult,'verbose',false);
 clear tbConfigResult
