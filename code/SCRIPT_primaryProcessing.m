@@ -43,6 +43,30 @@ paramsTable = readtable(paramsFileName, opts);
 projectList = unique(paramsTable{:,1});
 projectList = projectList(~strcmp(projectList,''));
 
+% Ask the operator which stages they would like to execute
+clc
+fprintf('Select the stages you would like to execute:\n')
+fprintf('\t1. Deinterlacing to initial ellipse fitting (1-6)\n');
+fprintf('\t2. Skip deinterlacing, to initial ellipse fitting (2-6)\n');
+fprintf('\t3. Estimation of scene parameters (7)\n');
+fprintf('\t4. Scene-constrained pupil fitting and empirical Bayes smoothing (8-end)\n');
+choice = input('\nYour choice: ','s');
+switch choice
+    case '1'
+        skipStageByNumber = [];
+        lastStageByNumber = 6;
+    case '2'
+        skipStageByNumber = 1;
+        lastStageByNumber = 6;
+    case '3'
+        skipStageByNumber = 1:6;
+        lastStageByNumber = 7;
+    case '4'
+        skipStageByNumber = 1:8;
+        lastStageByNumber = [];
+end
+
+
 % Ask the operator which project they would like to process
 clc
 choiceList = projectList;
@@ -157,7 +181,8 @@ for ss = 1:length(subjectIndexList)
         % Execute the pipeline for this project / session / subject, using
         % the global and custom key values
         pupilPipelineWrapper(pathParams, ...
-            'lastStageByNumber', 6, ...
+            'lastStageByNumber', lastStageByNumber, ...
+            'skipStageByNumber', skipStageByNumber, ...
             'useLowResSizeCalVideo',true, ...
             'consoleSelectAcquisition',consoleSelectAcquisition, ...
             'makeFitVideoByNumber', 6, ...
