@@ -136,7 +136,7 @@ for ss = 1:length(subjectIndexList)
     sessionDateList = unique(paramsTable{projectSubjectIntersection,3});
     
     if length(subjectIndexList)==1 && length(sessionDateList)>1
-        choiceList = {sessionDateList};
+        choiceList = sessionDateList;
         fprintf('\n\nSelect the sessions to process:\n')
         for pp=1:length(choiceList)
             optionName=['\t' num2str(pp) '. ' choiceList{pp} '\n'];
