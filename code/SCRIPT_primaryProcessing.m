@@ -49,10 +49,11 @@ fprintf('Select the stages you would like to execute:\n')
 fprintf('\t1. Deinterlacing to initial ellipse fitting (1-6)\n');
 fprintf('\t2. Skip deinterlacing, to initial ellipse fitting (2-6)\n');
 fprintf('\t3. Create a stage 3 fit video\n');
-fprintf('\t4. Create a stage 6 fit video\n');
-fprintf('\t5. Create default sceneGeometry (7)\n');
-fprintf('\t6. Search to refine sceneGeometry (7)\n');
-fprintf('\t7. Scene-constrained pupil fitting and empirical Bayes smoothing (8-end)\n');
+fprintf('\t4. Make control file to initial ellipse fitting (4-6)\n');
+fprintf('\t5. Create a stage 6 fit video\n');
+fprintf('\t6. Create default sceneGeometry (7)\n');
+fprintf('\t7. Search to refine sceneGeometry (7)\n');
+fprintf('\t8. Scene-constrained pupil fitting and empirical Bayes smoothing (8-end)\n');
 choice = input('\nYour choice: ','s');
 switch choice
     case '1'
@@ -71,21 +72,26 @@ switch choice
         makeFitVideoByNumber = 3;
         universalKeyValues = {};
     case '4'
+        skipStageByNumber = 1:3;
+        lastStageByNumber = 6;
+        makeFitVideoByNumber = [];
+        universalKeyValues = {};
+    case '5'
         skipStageByNumber = 1:6;
         lastStageByNumber = 6;
         makeFitVideoByNumber = 6;
         universalKeyValues = {};
-    case '5'
-        skipStageByNumber = 1:6;
-        lastStageByNumber = 7;
-        makeFitVideoByNumber = [];
-        universalKeyValues = {'nBADSsearches',0};
     case '6'
         skipStageByNumber = 1:6;
         lastStageByNumber = 7;
         makeFitVideoByNumber = [];
-        universalKeyValues = {};
+        universalKeyValues = {'nBADSsearches',0};
     case '7'
+        skipStageByNumber = 1:6;
+        lastStageByNumber = 7;
+        makeFitVideoByNumber = [];
+        universalKeyValues = {};
+    case '9'
         skipStageByNumber = 1:8;
         lastStageByNumber = [];
         makeFitVideoByNumber = [];
