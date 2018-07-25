@@ -161,7 +161,7 @@ for rr = 1 :length(sourceVideos) % loop over video files
         videoTypeChoice = 'LiveTrackWithVTOP_sizeCal';
     end
     
-    % Check if we the current runName matches an entry in the
+    % Check if the current runName matches an entry in the
     % runNamesToCustomize list
     customArgs=[];
     if ~isempty(p.Results.customKeyValues)
