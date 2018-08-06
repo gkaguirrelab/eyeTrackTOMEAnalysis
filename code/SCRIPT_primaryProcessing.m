@@ -91,7 +91,7 @@ switch choice
         lastStageByNumber = 7;
         makeFitVideoByNumber = [];
         universalKeyValues = {};
-    case '9'
+    case '8'
         skipStageByNumber = 1:8;
         lastStageByNumber = [];
         makeFitVideoByNumber = [];
@@ -99,7 +99,7 @@ switch choice
 end
 
 
-% Ask the operator which project they would like to process
+%% Ask the operator which project they would like to process
 choiceList = projectList;
 fprintf('Select a project:\n')
 for pp=1:length(choiceList)
@@ -116,7 +116,8 @@ end
 % Obtain a list of subjects for this project
 subjectList = unique(paramsTable{strcmp(paramsTable.projectSubfolder, pathParams.projectSubfolder),2});
 
-% Ask the operator which subject(s) they would like to process
+
+%% Ask the operator which subject(s) they would like to process
 choiceList = subjectList;
 fprintf('\n\nSelect the subjects to process:\n')
 for pp=1:length(choiceList)
@@ -124,11 +125,54 @@ for pp=1:length(choiceList)
     fprintf(optionName);
 end
 fprintf('\nYou can enter a single subject number (e.g. 4),\n  a range defined with a colon (e.g. 4:7),\n  or a list within square brackets (e.g., [4 5 7]):\n')
-fprintf('If you select multiple subjects, all sessions and acquisitions will be run.\n');
 choice = input('\nYour choice: ','s');
 
 % This is an array of indices that refer back to the subjectList
 subjectIndexList = eval(choice);
+
+
+%% Ask the operator which acquisitions they would like to process
+acquisitionStems = [];
+if length(subjectIndexList) > 1
+fprintf('Select the stages you would like to execute:\n')
+fprintf('\t1. All videos (fMRI, structural, gaze cal, scale cal)\n');
+fprintf('\t2. All fMRI\n');
+fprintf('\t3. All structural\n');
+fprintf('\t4. All gaze cal\n');
+fprintf('\t5. All scale cal\n');
+fprintf('\t6. Only FLASH\n');
+fprintf('\t7. Only MOVIE\n');
+fprintf('\t8. Only RETINO\n');
+fprintf('\t9. Only REST\n');
+fprintf('\t10. Only the custom sceneGeometry source video\n');
+choice = input('\nYour choice: ','s');
+switch choice
+    case '1'
+        acquisitionStems = [];
+    case '2'
+        acquisitionStems = {'fMRI_'};
+    case '3'
+        acquisitionStems = {'T1_','T2_','dMRI_'};
+    case '4'
+        acquisitionStems = {'GazeCal'};
+    case '5'
+        acquisitionStems = {'ScaleCal'};
+    case '6'
+        acquisitionStems = {'tfMRI_FLASH_'};
+    case '7'
+        acquisitionStems = {'tfMRI_MOVIE_'};
+    case '8'
+        acquisitionStems = {'tfMRI_RETINO_'};
+    case '9'
+        acquisitionStems = {'rfMRI_REST_'};
+    case '10'
+        % This is not the name of a acquistion file, but a flag to later
+        % code to replace this stem with the identity of the sceneGeometry
+        % input acquisition.
+        acquisitionStems = {'sceneGeometryFlag'};
+end
+    
+end
 
 % Loop through the selected subjects
 for ss = 1:length(subjectIndexList)
@@ -200,6 +244,19 @@ for ss = 1:length(subjectIndexList)
             end
         end
         
+        % Handle here the special case that the user wishes to only process
+        % those acquisitions which have been identified as being the source
+        % of a custom sceneGeometry input
+        if strcmp(acquisitionStems,'sceneGeometryFlag')
+            keyList = find(cellfun(@(x) ischar(x),globalKeyValues));
+            csgIdx = find(contains(globalKeyValues(keyList),'customSceneGeometry'));
+            acquisitionStems = globalKeyValues{keyList(csgIdx)+1};
+            % There should only be one acqusition stem now. Remove the
+            % "_sceneGeometry.mat" suffix
+            tmpStem=strsplit(acquisitionStems{1},'_sceneGeometry.mat');
+            acquisitionStems = tmpStem(1);
+        end
+        
         % If there is only one subject and one session, give the user the
         % option to select acquisitions to process. This is implemented by
         % setting a flag here that is passed to the pipeline wrapper.
@@ -216,6 +273,7 @@ for ss = 1:length(subjectIndexList)
             'skipStageByNumber', skipStageByNumber, ...
             'makeFitVideoByNumber',makeFitVideoByNumber, ...
             'consoleSelectAcquisition',consoleSelectAcquisition, ...
+            'acquisitionStems',acquisitionStems,...
             globalKeyValues{:}, 'customKeyValues', customKeyValues);
         
     end % loop over session dates

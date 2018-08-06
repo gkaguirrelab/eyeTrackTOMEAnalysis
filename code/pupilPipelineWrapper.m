@@ -17,6 +17,7 @@ p.addParameter('skipRun',false,@islogical);
 p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
 p.addParameter('saveLog',true,@islogical);
 p.addParameter('consoleSelectAcquisition',false,@islogical);
+p.addParameter('acquisitionStems',[],@(x)(isempty(x) | iscell(x)));
 p.addParameter('stopOnTbDeployError',false,@islogical);
 
 % parse
@@ -110,6 +111,20 @@ if p.Results.consoleSelectAcquisition
     fprintf('\nYou can enter a single acquisition number (e.g. 4),\n  a range defined with a colon (e.g. 4:7),\n  or a list within square brackets (e.g., [4 5 7]):\n')
     choice = input('\nYour choice: ','s');
     sourceVideos = sourceVideos(eval(choice));
+end
+
+% If acqusitionStems is not empty, refine the list of source videos to be
+% only those that match the acquisition stem
+if ~isempty(p.Results.acquisitionStems)
+    c = struct2cell(sourceVideos);
+    idxMatch = cellfun(@(x) contains(x,p.Results.acquisitionStems),c(1,:));
+    if sum(idxMatch)==0
+        fprintf(['\n' pathParams.projectSubfolder ' - ' pathParams.subjectID ' - ' pathParams.sessionDate '\n']);
+        fprintf('\nNo videos match the acquisition stem(s). Exiting.\n')
+        return
+    else
+        sourceVideos = sourceVideos(idxMatch);
+    end
 end
 
 % THE FOLLOWING SHALL BE CHANGED, AS NOW WE ARE ANALYZING VIDEOS AT A
