@@ -133,6 +133,7 @@ subjectIndexList = eval(choice);
 
 %% Ask the operator which acquisitions they would like to process
 acquisitionStems = [];
+sceneGeometryFlag = false;
 if length(subjectIndexList) > 1
 fprintf('Select the stages you would like to execute:\n')
 fprintf('\t1. All videos (fMRI, structural, gaze cal, scale cal)\n');
@@ -169,7 +170,8 @@ switch choice
         % This is not the name of a acquistion file, but a flag to later
         % code to replace this stem with the identity of the sceneGeometry
         % input acquisition.
-        acquisitionStems = {'sceneGeometryFlag'};
+        sceneGeometryFlag = true;
+        acquisitionStems = {''};
 end
     
 end
@@ -247,7 +249,8 @@ for ss = 1:length(subjectIndexList)
         % Handle here the special case that the user wishes to only process
         % those acquisitions which have been identified as being the source
         % of a custom sceneGeometry input
-        if strcmp(acquisitionStems,'sceneGeometryFlag')
+        if sceneGeometryFlag
+            foo=1;
             keyList = find(cellfun(@(x) ischar(x),globalKeyValues));
             csgIdx = find(contains(globalKeyValues(keyList),'customSceneGeometry'));
             acquisitionStems = globalKeyValues{keyList(csgIdx)+1};
