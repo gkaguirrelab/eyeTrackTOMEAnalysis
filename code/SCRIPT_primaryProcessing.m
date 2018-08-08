@@ -92,7 +92,7 @@ switch choice
         makeFitVideoByNumber = [];
         universalKeyValues = {};
     case '8'
-        skipStageByNumber = 1:8;
+        skipStageByNumber = 1:7;
         lastStageByNumber = [];
         makeFitVideoByNumber = [];
         universalKeyValues = {};
