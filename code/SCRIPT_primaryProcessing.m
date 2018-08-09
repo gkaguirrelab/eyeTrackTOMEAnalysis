@@ -33,6 +33,12 @@ pathParams.dataOutputDirRoot = fullfile(dropboxDir,'TOME_processing');
 pathParams.controlFileDirRoot = fullfile(dropboxDir,'TOME_processing');
 pathParams.eyeTrackingDir = 'EyeTracking';
 
+% Set parameters common to all analyses from this project
+universalKeyValues = {'intrinsicCameraMatrix',[2627.0 0 338.1; 0 2628.1 246.2; 0 0 1],...
+    'radialDistortionVector',[-0.3517 3.5353],...
+    'eyeLaterality','right',...
+    'spectralDomain','nir'};
+
 % Load analysis parameters table
 paramsFileName = 'eyeTrackingParams.xls';
 opts = detectImportOptions(paramsFileName);
@@ -55,53 +61,45 @@ fprintf('\t6. Create default sceneGeometry (7)\n');
 fprintf('\t7. Search to refine sceneGeometry (7)\n');
 fprintf('\t8. Scene-constrained pupil fitting to end (8-end)\n');
 fprintf('\t9. Empirical Bayes smoothing to end (9-end)\n');
-choice = input('\nYour choice: ','s');
-switch choice
+stageChoice = input('\nYour choice: ','s');
+switch stageChoice
     case '1'
         skipStageByNumber = [];
         lastStageByNumber = 6;
         makeFitVideoByNumber = [];
-        universalKeyValues = {};
     case '2'
         skipStageByNumber = 1;
         lastStageByNumber = 6;
         makeFitVideoByNumber = [];
-        universalKeyValues = {};
     case '3'
         skipStageByNumber = 1:3;
         lastStageByNumber = 3;
         makeFitVideoByNumber = 3;
-        universalKeyValues = {};
     case '4'
         skipStageByNumber = 1:3;
         lastStageByNumber = 6;
         makeFitVideoByNumber = [];
-        universalKeyValues = {};
     case '5'
         skipStageByNumber = 1:6;
         lastStageByNumber = 6;
         makeFitVideoByNumber = 6;
-        universalKeyValues = {};
     case '6'
         skipStageByNumber = 1:6;
         lastStageByNumber = 7;
         makeFitVideoByNumber = [];
-        universalKeyValues = {'nBADSsearches',0};
+        universalKeyValues = [universalKeyValues, {'nBADSsearches',0}];
     case '7'
         skipStageByNumber = 1:6;
         lastStageByNumber = 7;
         makeFitVideoByNumber = [];
-        universalKeyValues = {};
     case '8'
         skipStageByNumber = 1:7;
         lastStageByNumber = [];
         makeFitVideoByNumber = [];
-        universalKeyValues = {};
     case '9'
         skipStageByNumber = 1:8;
         lastStageByNumber = [];
         makeFitVideoByNumber = [];
-        universalKeyValues = {};
 end
 
 
@@ -112,11 +110,11 @@ for pp=1:length(choiceList)
     optionName=['\t' char(pp+96) '. ' choiceList{pp} '\n'];
     fprintf(optionName);
 end
-choice = input('\nYour choice: ','s');
-choice = int32(choice);
-if choice >= 97 && choice <= 122
+projectChoice = input('\nYour choice: ','s');
+projectChoice = int32(projectChoice);
+if projectChoice >= 97 && projectChoice <= 122
     % Assign the chosen project sub folder to the path params
-    pathParams.projectSubfolder=choiceList{choice-96};
+    pathParams.projectSubfolder=choiceList{projectChoice-96};
 end
 
 % Obtain a list of subjects for this project
@@ -131,10 +129,10 @@ for pp=1:length(choiceList)
     fprintf(optionName);
 end
 fprintf('\nYou can enter a single subject number (e.g. 4),\n  a range defined with a colon (e.g. 4:7),\n  or a list within square brackets (e.g., [4 5 7]):\n')
-choice = input('\nYour choice: ','s');
+subjectChoice = input('\nYour choice: ','s');
 
 % This is an array of indices that refer back to the subjectList
-subjectIndexList = eval(choice);
+subjectIndexList = eval(subjectChoice);
 
 
 %% Ask the operator which acquisitions they would like to process
@@ -152,8 +150,8 @@ fprintf('\t7. Only MOVIE\n');
 fprintf('\t8. Only RETINO\n');
 fprintf('\t9. Only REST\n');
 fprintf('\t10. Only the custom sceneGeometry source video\n');
-choice = input('\nYour choice: ','s');
-switch choice
+acqChoice = input('\nYour choice: ','s');
+switch acqChoice
     case '1'
         acquisitionStems = [];
     case '2'
@@ -202,8 +200,8 @@ for ss = 1:length(subjectIndexList)
         end
         fprintf('\nYou can enter a single session number (e.g. 1),\n  a range defined with a colon (e.g. 1:2),\n  or a list within square brackets (e.g., [1 2]):\n')
         fprintf('If you select multiple sessions, all acquisitions will be run.\n');
-        choice = input('\nYour choice: ','s');
-        sessionDateList = sessionDateList(eval(choice));
+        stageChoice = input('\nYour choice: ','s');
+        sessionDateList = sessionDateList(eval(stageChoice));
     end
 
     % Loop through the session dates
@@ -266,6 +264,35 @@ for ss = 1:length(subjectIndexList)
             acquisitionStems = tmpStem(1);
         end
         
+        % Handle here the special case that the user has selected to
+        % estimate sceneGeometry, and iris diameter has been provided
+        if strcmp(stageChoice,'6') || strcmp(stageChoice,'7')
+            % Check if the maxIrisDiamPixels has been defined
+            irisKeyIdx = strcmp(globalKeyValues,'maxIrisDiamPixels');
+            if sum(irisKeyIdx)==1
+                irisKeyIdx=find(irisKeyIdx);
+                maxIrisDiamPixels = globalKeyValues{irisKeyIdx+1};
+                sceneGeometry = createSceneGeometry(universalKeyValues{:});
+                [cameraDepthMean, cameraDepthSD] = depthFromIrisDiameter( sceneGeometry, maxIrisDiamPixels );
+                
+                % Assemble the scene parameter bounds. These are in the order of:
+                %   torsion, x, y, z, eyeRotationScalarJoint, eyeRotationScalerDifferential
+                % where torsion specifies the torsion of the camera with respect to the eye
+                % in degrees, [x y z] is the translation of the camera w.r.t. the eye in
+                % mm, and the eyeRotationScalar variables are multipliers that act upon the
+                % centers of rotation estimated for the eye.
+                sceneParamsLB = [-5; -5; -5; cameraDepthMean-cameraDepthSD*2; 0.75; 0.9];
+                sceneParamsLBp = [-3; -2; -2; cameraDepthMean-cameraDepthSD*1; 0.85; 0.95];
+                sceneParamsUBp = [3; 2; 2; cameraDepthMean+cameraDepthSD*1; 1.15; 1.05];
+                sceneParamsUB = [5; 5; 5; cameraDepthMean+cameraDepthSD*2; 1.25; 1.1];
+                
+                % Add these sceneParams to the globalKeyValues
+                globalKeyValues = [globalKeyValues,...
+                    {'sceneParamsLB',sceneParamsLB,'sceneParamsLBp',sceneParamsLBp,...
+                    'sceneParamsUBp',sceneParamsUBp,'sceneParamsUB',sceneParamsUB}];
+            end
+        end
+                
         % If there is only one subject and one session, give the user the
         % option to select acquisitions to process. This is implemented by
         % setting a flag here that is passed to the pipeline wrapper.
@@ -274,7 +301,7 @@ for ss = 1:length(subjectIndexList)
         else
             consoleSelectAcquisition = false;
         end
-        
+                
         % Execute the pipeline for this project / session / subject, using
         % the global and custom key values
         pupilPipelineWrapper(pathParams, ...
