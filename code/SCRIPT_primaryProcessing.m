@@ -53,7 +53,8 @@ fprintf('\t4. Make control file to initial ellipse fitting (4-6)\n');
 fprintf('\t5. Create a stage 6 fit video\n');
 fprintf('\t6. Create default sceneGeometry (7)\n');
 fprintf('\t7. Search to refine sceneGeometry (7)\n');
-fprintf('\t8. Scene-constrained pupil fitting and empirical Bayes smoothing (8-end)\n');
+fprintf('\t8. Scene-constrained pupil fitting to end (8-end)\n');
+fprintf('\t8. Empirical Bayes smoothing to end (9-end)\n');
 choice = input('\nYour choice: ','s');
 switch choice
     case '1'
@@ -93,6 +94,11 @@ switch choice
         universalKeyValues = {};
     case '8'
         skipStageByNumber = 1:7;
+        lastStageByNumber = [];
+        makeFitVideoByNumber = [];
+        universalKeyValues = {};
+    case '9'
+        skipStageByNumber = 1:8;
         lastStageByNumber = [];
         makeFitVideoByNumber = [];
         universalKeyValues = {};
