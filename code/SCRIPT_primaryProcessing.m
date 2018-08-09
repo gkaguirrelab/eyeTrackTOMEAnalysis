@@ -54,7 +54,7 @@ fprintf('\t5. Create a stage 6 fit video\n');
 fprintf('\t6. Create default sceneGeometry (7)\n');
 fprintf('\t7. Search to refine sceneGeometry (7)\n');
 fprintf('\t8. Scene-constrained pupil fitting to end (8-end)\n');
-fprintf('\t8. Empirical Bayes smoothing to end (9-end)\n');
+fprintf('\t9. Empirical Bayes smoothing to end (9-end)\n');
 choice = input('\nYour choice: ','s');
 switch choice
     case '1'
