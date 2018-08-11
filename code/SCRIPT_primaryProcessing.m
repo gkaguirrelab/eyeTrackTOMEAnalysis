@@ -91,6 +91,7 @@ switch stageChoice
     case '7'
         skipStageByNumber = 1:6;
         lastStageByNumber = 7;
+        universalKeyValues = [universalKeyValues, {'nBADSsearches',30}];
         makeFitVideoByNumber = [];
     case '8'
         skipStageByNumber = 1:7;
@@ -275,12 +276,14 @@ for ss = 1:length(subjectIndexList)
                 sceneGeometry = createSceneGeometry(universalKeyValues{:});
                 [cameraDepthMean, cameraDepthSD] = depthFromIrisDiameter( sceneGeometry, maxIrisDiamPixels );
                 
-                % Assemble the scene parameter bounds. These are in the order of:
+                % Assemble the scene parameter bounds. These are in the
+                % order of:
                 %   torsion, x, y, z, eyeRotationScalarJoint, eyeRotationScalerDifferential
-                % where torsion specifies the torsion of the camera with respect to the eye
-                % in degrees, [x y z] is the translation of the camera w.r.t. the eye in
-                % mm, and the eyeRotationScalar variables are multipliers that act upon the
-                % centers of rotation estimated for the eye.
+                % where torsion specifies the torsion of the camera with
+                % respect to the eye in degrees, [x y z] is the translation
+                % of the camera w.r.t. the eye in mm, and the
+                % eyeRotationScalar variables are multipliers that act upon
+                % the centers of rotation estimated for the eye.
                 sceneParamsLB = [-5; -5; -5; cameraDepthMean-cameraDepthSD*2; 0.75; 0.9];
                 sceneParamsLBp = [-3; -2; -2; cameraDepthMean-cameraDepthSD*1; 0.85; 0.95];
                 sceneParamsUBp = [3; 2; 2; cameraDepthMean+cameraDepthSD*1; 1.15; 1.05];
@@ -292,7 +295,7 @@ for ss = 1:length(subjectIndexList)
                     'sceneParamsUBp',sceneParamsUBp,'sceneParamsUB',sceneParamsUB}];
             end
         end
-                
+        
         % If there is only one subject and one session, give the user the
         % option to select acquisitions to process. This is implemented by
         % setting a flag here that is passed to the pipeline wrapper.
