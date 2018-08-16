@@ -276,18 +276,39 @@ for ss = 1:length(subjectIndexList)
                 sceneGeometry = createSceneGeometry(universalKeyValues{:});
                 [cameraDepthMean, cameraDepthSD] = depthFromIrisDiameter( sceneGeometry, maxIrisDiamPixels );
                 
-                % Assemble the scene parameter bounds. These are in the
-                % order of:
-                %   torsion, x, y, z, eyeRotationScalarJoint, eyeRotationScalerDifferential
-                % where torsion specifies the torsion of the camera with
-                % respect to the eye in degrees, [x y z] is the translation
-                % of the camera w.r.t. the eye in mm, and the
-                % eyeRotationScalar variables are multipliers that act upon
-                % the centers of rotation estimated for the eye.
-                sceneParamsLB = [-5; -5; -5; cameraDepthMean-cameraDepthSD*2; 0.75; 0.9];
-                sceneParamsLBp = [-3; -2; -2; cameraDepthMean-cameraDepthSD*1; 0.85; 0.95];
-                sceneParamsUBp = [3; 2; 2; cameraDepthMean+cameraDepthSD*1; 1.15; 1.05];
-                sceneParamsUB = [5; 5; 5; cameraDepthMean+cameraDepthSD*2; 1.25; 1.1];
+                % Check to see if the spreadsheet has specified an x0 value
+                % for the sceneParams.
+                sceneParamsX0 = strcmp(globalKeyValues,'sceneParamsX0');
+                if sum(sceneParamsX0)==1
+                    x0 = globalKeyValues{find(sceneParamsX0)+1};
+                    switch length(x0)
+                        case 4
+                            sceneParamsLB = [x0(1:3); x0(4)-cameraDepthSD*0.5; 0.75; 0.9];
+                            sceneParamsLBp = [x0(1:3); x0(4)-cameraDepthSD*0.25; 0.85; 0.95];
+                            sceneParamsUBp = [x0(1:3); x0(4)+cameraDepthSD*0.25; 1.15; 1.05];
+                            sceneParamsUB = [x0(1:3); x0(4)+cameraDepthSD*0.5; 1.25; 1.1];
+                        case 6
+                            sceneParamsLB = x0;
+                            sceneParamsLBp = x0;
+                            sceneParamsUBp = x0;
+                            sceneParamsUB = x0;
+                        otherwise
+                            error('Not sure to handle that sceneParamsX0 length');
+                    end
+                else
+                    % Assemble the scene parameter bounds. These are in the
+                    % order of:
+                    %   torsion, x, y, z, eyeRotationScalarJoint, eyeRotationScalerDifferential
+                    % where torsion specifies the torsion of the camera with
+                    % respect to the eye in degrees, [x y z] is the translation
+                    % of the camera w.r.t. the eye in mm, and the
+                    % eyeRotationScalar variables are multipliers that act upon
+                    % the centers of rotation estimated for the eye.
+                    sceneParamsLB = [-5; -5; -5; cameraDepthMean-cameraDepthSD*2; 0.75; 0.9];
+                    sceneParamsLBp = [-3; -2; -2; cameraDepthMean-cameraDepthSD*1; 0.85; 0.95];
+                    sceneParamsUBp = [3; 2; 2; cameraDepthMean+cameraDepthSD*1; 1.15; 1.05];
+                    sceneParamsUB = [5; 5; 5; cameraDepthMean+cameraDepthSD*2; 1.25; 1.1];
+                end
                 
                 % Add these sceneParams to the globalKeyValues
                 globalKeyValues = [globalKeyValues,...
