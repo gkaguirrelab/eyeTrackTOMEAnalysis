@@ -273,7 +273,7 @@ for ss = 1:length(subjectIndexList)
             if sum(irisKeyIdx)==1
                 irisKeyIdx=find(irisKeyIdx);
                 maxIrisDiamPixels = globalKeyValues{irisKeyIdx+1};
-                sceneGeometry = createSceneGeometry(universalKeyValues{:});
+                sceneGeometry = createSceneGeometry(universalKeyValues{:},'skipEyeAxes',true);
                 [cameraDepthMean, cameraDepthSD] = depthFromIrisDiameter( sceneGeometry, maxIrisDiamPixels );
                 
                 % Check to see if the spreadsheet has specified an x0 value
