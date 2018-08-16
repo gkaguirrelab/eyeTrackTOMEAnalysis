@@ -19,6 +19,7 @@ p.addParameter('saveLog',true,@islogical);
 p.addParameter('consoleSelectAcquisition',false,@islogical);
 p.addParameter('acquisitionStems',[],@(x)(isempty(x) | iscell(x)));
 p.addParameter('stopOnTbDeployError',false,@islogical);
+p.addParameter('obtainTbConfig',true,@islogical);
 
 % parse
 p.parse(pathParams, varargin{:});
@@ -34,16 +35,20 @@ TbTbProjectName = 'eyeTrackTOMEAnalysis';
 %% TbTb configuration
 % We will suppress the verbose output, but detect if there are deploy
 % errors and if so stop execution
-tbConfigResult=tbUseProject(TbTbProjectName,'reset','full','verbose',false);
-if sum(cellfun(@sum,extractfield(tbConfigResult, 'isOk')))~=length(tbConfigResult)
-    if p.Results.stopOnTbDeployError
-        error('There was a tb deploy error. Check the contents of tbConfigResult');
-    else
-        warning('There was a tb deploy error. Check the contents of tbConfigResult');
+if p.Results.obtainTbConfig
+    tbConfigResult=tbUseProject(TbTbProjectName,'reset','full','verbose',false);
+    if sum(cellfun(@sum,extractfield(tbConfigResult, 'isOk')))~=length(tbConfigResult)
+        if p.Results.stopOnTbDeployError
+            error('There was a tb deploy error. Check the contents of tbConfigResult');
+        else
+            warning('There was a tb deploy error. Check the contents of tbConfigResult');
+        end
     end
+    tbSnapshot=tbDeploymentSnapshot(tbConfigResult,'verbose',false);
+    clear tbConfigResult
+else
+    tbSnapshot=[];
 end
-tbSnapshot=tbDeploymentSnapshot(tbConfigResult,'verbose',false);
-clear tbConfigResult
 
 
 %% define full paths for input and output
@@ -71,19 +76,19 @@ end
 % useLowResSizeCalVideo flag is set to true, we copy this low-res video
 % over to the dataOutputDir and give it a "gray" suffix, so that it can be
 % processed
-if p.Results.useLowResSizeCalVideo
-    scaleCalLowResVideos = dir(fullfile(pathParams.dataSourceDirFull,'ScaleCalibration*.avi'));
-    if ~isempty(scaleCalLowResVideos)
-        for rr = 1: length(scaleCalLowResVideos)
-            newFileName = ['LowRes' scaleCalLowResVideos(rr).name(1:end-4) '_gray.avi'];
-            scaleCalLowResGrayAVIs(rr).name = newFileName;
-            scaleCalLowResGrayAVIs(rr).folder = pathParams.dataOutputDirFull;
-            fullFilePathDestination = fullfile(scaleCalLowResGrayAVIs(rr).folder, scaleCalLowResGrayAVIs(rr).name);
-            fullFilePathSource = fullfile(scaleCalLowResVideos(rr).folder, scaleCalLowResVideos(rr).name);
-            copyfile (fullFilePathSource, fullFilePathDestination)
-        end
-    end
-end
+% if p.Results.useLowResSizeCalVideo
+%     scaleCalLowResVideos = dir(fullfile(pathParams.dataSourceDirFull,'ScaleCalibration*.avi'));
+%     if ~isempty(scaleCalLowResVideos)
+%         for rr = 1: length(scaleCalLowResVideos)
+%             newFileName = ['LowRes' scaleCalLowResVideos(rr).name(1:end-4) '_gray.avi'];
+%             scaleCalLowResGrayAVIs(rr).name = newFileName;
+%             scaleCalLowResGrayAVIs(rr).folder = pathParams.dataOutputDirFull;
+%             fullFilePathDestination = fullfile(scaleCalLowResGrayAVIs(rr).folder, scaleCalLowResGrayAVIs(rr).name);
+%             fullFilePathSource = fullfile(scaleCalLowResVideos(rr).folder, scaleCalLowResVideos(rr).name);
+%             copyfile (fullFilePathSource, fullFilePathDestination)
+%         end
+%     end
+% end
 
 % if starting from convertRawToGray, get the file names from the  raw files in the data
 % folder. If starting from a later step, get the run name from the gray
