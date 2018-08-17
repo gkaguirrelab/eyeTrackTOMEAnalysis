@@ -91,7 +91,7 @@ switch stageChoice
     case '7'
         skipStageByNumber = 1:6;
         lastStageByNumber = 7;
-        universalKeyValues = [universalKeyValues, {'nBADSsearches',48}];
+        universalKeyValues = [universalKeyValues, {'nBADSsearches',12}];
         makeFitVideoByNumber = [];
     case '8'
         skipStageByNumber = 1:7;
@@ -283,10 +283,10 @@ for ss = 1:length(subjectIndexList)
                     x0 = globalKeyValues{find(sceneParamsX0)+1};
                     switch length(x0)
                         case 4
-                            sceneParamsLB = [x0(1:3); x0(4)-cameraDepthSD*0.5; 0.75; 0.9];
-                            sceneParamsLBp = [x0(1:3); x0(4)-cameraDepthSD*0.25; 0.85; 0.95];
-                            sceneParamsUBp = [x0(1:3); x0(4)+cameraDepthSD*0.25; 1.15; 1.05];
-                            sceneParamsUB = [x0(1:3); x0(4)+cameraDepthSD*0.5; 1.25; 1.1];
+                            sceneParamsLB = [x0(1:3)-0.5; x0(4)-cameraDepthSD*0.5; 0.8; 0.9];
+                            sceneParamsLBp = [x0(1:3)-0.5; x0(4)-cameraDepthSD*0.25; 0.9; 0.95];
+                            sceneParamsUBp = [x0(1:3)+0.5; x0(4)+cameraDepthSD*0.25; 1.1; 1.05];
+                            sceneParamsUB = [x0(1:3)+0.5; x0(4)+cameraDepthSD*0.5; 1.2; 1.1];
                         case 6
                             sceneParamsLB = x0;
                             sceneParamsLBp = x0;
