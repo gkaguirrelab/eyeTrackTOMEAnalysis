@@ -91,7 +91,7 @@ switch stageChoice
     case '7'
         skipStageByNumber = 1:6;
         lastStageByNumber = 7;
-        universalKeyValues = [universalKeyValues, {'nBADSsearches',12}];
+        universalKeyValues = [universalKeyValues, {'nBADSsearches',10}];
         makeFitVideoByNumber = [];
     case '8'
         skipStageByNumber = 1:7;
