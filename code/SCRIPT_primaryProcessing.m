@@ -1,10 +1,4 @@
-%% Stages 1 - 6
-%
-% This script allows the user to select a project (i.e., Session 1 or
-% Session 2 of the TOME study), then a set of subjects, and then submits
-% that set of projects / subjects / sessions to analysis from the stage of
-% initial de-interlacing of the pupil video to "stage 6", which is the
-% initial ellipse fit.
+
 
 
 % set dropbox directory
@@ -36,7 +30,9 @@ pathParams.eyeTrackingDir = 'EyeTracking';
 % Set parameters common to all analyses from this project
 universalKeyValues = {'intrinsicCameraMatrix',[2627.0 0 338.1; 0 2628.1 246.2; 0 0 1],...
     'radialDistortionVector',[-0.3517 3.5353],...
+    'constraintTolerance',0.05,...
     'eyeLaterality','right',...
+    'rankScaling',[10 1 1], ...
     'spectralDomain','nir'};
 
 % Load analysis parameters table
