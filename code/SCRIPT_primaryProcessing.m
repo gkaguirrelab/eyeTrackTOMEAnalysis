@@ -48,17 +48,23 @@ projectList = projectList(~strcmp(projectList,''));
 % Ask the operator which stages they would like to execute
 clc
 fprintf('Select the stages you would like to execute:\n')
+fprintf('\t0. Deinterlacing only (1)\n');
 fprintf('\t1. Deinterlacing to initial ellipse fitting (1-6)\n');
 fprintf('\t2. Skip deinterlacing, to initial ellipse fitting (2-6)\n');
 fprintf('\t3. Create a stage 3 fit video\n');
 fprintf('\t4. Make control file to initial ellipse fitting (4-6)\n');
-fprintf('\t5. Create a stage 6 fit video\n');
-fprintf('\t6. Create default sceneGeometry (7)\n');
-fprintf('\t7. Search to refine sceneGeometry (7)\n');
-fprintf('\t8. Scene-constrained pupil fitting to end (8-end)\n');
-fprintf('\t9. Empirical Bayes smoothing to end (9-end)\n');
+fprintf('\t5. Initial ellipse fitting only (6)\n');
+fprintf('\t6. Create a stage 6 fit video\n');
+fprintf('\t7. Create default sceneGeometry (7)\n');
+fprintf('\t8. Search to refine sceneGeometry (7)\n');
+fprintf('\t9. Scene-constrained pupil fitting to end (8-end)\n');
+fprintf('\t10. Empirical Bayes smoothing to end (9-end)\n');
 stageChoice = input('\nYour choice: ','s');
 switch stageChoice
+    case '0'
+        skipStageByNumber = [];
+        lastStageByNumber = 1;
+        makeFitVideoByNumber = [];
     case '1'
         skipStageByNumber = [];
         lastStageByNumber = 6;
@@ -76,24 +82,28 @@ switch stageChoice
         lastStageByNumber = 6;
         makeFitVideoByNumber = [];
     case '5'
+        skipStageByNumber = 1:5;
+        lastStageByNumber = 6;
+        makeFitVideoByNumber = [];
+    case '6'
         skipStageByNumber = 1:6;
         lastStageByNumber = 6;
         makeFitVideoByNumber = 6;
-    case '6'
+    case '7'
         skipStageByNumber = 1:6;
         lastStageByNumber = 7;
         makeFitVideoByNumber = [];
         universalKeyValues = [universalKeyValues, {'nBADSsearches',0}];
-    case '7'
+    case '8'
         skipStageByNumber = 1:6;
         lastStageByNumber = 7;
         universalKeyValues = [universalKeyValues, {'nBADSsearches',10}];
         makeFitVideoByNumber = [];
-    case '8'
+    case '9'
         skipStageByNumber = 1:7;
         lastStageByNumber = [];
         makeFitVideoByNumber = [];
-    case '9'
+    case '10'
         skipStageByNumber = 1:8;
         lastStageByNumber = [];
         makeFitVideoByNumber = [];
