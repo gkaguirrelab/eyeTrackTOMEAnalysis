@@ -1,5 +1,10 @@
 
 
+% Turn off the warning regarding over-writting the control file, as we are
+% not hand-editing this file in this project
+warningState = warning;
+warning('off','makeControlFile:overwrittingControlFile');
+
 
 % set dropbox directory
 [~,hostname] = system('hostname');
@@ -350,4 +355,7 @@ for ss = 1:length(subjectIndexList)
         
     end % loop over session dates
 end % loop over subjects
+
+% Restore the warning state
+warning(warningState);
 
