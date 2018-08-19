@@ -59,6 +59,7 @@ fprintf('\t7. Create default sceneGeometry (7)\n');
 fprintf('\t8. Search to refine sceneGeometry (7)\n');
 fprintf('\t9. Scene-constrained pupil fitting to end (8-end)\n');
 fprintf('\t10. Empirical Bayes smoothing to end (9-end)\n');
+fprintf('\t11. Generate timebase only (1)\n');
 stageChoice = input('\nYour choice: ','s');
 switch stageChoice
     case '0'
@@ -106,6 +107,11 @@ switch stageChoice
     case '10'
         skipStageByNumber = 1:8;
         lastStageByNumber = [];
+        makeFitVideoByNumber = [];
+    case '11'
+        skipStageByNumber = [];
+        lastStageByNumber = 1;
+        universalKeyValues = [universalKeyValues, {'generateTimebaseOnly',true}];
         makeFitVideoByNumber = [];
 end
 
