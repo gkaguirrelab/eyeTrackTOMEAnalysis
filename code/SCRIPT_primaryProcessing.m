@@ -284,7 +284,7 @@ for ss = 1:length(subjectIndexList)
         
         % Handle here the special case that the user has selected to
         % estimate sceneGeometry, and iris diameter has been provided
-        if strcmp(stageChoice,'6') || strcmp(stageChoice,'7')
+        if strcmp(stageChoice,'7') || strcmp(stageChoice,'8')
             % Check if the maxIrisDiamPixels has been defined
             irisKeyIdx = strcmp(globalKeyValues,'maxIrisDiamPixels');
             if sum(irisKeyIdx)==1
