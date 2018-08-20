@@ -50,6 +50,9 @@ paramsTable = readtable(paramsFileName, opts);
 projectList = unique(paramsTable{:,1});
 projectList = projectList(~strcmp(projectList,''));
 
+% Set a flag variable to empty
+consoleSelectAcquisition = [];
+
 % Ask the operator which stages they would like to execute
 clc
 fprintf('Select the stages you would like to execute:\n')
@@ -65,6 +68,7 @@ fprintf('\t8. Search to refine sceneGeometry (7)\n');
 fprintf('\t9. Scene-constrained pupil fitting to end (8-end)\n');
 fprintf('\t10. Empirical Bayes smoothing to end (9-end)\n');
 fprintf('\t11. Generate timebase only (1)\n');
+fprintf('\t12. Identify gaze cal frames and targets\n');
 stageChoice = input('\nYour choice: ','s');
 switch stageChoice
     case '0'
@@ -118,6 +122,15 @@ switch stageChoice
         lastStageByNumber = 1;
         universalKeyValues = [universalKeyValues, {'generateTimebaseOnly',true}];
         makeFitVideoByNumber = [];
+    case '12'
+        skipStageByNumber = [];
+        lastStageByNumber = 1;
+        universalKeyValues = [universalKeyValues, ...
+            {'videoTypeChoice','gazeCalInfo_HighResWithDotTimes', ...
+            'targetDeg',7,'skipStageByName',{'deinterlaceVideo'}}];
+        makeFitVideoByNumber = [];
+        consoleSelectAcquisition = false;
+        sceneGeometryFlag = false;
 end
 
 
@@ -152,50 +165,53 @@ subjectChoice = input('\nYour choice: ','s');
 % This is an array of indices that refer back to the subjectList
 subjectIndexList = eval(subjectChoice);
 
-
-%% Ask the operator which acquisitions they would like to process
-acquisitionStems = [];
-sceneGeometryFlag = false;
-if length(subjectIndexList) > 1
-fprintf('Select the stages you would like to execute:\n')
-fprintf('\t1. All videos (fMRI, structural, gaze cal, scale cal)\n');
-fprintf('\t2. All fMRI\n');
-fprintf('\t3. All structural\n');
-fprintf('\t4. All gaze cal\n');
-fprintf('\t5. All scale cal\n');
-fprintf('\t6. Only FLASH\n');
-fprintf('\t7. Only MOVIE\n');
-fprintf('\t8. Only RETINO\n');
-fprintf('\t9. Only REST\n');
-fprintf('\t10. Only the custom sceneGeometry source video\n');
-acqChoice = input('\nYour choice: ','s');
-switch acqChoice
-    case '1'
-        acquisitionStems = [];
-    case '2'
-        acquisitionStems = {'fMRI_'};
-    case '3'
-        acquisitionStems = {'T1_','T2_','dMRI_'};
-    case '4'
-        acquisitionStems = {'GazeCal'};
-    case '5'
-        acquisitionStems = {'ScaleCal'};
-    case '6'
-        acquisitionStems = {'tfMRI_FLASH_'};
-    case '7'
-        acquisitionStems = {'tfMRI_MOVIE_'};
-    case '8'
-        acquisitionStems = {'tfMRI_RETINO_'};
-    case '9'
-        acquisitionStems = {'rfMRI_REST_'};
-    case '10'
-        % This is not the name of a acquistion file, but a flag to later
-        % code to replace this stem with the identity of the sceneGeometry
-        % input acquisition.
-        sceneGeometryFlag = true;
-        acquisitionStems = {''};
-end
-    
+if eval(stageChoice)<=11
+    %% Ask the operator which acquisitions they would like to process
+    acquisitionStems = [];
+    sceneGeometryFlag = false;
+    if length(subjectIndexList) > 1
+        fprintf('Select the stages you would like to execute:\n')
+        fprintf('\t1. All videos (fMRI, structural, gaze cal, scale cal)\n');
+        fprintf('\t2. All fMRI\n');
+        fprintf('\t3. All structural\n');
+        fprintf('\t4. All gaze cal\n');
+        fprintf('\t5. All scale cal\n');
+        fprintf('\t6. Only FLASH\n');
+        fprintf('\t7. Only MOVIE\n');
+        fprintf('\t8. Only RETINO\n');
+        fprintf('\t9. Only REST\n');
+        fprintf('\t10. Only the custom sceneGeometry source video\n');
+        acqChoice = input('\nYour choice: ','s');
+        switch acqChoice
+            case '1'
+                acquisitionStems = [];
+            case '2'
+                acquisitionStems = {'fMRI_'};
+            case '3'
+                acquisitionStems = {'T1_','T2_','dMRI_'};
+            case '4'
+                acquisitionStems = {'GazeCal'};
+            case '5'
+                acquisitionStems = {'ScaleCal'};
+            case '6'
+                acquisitionStems = {'tfMRI_FLASH_'};
+            case '7'
+                acquisitionStems = {'tfMRI_MOVIE_'};
+            case '8'
+                acquisitionStems = {'tfMRI_RETINO_'};
+            case '9'
+                acquisitionStems = {'rfMRI_REST_'};
+            case '10'
+                % This is not the name of a acquistion file, but a flag to later
+                % code to replace this stem with the identity of the sceneGeometry
+                % input acquisition.
+                sceneGeometryFlag = true;
+                acquisitionStems = {''};
+        end
+        
+    end
+else
+    acquisitionStems = {'GazeCal'};
 end
 
 % Loop through the selected subjects
@@ -337,12 +353,14 @@ for ss = 1:length(subjectIndexList)
         % If there is only one subject and one session, give the user the
         % option to select acquisitions to process. This is implemented by
         % setting a flag here that is passed to the pipeline wrapper.
-        if length(subjectIndexList)==1 && length(sessionDateList)==1
-            consoleSelectAcquisition = true;
-        else
-            consoleSelectAcquisition = false;
+        if isempty(consoleSelectAcquisition)
+            if length(subjectIndexList)==1 && length(sessionDateList)==1
+                consoleSelectAcquisition = true;
+            else
+                consoleSelectAcquisition = false;
+            end
         end
-                
+        
         % Execute the pipeline for this project / session / subject, using
         % the global and custom key values
         pupilPipelineWrapper(pathParams, ...

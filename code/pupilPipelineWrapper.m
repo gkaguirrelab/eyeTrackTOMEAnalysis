@@ -13,6 +13,7 @@ p.addRequired('pathParams',@isstruct);
 p.addParameter('useLowResSizeCalVideo',false,@islogical);
 p.addParameter('skipStageByNumber',[],@isnumeric);
 p.addParameter('skipStageByName',[],@iscell);
+p.addParameter('videoTypeChoice',[],@ischar);
 p.addParameter('skipRun',false,@islogical);
 p.addParameter('customKeyValues',[],@(x)(isempty(x) | iscell(x)));
 p.addParameter('saveLog',true,@islogical);
@@ -168,17 +169,24 @@ for rr = 1 :length(sourceVideos) % loop over video files
     end
     fprintf ('\nProcessing video %d of %d\n',rr,length(sourceVideos))
     
-    if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{1}))
-        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(1)); % runs
-        videoTypeChoice = 'LiveTrackWithVTOP_eye';
-    end
-    if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{2}))
-        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(2)); % gaze calibrations
-        videoTypeChoice = 'LiveTrackWithVTOP_eye';
-    end
-    if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{3}))
-        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(3)); % scale calibrations
-        videoTypeChoice = 'LiveTrackWithVTOP_sizeCal';
+    if isempty(p.Results.videoTypeChoice)
+        if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{1}))
+            pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(1)); % runs
+            videoTypeChoice = 'LiveTrackWithVTOP_eye';
+        end
+        if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{2}))
+            pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(2)); % gaze calibrations
+            videoTypeChoice = 'LiveTrackWithVTOP_eye';
+        end
+        if regexp(sourceVideos(rr).name, regexptranslate('wildcard',suffixCodes{3}))
+            pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(3)); % scale calibrations
+            videoTypeChoice = 'LiveTrackWithVTOP_sizeCal';
+        end
+    else
+        videoTypeChoice = p.Results.videoTypeChoice;
+        % Assumes here that the suffix of the source video is always
+        % "_gray.avi", and thus 9 characters long.
+        pathParams.runName = sourceVideos(rr).name(1:end-suffixToTrim(1));
     end
     
     % Check if the current runName matches an entry in the
