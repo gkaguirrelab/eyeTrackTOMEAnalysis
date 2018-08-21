@@ -299,16 +299,22 @@ for ss = 1:length(subjectIndexList)
                     keyList = find(cellfun(@(x) ischar(x),customKeyValues{cc}));
                     csgIdx = find(contains(customKeyValues{cc}(keyList),'customSceneGeometry'));
                     if ~isempty(csgIdx)
-                        acquisitionStems = [acquisitionStems{:} customKeyValues{cc}{keyList(csgIdx)+1}];
+                        tmpStem=customKeyValues{cc}{keyList(csgIdx)+1};
+                        tmpStem=strsplit(tmpStem{1},'_sceneGeometry.mat');
+                        acquisitionStems = [acquisitionStems{:} tmpStem(1)];
                     end
                 end
             else
                 acquisitionStems = globalKeyValues{keyList(csgIdx)+1};
+                % Remove the "_sceneGeometry.mat" suffix
+                tmpStem=strsplit(acquisitionStems{1},'_sceneGeometry.mat');
+                acquisitionStems = tmpStem(1);
             end
-        % There should only be one acqusition stem now. Remove the
-            % "_sceneGeometry.mat" suffix
-            tmpStem=strsplit(acquisitionStems{1},'_sceneGeometry.mat');
-            acquisitionStems = tmpStem(1);
+            % Handle the case in which no custom scene geometry has been
+            % defined for this subject/session.
+            if isempty(acquisitionStems)
+                continue
+            end
         end
         
         % Handle here the special case that the user has selected to
