@@ -291,8 +291,21 @@ for ss = 1:length(subjectIndexList)
             foo=1;
             keyList = find(cellfun(@(x) ischar(x),globalKeyValues));
             csgIdx = find(contains(globalKeyValues(keyList),'customSceneGeometry'));
-            acquisitionStems = globalKeyValues{keyList(csgIdx)+1};
-            % There should only be one acqusition stem now. Remove the
+            if isempty(csgIdx)
+                % Check if the customSceneGeometry is defined as a custom
+                % key value, and not a global key value
+                acquisitionStems={};
+                for cc=1:size(customKeyValues,1)
+                    keyList = find(cellfun(@(x) ischar(x),customKeyValues{cc}));
+                    csgIdx = find(contains(customKeyValues{cc}(keyList),'customSceneGeometry'));
+                    if ~isempty(csgIdx)
+                        acquisitionStems = [acquisitionStems{:} customKeyValues{cc}{keyList(csgIdx)+1}];
+                    end
+                end
+            else
+                acquisitionStems = globalKeyValues{keyList(csgIdx)+1};
+            end
+        % There should only be one acqusition stem now. Remove the
             % "_sceneGeometry.mat" suffix
             tmpStem=strsplit(acquisitionStems{1},'_sceneGeometry.mat');
             acquisitionStems = tmpStem(1);
