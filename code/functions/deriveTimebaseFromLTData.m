@@ -57,6 +57,11 @@ function [timebase] = deriveTimebaseFromLTData(glintFileName,ltReportFileName,va
 %	timebase            - structure with fields that contain the timebase
 %                         information in milliseconds, and a meta field.
 %
+% Examples:
+%{
+    
+%}
+
 %% input parser
 
 p = inputParser; p.KeepUnmatched = true;
