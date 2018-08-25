@@ -165,6 +165,7 @@ if isempty(p.Results.fixedFrameDelay)
     % when cross correlation of the signals is max the lag equals the delay
     [~,I] = max(r);
     delay = lag(I); % unit = [number of samples]
+    delay = max([delay 0]);
 else
     delay = p.Results.fixedFrameDelay;
 end
