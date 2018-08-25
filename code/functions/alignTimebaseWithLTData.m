@@ -1,5 +1,5 @@
-function [timebase] = deriveTimebaseFromLTData(glintFileName,ltReportFileName,varargin)
-% Derives a timebase for eyetracking data acquired with the LiveTrack+VTop setup
+function alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName,varargin)
+% Adjust the pupil and glint timebase to match scanner timing
 % 
 % Description:
 %   this function is to be used with the LiveTrack+VTop setup and assignes
@@ -59,7 +59,10 @@ function [timebase] = deriveTimebaseFromLTData(glintFileName,ltReportFileName,va
 %
 % Examples:
 %{
-    
+    glintFileName='/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session1_restAndStructure/TOME_3015/030117/EyeTracking/rfMRI_REST_AP_run03_glint.mat';
+    timebaseFileName='/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session1_restAndStructure/TOME_3015/030117/EyeTracking/rfMRI_REST_AP_run03_timebase.mat';
+    ltReportFileName='/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_data/session1_restAndStructure/TOME_3015/030117/EyeTracking/rfMRI_REST_AP_run03_report.mat';
+    alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName);
 %}
 
 %% input parser
@@ -67,17 +70,17 @@ function [timebase] = deriveTimebaseFromLTData(glintFileName,ltReportFileName,va
 p = inputParser; p.KeepUnmatched = true;
 
 % Required
+p.addRequired('timebaseFileName',@ischar);
 p.addRequired('glintFileName',@ischar);
 p.addRequired('ltReportFileName',@ischar);
 
 % Optional analysis parameters
-p.addParameter('timebaseFileName', '', @ischar);
 p.addParameter('maxLag',500, @isnumeric);
 p.addParameter('numTRs',[],@(x)(isempty(x) | isnumeric(x)));
-p.addParameter('rawVidFrameRate',60, @isnumeric);
+p.addParameter('deinterlaceFlag',true,@islogical);
 p.addParameter('ltDataThreshold',0.1, @isnumeric);
 p.addParameter('reportSanityCheck',true, @islogical);
-p.addParameter('plotAlignment',true, @islogical);
+p.addParameter('savePlot',true, @islogical);
 
 % Optional display and I/O parameters
 p.addParameter('verbosity','none', @ischar);
@@ -89,13 +92,28 @@ p.addParameter('username',char(java.lang.System.getProperty('user.name')),@ischa
 p.addParameter('hostname',char(java.net.InetAddress.getLocalHost.getHostName),@ischar);
 
 % parse
-p.parse(glintFileName,ltReportFileName, varargin{:})
+p.parse(timebaseFileName,glintFileName,ltReportFileName, varargin{:})
 
 
-%% load tracking data
-glintData = load(glintFileName);
-liveTrack = load(ltReportFileName);
+%% load data
+try
+dataLoad = load(timebaseFileName);
+timebase = dataLoad.timebase;
+clear dataLoad
+dataLoad = load(glintFileName);
+glintData = dataLoad.glintData;
+clear dataLoad
+dataLoad = load(ltReportFileName);
+liveTrack.Report = dataLoad.Report;
+clear dataLoad
+catch
+    fprintf('One or more identified files are not available.\n');
+    return
+end
 
+%% get the deltaT
+tmpDiff = diff(timebase.values);
+deltaT = tmpDiff(1);
 
 %% Perform some sanity checks on the LiveTrack report
 if p.Results.reportSanityCheck
@@ -132,29 +150,31 @@ else
 end
 
 %% Prepare data for alignment
-% pick the right livetrack sampling data, based on the resolution of the
-% raw video.
-switch p.Results.rawVidFrameRate
-    case 30
-        % average the two channels, output is at 30Hz
-        ltSignal = mean([[liveTrack.Report.Glint1CameraX_Ch01];...
-            [liveTrack.Report.Glint1CameraX_Ch02]]);
-    case 60
-        % use all Report samples
-        ct = 0;
-        for ii = 1:length(liveTrack.Report)
-            % First field
-            ct = ct + 1;
-            ltSignal(ct) = liveTrack.Report(ii).Glint1CameraX_Ch01;
-            % Second field
-            ct = ct + 1;
-            ltSignal(ct) = liveTrack.Report(ii).Glint1CameraX_Ch02;
-        end
+% pick the right livetrack sampling data, based on whether the raw video
+% was deinterlaced
+if p.Results.deinterlaceFlag
+    % use all Report samples
+    ct = 0;
+    for ii = 1:length(liveTrack.Report)
+        % First field
+        ct = ct + 1;
+        ltSignal(ct) = liveTrack.Report(ii).Glint1CameraX_Ch01;
+        allTTLs(ct) = liveTrack.Report(ii).Digital_IO1;
+        % Second field
+        ct = ct + 1;
+        ltSignal(ct) = liveTrack.Report(ii).Glint1CameraX_Ch02;
+        allTTLs(ct) = liveTrack.Report(ii).Digital_IO2;
+    end
+else
+    % average the two channels, output is at 30Hz
+    ltSignal = mean([[liveTrack.Report.Glint1CameraX_Ch01];...
+        [liveTrack.Report.Glint1CameraX_Ch02]]);
+    % Just use channel one
+        allTTLs = liveTrack.Report.Digital_IO1;
 end
 
 % extract glint X position
-glintSignal = glintData.glintData.X;
-
+glintSignal = glintData.X;
 
 %% Cross correlate the signals to compute the delay
 % cross correlation doesn't work with NaNs, so we change them to zeros
@@ -185,42 +205,22 @@ ltAligned(ltAligned==0) = nan;
 glintAligned = [zeros(delay,1);glintSignal(1:end-delay)];
 glintAligned(glintAligned==0) = nan;
 
+% The corrected timebase is aligned with the LT timeseries, and has the
+% first TTL set as time zero
+firstTTLframe = find(allTTLs,1);
+timebase.values = timebase.values + (delay - firstTTLframe)*deltaT;
 
-%% assign a common timebase
-% since ltSignal was not shifted and ptSignal is now aligned, we can assign
-% a common timeBase
-timebaseTMP = 1:length(ltAligned);
+% Add the TTLs
+timebase.TTLs = zeros(size(timebase.values));
+timebase.TTLs(find(allTTLs)-delay)=1;
 
-% get the TRs from liveTrack.Report
-allTTLs = find([liveTrack.Report.Digital_IO1] == 1);
+% Add meta data
+timebase.meta.alignTimebaseWithLTData = p.Results;
+timebase.meta.alignTimebaseWithLTData.delayInFrames = delay;
+save([timebaseFileName],'timebase');
 
-% if TR are present, set the first TR to time zero. Otherwise, set as zero
-% the first liveTrack sample collected.
-if ~isempty(allTTLs)
-    firstTR = allTTLs(1);
-    liveTrackTimebase = ((timebaseTMP - firstTR) * (1/p.Results.rawVidFrameRate))'; %liveTrack timeBase in [sec]
-else
-    liveTrackTimebase = ((timebaseTMP - 1) * (1/p.Results.rawVidFrameRate))';
-end
-timebaseGlintTMP = liveTrackTimebase + delay * (1/p.Results.rawVidFrameRate); %pupilTrack timeBase in [sec]
-
-% make timebase.values as long as ptSignal
-if length(timebaseGlintTMP)<length(glintData.glintData.X)
-    %add missing values
-    glintPadding = timebaseGlintTMP(end)+(1/p.Results.rawVidFrameRate): (1/p.Results.rawVidFrameRate) :timebaseGlintTMP(end)+((length(glintData.glintData.X)-length(timebaseGlintTMP)*(1/p.Results.rawVidFrameRate)));
-    timebase.values = [timebaseGlintTMP glintPadding];
-elseif length(timebaseGlintTMP)>length(glintData.glintData.X)
-    %trim timeBase.rawVid
-    timebase.values = timebaseGlintTMP(1:length(glintData.glintData.X));
-else
-    timebase.values = timebaseGlintTMP;
-end
-
-% convert in milliseconds
-liveTrackTimebase = liveTrackTimebase * 1000;
-timebase.values = timebase.values * 1000;
-%% If so requested, plot the cross correlation results for quick review
-if p.Results.plotAlignment
+%% Save a plot of the cross correlation results for quick review
+if p.Results.savePlot
     
     figH = figure('visible','off');
     set(gcf,'PaperOrientation','landscape');
@@ -260,23 +260,12 @@ if p.Results.plotAlignment
     title(['After alignment (shift = ' num2str(delay) ' frames)']);
     
     % save figure
-    timebasePlotName = [p.Results.timebaseFileName(1:end-4) 'QA.pdf'];
-    saveas(figH,timebasePlotName)
-    close(figH)
+     timebasePlotName = [p.Results.timebaseFileName(1:end-4) '_QA.pdf'];
+     saveas(figH,timebasePlotName)
+     close(figH)
     
 end
 
-
-%% save out the timebase data
-% add some metafields first
-timebase.meta = p.Results;
-timebase.meta.delay = delay;
-timebase.meta.units = 'milliseconds';
-timebase.meta.liveTrackTimebase = liveTrackTimebase;
-
-if ~isempty(p.Results.timebaseFileName)
-    save(p.Results.timebaseFileName,'timebase');
-end
 
 
 end % main function
