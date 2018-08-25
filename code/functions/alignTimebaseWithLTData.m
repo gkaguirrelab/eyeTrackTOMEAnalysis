@@ -1,6 +1,6 @@
 function alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName,varargin)
 % Adjust the pupil and glint timebase to match scanner timing
-% 
+%
 % Description:
 %   this function is to be used with the LiveTrack+VTop setup and assignes
 %   a timebase to the raw data by aligning the tracked glint position
@@ -8,17 +8,17 @@ function alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName
 %   and the tracked glint position obtained with the custom tracking
 %   algorithm. Note that this step is only necessary because raw data
 %   acquired with the LiveTrack+VTop setup lacks syncing information with
-%   the scanner TRs. 
+%   the scanner TRs.
 %   As the X glint position is on average the best tracking results that
 %   the livetrack algorithm can provide, we cross-correlate that timeseries
 %   with our own tracked glint X position and determine the delay (in
 %   frames) between the start of the datastream from the VTop device with
 %   respect to the LiveTrack datastream.
-% 
+%
 %   Note that if no TR information is found in the LiveTrack Report file
 %   (i.e. for anatomical runs), the alignment with the scanner data is not
 %   possible.
-% 
+%
 % Input (required)
 %   glintFileName       - full path to the matFile with the glint tracking
 %                         results.
@@ -52,16 +52,16 @@ function alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName
 %  'timestamp'          - AUTOMATIC; The current time and date
 %  'username'           - AUTOMATIC; The user
 %  'hostname'           - AUTOMATIC; The host
-% 
+%
 % Output
 %	timebase            - structure with fields that contain the timebase
 %                         information in milliseconds, and a meta field.
 %
 % Examples:
 %{
-    glintFileName='/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session1_restAndStructure/TOME_3015/030117/EyeTracking/rfMRI_REST_AP_run03_glint.mat';
-    timebaseFileName='/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session1_restAndStructure/TOME_3015/030117/EyeTracking/rfMRI_REST_AP_run03_timebase.mat';
-    ltReportFileName='/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_data/session1_restAndStructure/TOME_3015/030117/EyeTracking/rfMRI_REST_AP_run03_report.mat';
+    glintFileName='/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session1_restAndStructure/TOME_3003/090216/EyeTracking/rfMRI_REST_AP_run01_glint.mat';
+    timebaseFileName='/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session1_restAndStructure/TOME_3003/090216/EyeTracking/rfMRI_REST_AP_run01_timebase.mat';
+    ltReportFileName='/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_data/session1_restAndStructure/TOME_3003/090216/EyeTracking/rfMRI_REST_AP_run01_report.mat';
     alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName);
 %}
 
@@ -76,11 +76,10 @@ p.addRequired('ltReportFileName',@ischar);
 
 % Optional analysis parameters
 p.addParameter('maxLag',500, @isnumeric);
-p.addParameter('numTRs',[],@(x)(isempty(x) | isnumeric(x)));
 p.addParameter('deinterlaceFlag',true,@islogical);
 p.addParameter('ltDataThreshold',0.1, @isnumeric);
-p.addParameter('reportSanityCheck',true, @islogical);
 p.addParameter('savePlot',true, @islogical);
+p.addParameter('fixedFrameDelay',[],@(x)(isempty(x) | isnumeric(x)));
 
 % Optional display and I/O parameters
 p.addParameter('verbosity','none', @ischar);
@@ -97,15 +96,15 @@ p.parse(timebaseFileName,glintFileName,ltReportFileName, varargin{:})
 
 %% load data
 try
-dataLoad = load(timebaseFileName);
-timebase = dataLoad.timebase;
-clear dataLoad
-dataLoad = load(glintFileName);
-glintData = dataLoad.glintData;
-clear dataLoad
-dataLoad = load(ltReportFileName);
-liveTrack.Report = dataLoad.Report;
-clear dataLoad
+    dataLoad = load(timebaseFileName);
+    timebase = dataLoad.timebase;
+    clear dataLoad
+    dataLoad = load(glintFileName);
+    glintData = dataLoad.glintData;
+    clear dataLoad
+    dataLoad = load(ltReportFileName);
+    liveTrack.Report = dataLoad.Report;
+    clear dataLoad
 catch
     fprintf('One or more identified files are not available.\n');
     return
@@ -115,39 +114,6 @@ end
 tmpDiff = diff(timebase.values);
 deltaT = tmpDiff(1);
 
-%% Perform some sanity checks on the LiveTrack report
-if p.Results.reportSanityCheck
-    % check if the frameCount is progressive
-    tmpFrameCountFieldIdx = strcmp(fieldnames(liveTrack.Report),'frameCount');
-    tmpCell = struct2cell(liveTrack.Report);
-    tmpFrameCount = squeeze(cell2mat(tmpCell(tmpFrameCountFieldIdx,1,:)));
-    frameCountDiff = unique(diff(tmpFrameCount));
-    if numel(frameCountDiff)~=1
-        warning('LiveTrack frame Count is not progressive.');
-    end
-    % verify that the correct amount of TTLs has been recorded (for fMRI runs)
-    if ~isempty(p.Results.numTRs)
-        allPulses = find ([liveTrack.Report.Digital_IO1]);
-        if isempty(allPulses)
-            TTLPulses = 0;
-        else
-            spacing = diff(allPulses);
-            for ii = 1:length(spacing)
-                if spacing (ii) == 1
-                    adjacent (ii) = 1;
-                else
-                    adjacent (ii) = 0;
-                end
-            end
-            TTLPulses = length (allPulses) - length (find(adjacent));
-        end
-        if TTLPulses~=p.Results.numTRs
-            warning('LiveTrack TTLs do not match TRs!');
-        end
-    end
-else
-    warning ('No sanity check is being performed on the LiveTrack report.')
-end
 
 %% Prepare data for alignment
 % pick the right livetrack sampling data, based on whether the raw video
@@ -170,7 +136,7 @@ else
     ltSignal = mean([[liveTrack.Report.Glint1CameraX_Ch01];...
         [liveTrack.Report.Glint1CameraX_Ch02]]);
     % Just use channel one
-        allTTLs = liveTrack.Report.Digital_IO1;
+    allTTLs = liveTrack.Report.Digital_IO1;
 end
 
 % extract glint X position
@@ -192,12 +158,16 @@ else
     glintCorr = [glintCorr; zeros((length(ltCorr) - length(glintCorr)),1)];
 end
 
-% calculate cross correlation and lag array
-[r,lag]  = xcorr(ltCorr,glintCorr,p.Results.maxLag);
-
-% when cross correlation of the signals is max the lag equals the delay
-[~,I] = max(abs(r));
-delay = lag(I); % unit = [number of samples]
+if isempty(p.Results.fixedFrameDelay)
+    % calculate cross correlation and lag array
+    [r,lag]  = xcorr(ltCorr,glintCorr,p.Results.maxLag);
+    
+    % when cross correlation of the signals is max the lag equals the delay
+    [~,I] = max(r);
+    delay = lag(I); % unit = [number of samples]
+else
+    delay = p.Results.fixedFrameDelay;
+end
 
 % shift the signals by the 'delay' and replace the nans
 ltAligned = ltSignal; % lt is not shifted
@@ -217,7 +187,7 @@ timebase.TTLs(find(allTTLs)-delay)=1;
 % Add meta data
 timebase.meta.alignTimebaseWithLTData = p.Results;
 timebase.meta.alignTimebaseWithLTData.delayInFrames = delay;
-save([timebaseFileName],'timebase');
+save(timebaseFileName,'timebase');
 
 %% Save a plot of the cross correlation results for quick review
 if p.Results.savePlot
@@ -228,12 +198,12 @@ if p.Results.savePlot
     height = 6;
     width = 18;
     set(figH, 'Position',[25 5 width height],...
-    'PaperSize',[width height],...
-    'PaperPositionMode','auto',...
-    'Color','w',...
-    'Renderer','painters'...
-    );
-
+        'PaperSize',[width height],...
+        'PaperPositionMode','auto',...
+        'Color','w',...
+        'Renderer','painters'...
+        );
+    
     % before alignment
     subplot(2,1,1)
     plot(ltSignal - nanmedian(ltSignal), 'b', 'LineWidth',1);
@@ -260,9 +230,9 @@ if p.Results.savePlot
     title(['After alignment (shift = ' num2str(delay) ' frames)']);
     
     % save figure
-     timebasePlotName = [p.Results.timebaseFileName(1:end-4) '_QA.pdf'];
-     saveas(figH,timebasePlotName)
-     close(figH)
+    timebasePlotName = [p.Results.timebaseFileName(1:end-4) '_QA.pdf'];
+    saveas(figH,timebasePlotName)
+    close(figH)
     
 end
 
