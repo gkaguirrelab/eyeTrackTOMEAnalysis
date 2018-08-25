@@ -69,6 +69,7 @@ fprintf('\t9. Scene-constrained pupil fitting to end (8-end)\n');
 fprintf('\t10. Empirical Bayes smoothing to end (9-end)\n');
 fprintf('\t11. Generate timebase only (1)\n');
 fprintf('\t12. Identify gaze cal frames and targets\n');
+fprintf('\t13. Align timebase with liveTrack report\n');
 stageChoice = input('\nYour choice: ','s');
 switch stageChoice
     case '0'
@@ -131,6 +132,14 @@ switch stageChoice
         makeFitVideoByNumber = [];
         consoleSelectAcquisition = false;
         sceneGeometryFlag = false;
+    case '13'
+        skipStageByNumber = [];
+        lastStageByNumber = 1;
+        universalKeyValues = [universalKeyValues, ...
+            {'videoTypeChoice','adjustTimeBase', ...
+            'savePlot',true,...
+            'skipStageByName',{'deinterlaceVideo'}}];
+        makeFitVideoByNumber = [];
 end
 
 
@@ -165,7 +174,7 @@ subjectChoice = input('\nYour choice: ','s');
 % This is an array of indices that refer back to the subjectList
 subjectIndexList = eval(subjectChoice);
 
-if eval(stageChoice)<=11
+if eval(stageChoice)~=12
     %% Ask the operator which acquisitions they would like to process
     acquisitionStems = [];
     sceneGeometryFlag = false;
