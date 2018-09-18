@@ -65,8 +65,8 @@ fprintf('\t5. Initial ellipse fitting only (6)\n');
 fprintf('\t6. Create a stage 6 fit video\n');
 fprintf('\t7. Create default sceneGeometry (7)\n');
 fprintf('\t8. Search to refine sceneGeometry (7)\n');
-fprintf('\t9. Scene-constrained pupil fitting to end (8-end)\n');
-fprintf('\t10. Empirical Bayes smoothing to end (9-end)\n');
+fprintf('\t9. Scene-constrained pupil fitting (8)\n');
+fprintf('\t10. Empirical Bayes smoothing (9)\n');
 fprintf('\t11. Generate timebase only (1)\n');
 fprintf('\t12. Identify gaze cal frames and targets\n');
 fprintf('\t13. Align timebase with liveTrack report\n');
@@ -112,11 +112,11 @@ switch stageChoice
         makeFitVideoByNumber = [];
     case '9'
         skipStageByNumber = 1:7;
-        lastStageByNumber = [];
+        lastStageByNumber = [8];
         makeFitVideoByNumber = [];
     case '10'
         skipStageByNumber = 1:8;
-        lastStageByNumber = [];
+        lastStageByNumber = [9];
         makeFitVideoByNumber = [];
     case '11'
         skipStageByNumber = [];
