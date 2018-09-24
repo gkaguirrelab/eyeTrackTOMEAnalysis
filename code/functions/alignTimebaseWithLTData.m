@@ -110,6 +110,13 @@ catch
     return
 end
 
+% CHeck if the timebase has already been adjusted for the LT data, and exit
+% if it has
+if isfield(timebase.meta,'alignTimebaseWithLTData')
+    fprintf('This timebase has already been adjusted for glint and LTdata timing; returning\n');
+    return
+end
+
 %% get the deltaT
 tmpDiff = diff(timebase.values);
 deltaT = tmpDiff(1);
@@ -185,10 +192,11 @@ timebase.values = timebase.values + (delay - firstTTLframe)*deltaT;
 timebase.TTLs = zeros(size(timebase.values));
 timebase.TTLs(find(allTTLs)-delay)=1;
 
-% Add meta data
+% Add meta data and save
 timebase.meta.alignTimebaseWithLTData = p.Results;
 timebase.meta.alignTimebaseWithLTData.delayInFrames = delay;
 save(timebaseFileName,'timebase');
+
 
 %% Save a plot of the cross correlation results for quick review
 if p.Results.savePlot
