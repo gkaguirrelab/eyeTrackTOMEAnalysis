@@ -15,7 +15,7 @@ switch hostname
     case 'seele.psych.upenn.edu'
         dropboxDir = '/Volumes/seeleExternalDrive/Dropbox (Aguirre-Brainard Lab)';
     case 'magi-1-melchior.psych.upenn.edu'
-        dropboxDir = '/Volumes/melchiorExternalDrive/Dropbox (Aguirre-Brainard Lab)';
+        dropboxDir = '/Volumes/melchiorBayTwo/Dropbox (Aguirre-Brainard Lab)';
     case 'magi-2-balthasar.psych.upenn.edu'
         dropboxDir = '/Volumes/balthasarExternalDrive/Dropbox (Aguirre-Brainard Lab)';
     otherwise
