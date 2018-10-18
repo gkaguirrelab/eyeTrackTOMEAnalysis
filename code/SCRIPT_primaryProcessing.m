@@ -72,6 +72,7 @@ fprintf('\t12. Identify gaze cal frames and targets\n');
 fprintf('\t13. Align timebase with liveTrack report\n');
 fprintf('\t14. Create a stage 8 fit video\n');
 fprintf('\t15. Create a final fit video\n');
+fprintf('\t16. Scene-constrained fitting to end (8,9)\n');
 stageChoice = input('\nYour choice: ','s');
 switch stageChoice
     case '0'
@@ -149,6 +150,10 @@ switch stageChoice
     case '15'
         skipStageByNumber = 1:9;
         lastStageByNumber = 10;
+        makeFitVideoByNumber = [];
+    case '16'
+        skipStageByNumber = 1:7;
+        lastStageByNumber = [9];
         makeFitVideoByNumber = [];
 
 end
