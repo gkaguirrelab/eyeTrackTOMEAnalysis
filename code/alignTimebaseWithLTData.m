@@ -80,7 +80,7 @@ p.addParameter('maxLag',500, @isnumeric);
 p.addParameter('deinterlaceFlag',true,@islogical);
 p.addParameter('ltDataThreshold',0.1, @isnumeric);
 p.addParameter('savePlot',true, @islogical);
-p.addParameter('interactiveMode',true, @islogical);
+p.addParameter('interactiveMode',false, @islogical);
 p.addParameter('fixedFrameDelay',[],@(x)(isempty(x) | isnumeric(x)));
 
 % Environment parameters
