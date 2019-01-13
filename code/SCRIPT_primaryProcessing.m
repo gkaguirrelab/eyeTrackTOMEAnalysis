@@ -76,6 +76,7 @@ fprintf('\t15. Create a final fit video (10)\n');
 fprintf('\t16. Perimeter definition to end, including video (3-6, 8-10)\n');
 fprintf('\t17. Control file to end, including video (4-6, 8-10)\n');
 fprintf('\t18. Scene-constrained fitting to end, including video (8-10)\n');
+fprintf('\t19. Glint selection and final fit video (2, 10)\n');
 
 stageChoice = input('\nYour choice: ','s');
 switch stageChoice
@@ -165,6 +166,10 @@ switch stageChoice
         makeFitVideoByNumber = [];
     case '18'
         skipStageByNumber = 1:7;
+        lastStageByNumber = 10;
+        makeFitVideoByNumber = [];
+    case '19'
+        skipStageByNumber = [1,3:9];
         lastStageByNumber = 10;
         makeFitVideoByNumber = [];
 
