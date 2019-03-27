@@ -91,9 +91,9 @@ end
 %     end
 % end
 
-% if starting from convertRawToGray, get the file names from the  raw files in the data
-% folder. If starting from a later step, get the run name from the gray
-% files instead.
+% if starting from deinterlaceVideo, get the file names from the  raw files
+% in the data folder. If starting from a later step, get the run name from
+% the gray files instead.
 if  any(strcmp(p.Results.skipStageByName,'deinterlaceVideo')) || any(find(p.Results.skipStageByNumber,1))
     sourceVideos = dir(fullfile(pathParams.dataOutputDirFull,'*_gray.avi'));
     suffixCodes = {'*_gray.avi','GazeCal*gray.avi','*ScaleCal*gray.avi',};
