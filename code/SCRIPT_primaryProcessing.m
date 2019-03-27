@@ -120,16 +120,15 @@ switch stageChoice
         makeFitVideoByNumber = [];
     case '9'
         skipStageByNumber = 1:7;
-        lastStageByNumber = [8];
+        lastStageByNumber = 8;
         makeFitVideoByNumber = [];
     case '10'
         skipStageByNumber = 1:8;
-        lastStageByNumber = [9];
+        lastStageByNumber = 9;
         makeFitVideoByNumber = [];
     case '11'
-        skipStageByNumber = [];
-        lastStageByNumber = 1;
-        universalKeyValues = [universalKeyValues, {'generateTimebaseOnly',true}];
+        skipStageByNumber = 1:10;
+        lastStageByNumber = 11;
         makeFitVideoByNumber = [];
     case '12'
         skipStageByNumber = [];
