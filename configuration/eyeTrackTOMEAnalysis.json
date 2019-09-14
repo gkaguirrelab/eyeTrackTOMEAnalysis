@@ -1,17 +1,17 @@
 [
 	{
-		"flavor": "",
-		"hook": "",
-		"importance": "",
-		"localHookTemplate": "config/eyeTrackTOMEAnalysisLocalHook.m",
-		"printLocalHookOutput": "1",
-		"name": "eyeTrackTOMEAnalysis",
-		"pathPlacement": "append",
-		"subfolder": "code",
-		"toolboxRoot": "",
-		"type": "git",
-		"update": "",
-		"url": ""
+	"flavor": "",
+	"hook": "",
+	"importance": "",
+	"localHookTemplate": "configuration/eyeTrackTOMEAnalysisLocalHook.m",
+	"printLocalHookOutput": "1",
+	"name": "eyeTrackTOMEAnalysis",
+	"pathPlacement": "append",
+	"subfolder": "code",
+	"toolboxRoot": "",
+	"type": "git",
+	"update": "",
+	"url": ""
 	},
  	{
 		"flavor": "",

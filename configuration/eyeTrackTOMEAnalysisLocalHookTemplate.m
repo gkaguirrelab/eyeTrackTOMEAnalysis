@@ -11,15 +11,22 @@ function eyeTrackTOMEAnalysisLocalHook
 % You will need to edit the project location and i/o directory locations
 % to match what is true on your computer.
 
+%% Define project
+projectName = 'eyeTrackTOMEAnalysis';
+
+%% Clear out old preferences
+if (ispref(projectName))
+    rmpref(projectName);
+end
 
 
 %% Set preferences
 
 % Find the project directory, add it to the path, save this as a
 %  pref, and then make this the current directory
-projectDir = fullfile(tbLocateProject('eyeTrackTOMEAnalysis'));
+projectDir = fullfile(tbLocateProject(projectName));
 addpath(genpath(projectDir));
-setpref('eyeTrackTOMEAnalysis', 'projectDir', projectDir);
+setpref(projectName, 'projectDir', projectDir);
 
 
 %% Check for required Matlab toolboxes
@@ -34,8 +41,8 @@ warnState = warning();
 warning off backtrace
 for ii=1:length(requiredAddOns)
     if ~any(strcmp(VName, requiredAddOns{ii}))
-        warnString = ['The Matlab ' requiredAddOns{ii} ' is missing. ' toolboxName ' may not function properly.'];
-        warning('localHook:requiredMatlabToolboxCheck',warnString);
+        warnString = ['The Matlab ' requiredAddOns{ii} ' is missing. ' projectName ' may not function properly.'];
+        error('localHook:requiredMatlabToolboxCheck',warnString);
     end
 end
 warning(warnState);
