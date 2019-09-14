@@ -3,7 +3,7 @@
 	"flavor": "",
 	"hook": "",
 	"importance": "",
-	"localHookTemplate": "configuration/eyeTrackTOMEAnalysisLocalHookTemplate.m",
+	"localHookTemplate": "config/eyeTrackTOMEAnalysisLocalHookTemplate.m",
 	"printLocalHookOutput": "1",
 	"name": "eyeTrackTOMEAnalysis",
 	"pathPlacement": "append",

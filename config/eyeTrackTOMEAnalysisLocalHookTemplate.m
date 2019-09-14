@@ -42,7 +42,7 @@ warning off backtrace
 for ii=1:length(requiredAddOns)
     if ~any(strcmp(VName, requiredAddOns{ii}))
         warnString = ['The Matlab ' requiredAddOns{ii} ' is missing. ' projectName ' may not function properly.'];
-        error('localHook:requiredMatlabToolboxCheck',warnString);
+        warning('localHook:requiredMatlabToolboxCheck',warnString);
     end
 end
 warning(warnState);
