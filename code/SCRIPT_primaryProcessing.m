@@ -1,6 +1,6 @@
 
 
-% Turn off the warning regarding over-writting the control file, as we are
+% Turn off the warning regarding over-writing the control file, as we are
 % not hand-editing this file in this project
 warningState = warning;
 warning('off','makeControlFile:overwrittingControlFile');
