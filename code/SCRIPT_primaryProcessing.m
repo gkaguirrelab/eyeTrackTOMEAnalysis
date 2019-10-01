@@ -376,15 +376,15 @@ for ss = 1:length(subjectIndexList)
                     x0 = globalKeyValues{find(sceneParamsX0)+1};
                     switch length(x0)
                         case 4
-                            sceneParamsLB = [x0(1)-10; x0(2:3)-1.5; x0(4)-cameraDepthSD*0.25; 0.5; 0.9];
-                            sceneParamsLBp = [x0(1)-5; x0(2:3)-0.75; x0(4)-cameraDepthSD*0.125; 0.75; 0.95];
-                            sceneParamsUBp = [x0(1)+5; x0(2:3)+0.75; x0(4)+cameraDepthSD*0.125; 1.1; 1.05];
-                            sceneParamsUB = [x0(1)+10; x0(2:3)+1.5; x0(4)+cameraDepthSD*0.25; 1.2; 1.1];
+                            sceneParamsLB = [x0(1)-5; x0(2:3)-0.75; x0(4)-cameraDepthSD*0.125; 0.5; 0.9];
+                            sceneParamsLBp = [x0(1)-2.5; x0(2:3)-0.5; x0(4)-cameraDepthSD; 0.75; 0.95];
+                            sceneParamsUBp = [x0(1)+2.5; x0(2:3)+0.5; x0(4)+cameraDepthSD; 1.1; 1.05];
+                            sceneParamsUB = [x0(1)+5; x0(2:3)+0.75; x0(4)+cameraDepthSD*0.125; 1.2; 1.1];
                         case 5
-                            sceneParamsLB = [x0(1)-10; x0(2:3)-1.5; x0(4)-cameraDepthSD*0.25; x0(5)*0.9; 0.9];
-                            sceneParamsLBp = [x0(1)-5; x0(2:3)-0.75; x0(4)-cameraDepthSD*0.125; x0(5)*0.95; 0.95];
-                            sceneParamsUBp = [x0(1)+5; x0(2:3)+0.75; x0(4)+cameraDepthSD*0.125; x0(5)*1.05; 1.05];
-                            sceneParamsUB = [x0(1)+10; x0(2:3)+1.5; x0(4)+cameraDepthSD*0.25; x0(5)*1.1; 1.1];
+                            sceneParamsLB = [x0(1)-5; x0(2:3)-0.75; x0(4)-cameraDepthSD*0.125; x0(5)*0.9; 0.9];
+                            sceneParamsLBp = [x0(1)-2.5; x0(2:3)-0.5; x0(4)-cameraDepthSD; x0(5)*0.95; 0.95];
+                            sceneParamsUBp = [x0(1)+2.5; x0(2:3)+0.5; x0(4)+cameraDepthSD; x0(5)*1.05; 1.05];
+                            sceneParamsUB = [x0(1)+5; x0(2:3)+0.75; x0(4)+cameraDepthSD*0.125; x0(5)*1.1; 1.1];
                         case 6
                             sceneParamsLB = x0;
                             sceneParamsLBp = x0;
