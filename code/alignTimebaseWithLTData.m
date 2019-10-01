@@ -81,6 +81,7 @@ p.addParameter('deinterlaceFlag',true,@islogical);
 p.addParameter('ltDataThreshold',0.1, @isnumeric);
 p.addParameter('savePlot',true, @islogical);
 p.addParameter('interactiveMode',false, @islogical);
+p.addParameter('displayFraction',1/4, @isscalar);
 p.addParameter('fixedFrameDelay',[],@(x)(isempty(x) | isnumeric(x)));
 
 % Environment parameters
@@ -214,7 +215,7 @@ if p.Results.savePlot || p.Results.interactiveMode
     ylabel('glint X (zero centered)')
     xlabel('Frames (first quarter of the video)')
     ylim([-50 50])
-    xlim([0 length(ltSignal)/4])
+    xlim([0 length(ltSignal).*p.Results.displayFraction])
     legend ('liveTrack','transparentTrack')
     title ('Before alignment')
     
@@ -227,7 +228,7 @@ if p.Results.savePlot || p.Results.interactiveMode
     ylabel('glint X (zero centered)')
     xlabel('Frames (first quarter of the video)')
     ylim([-50 50])
-    xlim([0 length(ltSignal)/4])
+    xlim([0 length(ltSignal).*p.Results.displayFraction])
     legend ('liveTrack','transparentTrack')
     titleHandle = title(['After alignment (shift = ' num2str(delay) ' frames)']);
     
