@@ -213,7 +213,7 @@ if eval(stageChoice)~=12
     if length(subjectIndexList) > 1
         fprintf('Select the stages you would like to execute:\n')
         fprintf('\t1. All videos (fMRI, structural, gaze cal, scale cal)\n');
-        fprintf('\t2. All fMRI\n');
+        fprintf('\t2. All fMRI and gaze cal\n');
         fprintf('\t3. All structural\n');
         fprintf('\t4. All gaze cal\n');
         fprintf('\t5. All scale cal\n');
@@ -227,7 +227,7 @@ if eval(stageChoice)~=12
             case '1'
                 acquisitionStems = [];
             case '2'
-                acquisitionStems = {'fMRI_'};
+                acquisitionStems = {'fMRI_','GazeCal'};
             case '3'
                 acquisitionStems = {'T1_','T2_','dMRI_'};
             case '4'
