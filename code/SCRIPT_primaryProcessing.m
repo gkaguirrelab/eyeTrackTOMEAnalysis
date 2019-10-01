@@ -376,15 +376,15 @@ for ss = 1:length(subjectIndexList)
                     x0 = globalKeyValues{find(sceneParamsX0)+1};
                     switch length(x0)
                         case 4
-                            sceneParamsLB = [x0(1)-10; x0(2:3)-1.5; x0(4)-cameraDepthSD*0.5; 0.5; 0.9];
-                            sceneParamsLBp = [x0(1)-5; x0(2:3)-0.75; x0(4)-cameraDepthSD*0.25; 0.75; 0.95];
-                            sceneParamsUBp = [x0(1)+5; x0(2:3)+0.75; x0(4)+cameraDepthSD*0.25; 1.1; 1.05];
-                            sceneParamsUB = [x0(1)+10; x0(2:3)+1.5; x0(4)+cameraDepthSD*0.5; 1.2; 1.1];
+                            sceneParamsLB = [x0(1)-10; x0(2:3)-1.5; x0(4)-cameraDepthSD*0.25; 0.5; 0.9];
+                            sceneParamsLBp = [x0(1)-5; x0(2:3)-0.75; x0(4)-cameraDepthSD*0.125; 0.75; 0.95];
+                            sceneParamsUBp = [x0(1)+5; x0(2:3)+0.75; x0(4)+cameraDepthSD*0.125; 1.1; 1.05];
+                            sceneParamsUB = [x0(1)+10; x0(2:3)+1.5; x0(4)+cameraDepthSD*0.25; 1.2; 1.1];
                         case 5
-                            sceneParamsLB = [x0(1)-10; x0(2:3)-1.5; x0(4)-cameraDepthSD*0.5; x0(5)*0.9; 0.9];
-                            sceneParamsLBp = [x0(1)-5; x0(2:3)-0.75; x0(4)-cameraDepthSD*0.25; x0(5)*0.95; 0.95];
-                            sceneParamsUBp = [x0(1)+5; x0(2:3)+0.75; x0(4)+cameraDepthSD*0.25; x0(5)*1.05; 1.05];
-                            sceneParamsUB = [x0(1)+10; x0(2:3)+1.5; x0(4)+cameraDepthSD*0.5; x0(5)*1.1; 1.1];
+                            sceneParamsLB = [x0(1)-10; x0(2:3)-1.5; x0(4)-cameraDepthSD*0.25; x0(5)*0.9; 0.9];
+                            sceneParamsLBp = [x0(1)-5; x0(2:3)-0.75; x0(4)-cameraDepthSD*0.125; x0(5)*0.95; 0.95];
+                            sceneParamsUBp = [x0(1)+5; x0(2:3)+0.75; x0(4)+cameraDepthSD*0.125; x0(5)*1.05; 1.05];
+                            sceneParamsUB = [x0(1)+10; x0(2:3)+1.5; x0(4)+cameraDepthSD*0.25; x0(5)*1.1; 1.1];
                         case 6
                             sceneParamsLB = x0;
                             sceneParamsLBp = x0;
@@ -402,10 +402,10 @@ for ss = 1:length(subjectIndexList)
                     % of the camera w.r.t. the eye in mm, and the
                     % eyeRotationScalar variables are multipliers that act upon
                     % the centers of rotation estimated for the eye.
-                    sceneParamsLB = [-5; -5; -5; cameraDepthMean-cameraDepthSD*2; 0.75; 0.9];
-                    sceneParamsLBp = [-3; -2; -2; cameraDepthMean-cameraDepthSD*1; 0.85; 0.95];
-                    sceneParamsUBp = [3; 2; 2; cameraDepthMean+cameraDepthSD*1; 1.15; 1.05];
-                    sceneParamsUB = [5; 5; 5; cameraDepthMean+cameraDepthSD*2; 1.25; 1.1];
+                    sceneParamsLB = [-5; -5; -5; cameraDepthMean-cameraDepthSD*1; 0.75; 0.9];
+                    sceneParamsLBp = [-3; -2; -2; cameraDepthMean-cameraDepthSD*0.5; 0.85; 0.95];
+                    sceneParamsUBp = [3; 2; 2; cameraDepthMean+cameraDepthSD*0.5; 1.15; 1.05];
+                    sceneParamsUB = [5; 5; 5; cameraDepthMean+cameraDepthSD*1; 1.25; 1.1];
                 end
                 
                 % Add these sceneParams to the globalKeyValues
