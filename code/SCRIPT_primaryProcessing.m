@@ -391,8 +391,8 @@ for ss = 1:length(subjectIndexList)
                         case 4
                             sceneParamsLB = [x0(1)-10; x0(2:3)-transDelta; x0(4)-cameraDepthSD*0.25; 0.5; 0.8];
                             sceneParamsLBp = [x0(1)-5; x0(2:3)-transDelta/2; x0(4)-cameraDepthSD*0.125; 0.75; 0.9];
-                            sceneParamsUBp = [x0(1)+5; x0(2:3)+transDelta/2; x0(4)+cameraDepthSD*0.125; 1.1; 1.1];
-                            sceneParamsUB = [x0(1)+10; x0(2:3)+transDelta; x0(4)+cameraDepthSD*0.25; 1.2; 1.2];
+                            sceneParamsUBp = [x0(1)+5; x0(2:3)+transDelta/2; x0(4)+cameraDepthSD*0.125; 1.25; 1.1];
+                            sceneParamsUB = [x0(1)+10; x0(2:3)+transDelta; x0(4)+cameraDepthSD*0.25; 1.5; 1.2];
                         case 5
                             sceneParamsLB = [x0(1)-10; x0(2:3)-transDelta; x0(4)-cameraDepthSD*0.25; x0(5)*0.9; 0.8];
                             sceneParamsLBp = [x0(1)-5; x0(2:3)-transDelta/2; x0(4)-cameraDepthSD*0.125; x0(5)*0.95; 0.9];
