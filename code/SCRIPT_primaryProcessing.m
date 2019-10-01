@@ -364,6 +364,10 @@ for ss = 1:length(subjectIndexList)
             % Check if the maxIrisDiamPixels has been defined
             irisKeyIdx = strcmp(globalKeyValues,'maxIrisDiamPixels');
             if sum(irisKeyIdx)==1
+                
+                % Use the iris diameter to find the expected camera depth
+                % mean and SD. This is then used to set bound on camera
+                % translation.
                 irisKeyIdx=find(irisKeyIdx);
                 maxIrisDiamPixels = globalKeyValues{irisKeyIdx+1};
                 sceneGeometry = createSceneGeometry(universalKeyValues{:},'skipEyeAxes',true);
@@ -376,7 +380,7 @@ for ss = 1:length(subjectIndexList)
                 % mean camera depth. The farther away the eye is from the
                 % camera, the more we will allow the search to shift
                 % translational position
-                transDelta = cameraDepthMean / 200;
+                transDelta = cameraDepthMean / 250;
                 
                 % Check to see if the spreadsheet has specified an x0 value
                 % for the sceneParams.
@@ -386,8 +390,8 @@ for ss = 1:length(subjectIndexList)
                     switch length(x0)
                         case 4
                             sceneParamsLB = [x0(1)-10; x0(2:3)-transDelta; x0(4)-cameraDepthSD*0.25; 0.5; 0.8];
-                            sceneParamsLBp = [x0(1)-5; x0(2:3)-0.5; x0(4)-cameraDepthSD*0.125; 0.75; 0.9];
-                            sceneParamsUBp = [x0(1)+5; x0(2:3)+0.5; x0(4)+cameraDepthSD*0.125; 1.1; 1.1];
+                            sceneParamsLBp = [x0(1)-5; x0(2:3)-transDelta/2; x0(4)-cameraDepthSD*0.125; 0.75; 0.9];
+                            sceneParamsUBp = [x0(1)+5; x0(2:3)+transDelta/2; x0(4)+cameraDepthSD*0.125; 1.1; 1.1];
                             sceneParamsUB = [x0(1)+10; x0(2:3)+transDelta; x0(4)+cameraDepthSD*0.25; 1.2; 1.2];
                         case 5
                             sceneParamsLB = [x0(1)-10; x0(2:3)-transDelta; x0(4)-cameraDepthSD*0.25; x0(5)*0.9; 0.8];
