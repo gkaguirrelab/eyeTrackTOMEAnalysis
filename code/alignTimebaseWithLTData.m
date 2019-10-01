@@ -57,13 +57,13 @@ function alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName
 %
 % Examples:
 %{
-    subject = 'TOME_3042';
-    session = '080718';
-    acquisition = 'rfMRI_REST_PA_run04';
-    glintFileName=['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session1_restAndStructure/' subject '/' session '/EyeTracking/' acquisition '_glint.mat'];
-    timebaseFileName=['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session1_restAndStructure/' subject '/' session '/EyeTracking/' acquisition '_timebase.mat'];
-    ltReportFileName=['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_data/session1_restAndStructure/' subject '/' session '/EyeTracking/' acquisition '_report.mat'];
-    alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName);
+    subject = 'TOME_3039';
+    session = '082218';
+    acquisition = 'tfMRI_MOVIE_AP_run02';
+    glintFileName=['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/' subject '/' session '/EyeTracking/' acquisition '_glint.mat'];
+    timebaseFileName=['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/' subject '/' session '/EyeTracking/' acquisition '_timebase.mat'];
+    ltReportFileName=['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_data/session2_spatialStimuli/' subject '/' session '/EyeTracking/' acquisition '_report.mat'];
+    alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName,'interactiveMode',true);
 %}
 
 %% input parser
