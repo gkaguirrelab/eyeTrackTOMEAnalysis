@@ -63,7 +63,7 @@ function alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName
     glintFileName=['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/' subject '/' session '/EyeTracking/' acquisition '_glint.mat'];
     timebaseFileName=['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/' subject '/' session '/EyeTracking/' acquisition '_timebase.mat'];
     ltReportFileName=['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_data/session2_spatialStimuli/' subject '/' session '/EyeTracking/' acquisition '_report.mat'];
-    alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName,'interactiveMode',true);
+    alignTimebaseWithLTData(timebaseFileName,glintFileName,ltReportFileName,'interactiveMode',true,'fixedFrameDelay',14);
 %}
 
 %% input parser
@@ -181,9 +181,13 @@ end
 ltSignal(ltSignal==0) = nan;
 
 % shift the signals by the 'delay' and replace the nans
-glintAligned = [zeros(delay,1);glintSignal(1:end-delay)];
-glintAligned(glintAligned==0) = nan;
-
+if delay >= 0
+    glintAligned = [zeros(delay,1);glintSignal(1:end-delay)];
+    glintAligned(glintAligned==0) = nan;
+else
+    glintAligned = [glintSignal(-delay+1:end);zeros(-delay,1);];
+    glintAligned(glintAligned==0) = nan;
+end
 
 %% Save a plot of the cross correlation results for quick review
 % Or, implememt here an interactive mode to adjust the delay.
@@ -247,9 +251,14 @@ if p.Results.savePlot || p.Results.interactiveMode
         delete(glintAlignedHandle);
         delete(titleHandle);
         
-        % Shift the signals by the 'delay' and replace the nans
-        glintAligned = [zeros(delay,1);glintSignal(1:end-delay)];
-        glintAligned(glintAligned==0) = nan;
+        % shift the signals by the 'delay' and replace the nans
+        if delay >= 0
+            glintAligned = [zeros(delay,1);glintSignal(1:end-delay)];
+            glintAligned(glintAligned==0) = nan;
+        else
+            glintAligned = [glintSignal(-delay+1:end);zeros(-delay,1);];
+            glintAligned(glintAligned==0) = nan;
+        end
         
         % Plot the glintAligned timeseries
         glintAlignedHandle = plot(glintAligned - nanmedian(glintAligned), 'r','LineWidth',1);
