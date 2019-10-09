@@ -384,7 +384,7 @@ for ss = 1:length(subjectIndexList)
                 % mean camera depth. The farther away the eye is from the
                 % camera, the more we will allow the search to shift
                 % translational position
-                transDelta = cameraDepthMean / 250;
+                transDelta = cameraDepthMean / 500;
                 
                 % Check to see if the spreadsheet has specified an x0 value
                 % for the sceneParams.
