@@ -220,7 +220,7 @@ if eval(stageChoice)~=12
         fprintf('\t2. All fMRI and gaze cal\n');
         fprintf('\t3. All structural\n');
         fprintf('\t4. All gaze cal\n');
-        fprintf('\t5. All scale cal\n');
+        fprintf('\t5. All fMRI\n');
         fprintf('\t6. Only FLASH\n');
         fprintf('\t7. Only MOVIE\n');
         fprintf('\t8. Only RETINO\n');
@@ -237,7 +237,7 @@ if eval(stageChoice)~=12
             case '4'
                 acquisitionStems = {'GazeCal'};
             case '5'
-                acquisitionStems = {'ScaleCal'};
+                acquisitionStems = {'fMRI_'};
             case '6'
                 acquisitionStems = {'tfMRI_FLASH_'};
             case '7'
