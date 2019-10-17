@@ -6,30 +6,13 @@ warningState = warning;
 warning('off','makeControlFile:overwrittingControlFile');
 
 
-% set dropbox directory
-[~,hostname] = system('hostname');
-hostname = strtrim(lower(hostname));
-
-% handle hosts with custom dropbox locations
-switch hostname
-    case 'seele.psych.upenn.edu'
-        dropboxDir = '/Volumes/seeleExternalDrive/Dropbox (Aguirre-Brainard Lab)';
-    case 'magi-1-melchior.psych.upenn.edu'
-        dropboxDir = '/Volumes/melchiorBayTwo/Dropbox (Aguirre-Brainard Lab)';
-    case 'magi-2-balthasar.psych.upenn.edu'
-        dropboxDir = '/Volumes/balthasarExternalDrive/Dropbox (Aguirre-Brainard Lab)';
-    otherwise
-        [~, userName] = system('whoami');
-        userName = strtrim(userName);
-        dropboxDir = ...
-            fullfile('/Users', userName, ...
-            'Dropbox (Aguirre-Brainard Lab)');
-end
+% Get the DropBox base directory
+dropboxBaseDir = getpref(projectName,'dropboxBaseDir'); 
 
 % set common path params
-pathParams.dataSourceDirRoot = fullfile(dropboxDir,'TOME_data');
-pathParams.dataOutputDirRoot = fullfile(dropboxDir,'TOME_processing');
-pathParams.controlFileDirRoot = fullfile(dropboxDir,'TOME_processing');
+pathParams.dataSourceDirRoot = fullfile(dropboxBaseDir,'TOME_data');
+pathParams.dataOutputDirRoot = fullfile(dropboxBaseDir,'TOME_processing');
+pathParams.controlFileDirRoot = fullfile(dropboxBaseDir,'TOME_processing');
 pathParams.eyeTrackingDir = 'EyeTracking';
 
 % Set parameters common to all analyses from this project

@@ -20,6 +20,30 @@ if (ispref(projectName))
 end
 
 
+% Obtain the Dropbox path
+[~,hostname] = system('hostname');
+hostname = strtrim(lower(hostname));
+
+% handle hosts with custom dropbox locations
+switch hostname
+    case 'seele.psych.upenn.edu'
+        dropboxBaseDir = '/Volumes/seeleExternalDrive/Dropbox (Aguirre-Brainard Lab)';
+    case 'magi-1-melchior.psych.upenn.edu'
+        dropboxBaseDir = '/Volumes/melchiorBayTwo/Dropbox (Aguirre-Brainard Lab)';
+    case 'magi-2-balthasar.psych.upenn.edu'
+        dropboxBaseDir = '/Volumes/balthasarExternalDrive/Dropbox (Aguirre-Brainard Lab)';
+    otherwise
+        [~, userName] = system('whoami');
+        userName = strtrim(userName);
+        dropboxBaseDir = ...
+            fullfile('/Users', userName, ...
+            'Dropbox (Aguirre-Brainard Lab)');
+end
+
+%% Set preferences for project output
+setpref(projectName,'dropboxBaseDir',dropboxBaseDir); % main directory path 
+
+
 %% Set preferences
 
 % Find the project directory, add it to the path, save this as a
