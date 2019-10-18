@@ -7,7 +7,7 @@ warning('off','makeControlFile:overwrittingControlFile');
 
 
 % Get the DropBox base directory
-dropboxBaseDir = getpref(projectName,'dropboxBaseDir'); 
+dropboxBaseDir = getpref('eyeTrackTOMEAnalysis','dropboxBaseDir'); 
 
 % set common path params
 pathParams.dataSourceDirRoot = fullfile(dropboxBaseDir,'TOME_data');
