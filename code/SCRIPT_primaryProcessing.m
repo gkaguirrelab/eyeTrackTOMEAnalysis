@@ -345,71 +345,7 @@ for ss = 1:length(subjectIndexList)
             end
         end
         
-        % Handle here the special case that the user has selected to
-        % estimate sceneGeometry, and iris diameter has been provided
-        if strcmp(stageChoice,'7') || strcmp(stageChoice,'8')
-            % Check if the maxIrisDiamPixels has been defined
-            irisKeyIdx = strcmp(globalKeyValues,'maxIrisDiamPixels');
-            if sum(irisKeyIdx)==1
-                
-                % Use the iris diameter to find the expected camera depth
-                % mean and SD. This is then used to set bound on camera
-                % translation.
-                irisKeyIdx=find(irisKeyIdx);
-                maxIrisDiamPixels = globalKeyValues{irisKeyIdx+1};
-                sceneGeometry = createSceneGeometry(universalKeyValues{:},'skipEyeAxes',true);
-                [cameraDepthMean, cameraDepthSD] = depthFromIrisDiameter( sceneGeometry, maxIrisDiamPixels );
-                
-                % estimateSceneGeometry takes bounds on the search. If x0
-                % params have been set, then we want fairly tight bounds on
-                % translation, as the x0 value was set by hand.
-                transDelta = 0.25;
-                
-                % Check to see if the spreadsheet has specified an x0 value
-                % for the sceneParams.
-                sceneParamsX0 = strcmp(globalKeyValues,'sceneParamsX0');
-                if sum(sceneParamsX0)==1
-                    x0 = globalKeyValues{find(sceneParamsX0)+1};
-                    switch length(x0)
-                        case 4
-                            sceneParamsLB = [-22.5; x0(2:3)-transDelta; x0(4)-cameraDepthSD*0.25; 0.5; 0.8];
-                            sceneParamsLBp = [-11.25; x0(2:3)-transDelta/2; x0(4)-cameraDepthSD*0.125; 0.75; 0.9];
-                            sceneParamsUBp = [11.25; x0(2:3)+transDelta/2; x0(4)+cameraDepthSD*0.125; 1; 1.1];
-                            sceneParamsUB = [22.5; x0(2:3)+transDelta; x0(4)+cameraDepthSD*0.25; 1.125; 1.2];
-                        case 5
-                            sceneParamsLB = [x0(1)-10; x0(2:3)-transDelta; x0(4)-cameraDepthSD*0.25; x0(5)*0.9; 0.8];
-                            sceneParamsLBp = [x0(1)-5; x0(2:3)-transDelta/2; x0(4)-cameraDepthSD*0.125; x0(5)*0.95; 0.9];
-                            sceneParamsUBp = [x0(1)+5; x0(2:3)+transDelta/2; x0(4)+cameraDepthSD*0.125; x0(5)*1.05; 1.1];
-                            sceneParamsUB = [x0(1)+10; x0(2:3)+transDelta; x0(4)+cameraDepthSD*0.25; x0(5)*1.1; 1.2];
-                        case 6
-                            sceneParamsLB = x0;
-                            sceneParamsLBp = x0;
-                            sceneParamsUBp = x0;
-                            sceneParamsUB = x0;
-                        otherwise
-                            error('Not sure to handle that sceneParamsX0 length');
-                    end
-                else
-                    % Assemble the scene parameter bounds. These are in the
-                    % order of:
-                    %   torsion, x, y, z, eyeRotationScalarJoint, eyeRotationScalerDifferential
-                    % where torsion specifies the torsion of the camera with
-                    % respect to the eye in degrees, [x y z] is the translation
-                    % of the camera w.r.t. the eye in mm, and the
-                    % eyeRotationScalar variables are multipliers that act upon
-                    % the centers of rotation estimated for the eye.
-                    sceneParamsLB = [-5; -5; -5; cameraDepthMean-cameraDepthSD*1; 0.75; 0.9];
-                    sceneParamsLBp = [-3; -2; -2; cameraDepthMean-cameraDepthSD*0.5; 0.85; 0.95];
-                    sceneParamsUBp = [3; 2; 2; cameraDepthMean+cameraDepthSD*0.5; 1.15; 1.05];
-                    sceneParamsUB = [5; 5; 5; cameraDepthMean+cameraDepthSD*1; 1.25; 1.1];
-                end
-                
-                % Add these sceneParams to the globalKeyValues
-                globalKeyValues = [globalKeyValues,...
-                    {'sceneParamsLB',sceneParamsLB,'sceneParamsLBp',sceneParamsLBp,...
-                    'sceneParamsUBp',sceneParamsUBp,'sceneParamsUB',sceneParamsUB}];
-            end
-        end
+
         
         % If there is only one subject and one session, give the user the
         % option to select acquisitions to process. This is implemented by
