@@ -18,8 +18,10 @@ sessionDirs = {'session1_restAndStructure','session2_spatialStimuli'};
 fvals=nan(2,46);
 SR = nan(2,46);
 AL = nan(2,46);
-aziCenter = nan(2,46);
-eleCenter = nan(2,46);
+aziCenterP1 = nan(2,46);
+eleCenterP1 = nan(2,46);
+aziCenterP2 = nan(2,46);
+eleCenterP2 = nan(2,46);
 
 
 % Loop over sessions
@@ -52,8 +54,10 @@ for ss = 1:2
             sessionFvals = [];
             sessionSR = [];
             sessionAL = [];
-            sessionAzi = [];
-            sessionEle = [];
+            sessionAziP1 = [];
+            sessionEleP1 = [];
+            sessionAziP2 = [];
+            sessionEleP2 = [];
             
             % Loop over any gaze cal files for this session
             for gg = 1:length(fileListStruct)
@@ -62,8 +66,10 @@ for ss = 1:2
                 sessionFvals(end+1,:)=sceneGeometry.meta.estimateSceneParams.search.fVal;
                 sessionSR(end+1,:)=sceneGeometry.eye.meta.sphericalAmetropia;
                 sessionAL(end+1,:)=sceneGeometry.eye.meta.axialLength;
-                sessionAzi(end+1,:)=sceneGeometry.eye.rotationCenters.azi(1);
-                sessionEle(end+1,:)=sceneGeometry.eye.rotationCenters.ele(1);
+                sessionAziP1(end+1,:)=sceneGeometry.eye.rotationCenters.azi(1);
+                sessionEleP1(end+1,:)=sceneGeometry.eye.rotationCenters.ele(1);
+                sessionAziP2(end+1,:)=sceneGeometry.eye.rotationCenters.azi(2);
+                sessionEleP2(end+1,:)=sceneGeometry.eye.rotationCenters.ele(2);
             end
             
             % Store the values from the best sceneGeometry
@@ -71,8 +77,10 @@ for ss = 1:2
             fvals(ss,subjectID) = sessionFvals(bestIdx);
             SR(ss,subjectID) = sessionSR(bestIdx);
             AL(ss,subjectID) = sessionAL(bestIdx);
-            aziCenter(ss,subjectID) = sessionAzi(bestIdx);
-            eleCenter(ss,subjectID) = sessionEle(bestIdx);
+            aziCenterP1(ss,subjectID) = sessionAziP1(bestIdx);
+            eleCenterP1(ss,subjectID) = sessionEleP1(bestIdx);
+            aziCenterP2(ss,subjectID) = sessionAziP2(bestIdx);
+            eleCenterP2(ss,subjectID) = sessionEleP2(bestIdx);
         end
     end
 end
@@ -89,7 +97,7 @@ fprintf('IQR absolute fixation errors, session 1 and 2 (degrees): [%2.2f, %2.2f]
 % Figure 1 -- Reproducibility of center of rotation measurement
 figure
 subplot(1,2,1);
-h = scatter(-aziCenter(1,:),-aziCenter(2,:),100,'o','MarkerFaceColor','k','MarkerEdgeColor','none');
+h = scatter(-aziCenterP1(1,:),-aziCenterP1(2,:),100,'o','MarkerFaceColor','k','MarkerEdgeColor','none');
 h.MarkerFaceAlpha = 0.25;
 xlim([8 15]);
 ylim([8 15]);
@@ -98,12 +106,12 @@ ylabel('Session 2');
 axis square
 h = refline(1,0);
 h.Color = 'k';
-r = corr(aziCenter(1,:)',aziCenter(2,:)','Rows','pairwise');
-n = sum(~isnan(sum(aziCenter)));
+r = corr(aziCenterP1(1,:)',aziCenterP1(2,:)','Rows','pairwise');
+n = sum(~isnan(sum(aziCenterP1)));
 textString = sprintf('Azimuthal rotation center, n = %d, r = %2.2f',n,r);
 title(textString);
 subplot(1,2,2);
-h = scatter(-eleCenter(1,:),-eleCenter(2,:),100,'o','MarkerFaceColor','r','MarkerEdgeColor','none');
+h = scatter(-eleCenterP1(1,:),-eleCenterP1(2,:),100,'o','MarkerFaceColor','r','MarkerEdgeColor','none');
 h.MarkerFaceAlpha = 0.25;
 xlim([8 15]);
 ylim([8 15]);
@@ -112,33 +120,42 @@ ylabel('Session 2');
 axis square
 h = refline(1,0);
 h.Color = 'r';
-r = corr(eleCenter(1,:)',eleCenter(2,:)','Rows','pairwise');
-n = sum(~isnan(sum(aziCenter)));
+r = corr(eleCenterP1(1,:)',eleCenterP1(2,:)','Rows','pairwise');
+n = sum(~isnan(sum(aziCenterP1)));
 textString = sprintf('Elevational rotation center, n = %d, r = %2.2f',n,r);
 title(textString);
 
 % Take the mean measures across session 1 and 2
-meanAziCenter = nanmean(aziCenter);
-meanEleCenter = nanmean(eleCenter);
+meanAziCenterP1 = nanmean(aziCenterP1);
+meanEleCenterP1 = nanmean(eleCenterP1);
+meanAziCenterP2 = nanmean(aziCenterP2);
+meanEleCenterP2 = nanmean(eleCenterP2);
 meanSR = nanmean(SR);
 meanAL = nanmean(AL);
 
+% Report median rotation values
+fprintf('Median azimuth rotation center in mm (P1, P2): %2.2f, %2.2f \n', nanmedian(meanAziCenterP1),nanmedian(meanAziCenterP2));
+fprintf('Median elevation rotation center in mm (P1, P2): %2.2f, %2.2f \n', nanmedian(meanEleCenterP1),nanmedian(meanEleCenterP2));
+
+
 % Figure 2 -- Azi and Ele values, medians and IQRs
 figure
-idx = ~isnan(meanAziCenter);
-h = scatter(zeros(1,sum(idx))+0.5,-meanAziCenter(idx),200,'o','MarkerFaceColor','k','MarkerEdgeColor','none');
-h.MarkerFaceAlpha = 0.1;
+idx = ~isnan(meanAziCenterP1);
+h = scatter(zeros(1,sum(idx))+0.5,-meanAziCenterP1(idx),200,'o','MarkerFaceColor','k','MarkerEdgeColor','k');
+h.MarkerFaceAlpha = 0.10;
+h.MarkerEdgeAlpha = 0.15;
 hold on
-m = median(-meanAziCenter(idx));
-q = iqr(-meanAziCenter(idx));
+m = median(-meanAziCenterP1(idx));
+q = iqr(-meanAziCenterP1(idx));
 plot(1,m,'xk')
 plot([1 1],[m+q m-q],'-k');
 
-idx = ~isnan(meanEleCenter);
-h = scatter(zeros(1,sum(idx))+1.5,-meanEleCenter(idx),200,'o','MarkerFaceColor','r','MarkerEdgeColor','none');
-h.MarkerFaceAlpha = 0.1;
-m = median(-meanEleCenter(idx));
-q = iqr(-meanEleCenter(idx));
+idx = ~isnan(meanEleCenterP1);
+h = scatter(zeros(1,sum(idx))+1.5,-meanEleCenterP1(idx),200,'o','MarkerFaceColor','r','MarkerEdgeColor','r');
+h.MarkerFaceAlpha = 0.10;
+h.MarkerEdgeAlpha = 0.15;
+m = median(-meanEleCenterP1(idx));
+q = iqr(-meanEleCenterP1(idx));
 plot(2,m,'xr')
 plot([2 2],[m+q m-q],'-r');
 ylim([0 15])
