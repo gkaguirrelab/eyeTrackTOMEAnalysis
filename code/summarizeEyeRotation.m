@@ -155,7 +155,11 @@ h = scatter(zeros(1,sum(idx))+1.5,-meanEleCenterP1(idx),200,'o','MarkerFaceColor
 h.MarkerFaceAlpha = 0.10;
 h.MarkerEdgeAlpha = 0.15;
 m = median(-meanEleCenterP1(idx));
-q = iqr(-meanEleCenterP1(idx));
+
+% The IQR is the range between + and - one quartile. So, to plot the IQR
+% around a median, we plot +- 1/2 the IQR, which then places the error bar
+% on the bounds of the upper and lower quartile.
+q = iqr(-meanEleCenterP1(idx))/2;
 plot(2,m,'xr')
 plot([2 2],[m+q m-q],'-r');
 ylim([0 15])
