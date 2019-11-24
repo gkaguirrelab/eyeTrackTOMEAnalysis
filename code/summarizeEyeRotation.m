@@ -70,6 +70,12 @@ for ss = 1:2
                 sessionEleP1(end+1,:)=sceneGeometry.eye.rotationCenters.ele(1);
                 sessionAziP2(end+1,:)=sceneGeometry.eye.rotationCenters.azi(2);
                 sessionEleP2(end+1,:)=sceneGeometry.eye.rotationCenters.ele(2);
+                % If this is a sceneGeometry that was not generated with
+                % fixation targets, then set the fVal to be vey high, as we
+                % do not wish it to be part of this analysis
+                if sceneGeometry.screenPosition.fixationAngles(1) == 0
+                    sessionFvals(end,:)=1e6;
+                end
             end
             
             % Store the values from the best sceneGeometry
@@ -81,6 +87,10 @@ for ss = 1:2
             eleCenterP1(ss,subjectID) = sessionEleP1(bestIdx);
             aziCenterP2(ss,subjectID) = sessionAziP2(bestIdx);
             eleCenterP2(ss,subjectID) = sessionEleP2(bestIdx);
+            
+            if sessionEleP1(bestIdx) < -14
+                foo =1;
+            end
         end
     end
 end
@@ -106,9 +116,9 @@ ylabel('Session 2');
 axis square
 h = refline(1,0);
 h.Color = 'k';
-r = corr(aziCenterP1(1,:)',aziCenterP1(2,:)','Rows','pairwise');
+[rho,pval] = corr(aziCenterP1(1,:)',aziCenterP1(2,:)','Rows','pairwise','Type','Spearman');
 n = sum(~isnan(sum(aziCenterP1)));
-textString = sprintf('Azimuthal rotation center, n = %d, r = %2.2f',n,r);
+textString = sprintf('Azi center, n = %d, Spearman rho = %2.2f, p = %2.5f',n,rho,pval);
 title(textString);
 subplot(1,2,2);
 h = scatter(-eleCenterP1(1,:),-eleCenterP1(2,:),100,'o','MarkerFaceColor','r','MarkerEdgeColor','none');
@@ -120,9 +130,9 @@ ylabel('Session 2');
 axis square
 h = refline(1,0);
 h.Color = 'r';
-r = corr(eleCenterP1(1,:)',eleCenterP1(2,:)','Rows','pairwise');
+[rho,pval] = corr(eleCenterP1(1,:)',eleCenterP1(2,:)','Rows','pairwise','Type','Spearman');
 n = sum(~isnan(sum(aziCenterP1)));
-textString = sprintf('Elevational rotation center, n = %d, r = %2.2f',n,r);
+textString = sprintf('Ele center, n = %d, Spearman rho = %2.2f, p = %2.5f',n,rho,pval);
 title(textString);
 
 % Take the mean measures across session 1 and 2
