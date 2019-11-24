@@ -200,7 +200,7 @@ subjectChoice = input('\nYour choice: ','s');
 % This is an array of indices that refer back to the subjectList
 subjectIndexList = eval(subjectChoice);
 
-if eval(stageChoice)~=12
+if eval(stageChoice)~=13
     %% Ask the operator which acquisitions they would like to process
     acquisitionStems = [];
     sceneGeometryFlag = false;
