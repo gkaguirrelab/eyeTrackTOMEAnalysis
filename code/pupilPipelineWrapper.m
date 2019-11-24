@@ -72,25 +72,6 @@ if p.Results.saveLog
 end
 
 
-% for some subjects, the high-res video of the size calibration step was
-% not obtained, only the low-res, LiveTrack "tracked" avi video. If the
-% useLowResSizeCalVideo flag is set to true, we copy this low-res video
-% over to the dataOutputDir and give it a "gray" suffix, so that it can be
-% processed
-% if p.Results.useLowResSizeCalVideo
-%     scaleCalLowResVideos = dir(fullfile(pathParams.dataSourceDirFull,'ScaleCalibration*.avi'));
-%     if ~isempty(scaleCalLowResVideos)
-%         for rr = 1: length(scaleCalLowResVideos)
-%             newFileName = ['LowRes' scaleCalLowResVideos(rr).name(1:end-4) '_gray.avi'];
-%             scaleCalLowResGrayAVIs(rr).name = newFileName;
-%             scaleCalLowResGrayAVIs(rr).folder = pathParams.dataOutputDirFull;
-%             fullFilePathDestination = fullfile(scaleCalLowResGrayAVIs(rr).folder, scaleCalLowResGrayAVIs(rr).name);
-%             fullFilePathSource = fullfile(scaleCalLowResVideos(rr).folder, scaleCalLowResVideos(rr).name);
-%             copyfile (fullFilePathSource, fullFilePathDestination)
-%         end
-%     end
-% end
-
 % if starting from deinterlaceVideo, get the file names from the  raw files
 % in the data folder. If starting from a later step, get the run name from
 % the gray files instead.
@@ -132,15 +113,6 @@ if ~isempty(p.Results.acquisitionStems)
         sourceVideos = sourceVideos(idxMatch);
     end
 end
-
-% THE FOLLOWING SHALL BE CHANGED, AS NOW WE ARE ANALYZING VIDEOS AT A
-% DIFFERENT RESOLUTION THAN THE LIVETRACK.
-% % In the event that we both wish to skip the convertRawToGray stage and we are
-% % using the lowResSizeCalVideos, then we need to add these low res videos
-% % to the sourceVideo list
-% if p.Results.useLowResSizeCalVideo && ~any(strcmp(p.Results.skipStage,'deinterlaceVideo'))
-%     sourceVideos = [sourceVideos scaleCalLowResGrayAVIs];
-% end
 
 if ~isempty(p.Results.customKeyValues)
     runNamesToCustomize = cellfun(@(x) x{1},p.Results.customKeyValues,'UniformOutput',false);
