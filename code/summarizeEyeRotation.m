@@ -18,6 +18,7 @@ sessionDirs = {'session1_restAndStructure','session2_spatialStimuli'};
 fvals=nan(2,46);
 SR = nan(2,46);
 AL = nan(2,46);
+bestIndices = nan(2,46);
 aziCenterP1 = nan(2,46);
 eleCenterP1 = nan(2,46);
 aziCenterP2 = nan(2,46);
@@ -80,6 +81,7 @@ for ss = 1:2
             
             % Store the values from the best sceneGeometry
             [~,bestIdx] = min(sessionFvals);
+            bestIndices(ss,subjectID)=bestIdx;
             fvals(ss,subjectID) = sessionFvals(bestIdx);
             SR(ss,subjectID) = sessionSR(bestIdx);
             AL(ss,subjectID) = sessionAL(bestIdx);
@@ -87,10 +89,7 @@ for ss = 1:2
             eleCenterP1(ss,subjectID) = sessionEleP1(bestIdx);
             aziCenterP2(ss,subjectID) = sessionAziP2(bestIdx);
             eleCenterP2(ss,subjectID) = sessionEleP2(bestIdx);
-            
-            if sessionEleP1(bestIdx) < -14
-                foo =1;
-            end
+
         end
     end
 end
@@ -176,3 +175,9 @@ ylim([0 15])
 xlim([0 3])
 ylabel('Rotation center depth [mm]');
 title('Azi and ele rotation centers. median +- IQR');
+
+% Figure 3 -- Across subjects, the correlation between azi and ele
+figure
+idx = logical(double(~isnan(meanAziCenterP1)) .* double(~isnan(meanEleCenterP1)));
+h = scatter(-meanAziCenterP1(idx),-meanEleCenterP1(idx),200,'o','MarkerFaceColor','r','MarkerEdgeColor','r');
+
