@@ -172,7 +172,7 @@ switch stageChoice
             {'videoTypeChoice','syncSceneGeometry', ...
             'skipStageByName',{'deinterlaceVideo'}}];
         makeFitVideoByNumber = [];
-        consoleSelectAcquisition = true;
+        consoleSelectAcquisition = false;
         sceneGeometryFlag = false;
 
 end
