@@ -48,6 +48,7 @@ for ss = 1:2
             
             % Figure out which subject this is
             tmp = strsplit(sessionDir,filesep);
+            sessionLabel = fullfile(tmp{end-2},tmp{end-1});
             tmp = tmp{end-2};
             subjectID = str2double(tmp(8:9));
                         
@@ -89,6 +90,10 @@ for ss = 1:2
             eleCenterP1(ss,subjectID) = sessionEleP1(bestIdx);
             aziCenterP2(ss,subjectID) = sessionAziP2(bestIdx);
             eleCenterP2(ss,subjectID) = sessionEleP2(bestIdx);
+            
+            % Report which GazeCal is the best for this session
+            msg = [sessionLabel ' - GazeCal0' num2str(bestIdx) '_sceneGeometry.mat\n'];
+            fprintf(msg);
 
         end
     end
