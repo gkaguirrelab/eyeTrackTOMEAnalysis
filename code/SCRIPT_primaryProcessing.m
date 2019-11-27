@@ -62,6 +62,7 @@ fprintf('\t18. Control file to end, including video (4-6, 8-11)\n');
 fprintf('\t19. Scene-constrained fitting, Bayesx2, video (8-11)\n');
 fprintf('\t20. Glint selection and final fit video (2, 11)\n');
 fprintf('\t21. Glint selection only (2)\n');
+fprintf('\t22. Sync sceneGeometry to acquisition\n');
 
 stageChoice = input('\nYour choice: ','s');
 switch stageChoice
@@ -164,6 +165,16 @@ switch stageChoice
         skipStageByNumber = [1];
         lastStageByNumber = 2;
         makeFitVideoByNumber = [];
+    case '22'
+        skipStageByNumber = [];
+        lastStageByNumber = 1;
+        universalKeyValues = [universalKeyValues, ...
+            {'videoTypeChoice','syncSceneGeometry', ...
+            'skipStageByName',{'deinterlaceVideo'}}];
+        makeFitVideoByNumber = [];
+        consoleSelectAcquisition = true;
+        sceneGeometryFlag = false;
+
 end
 
 
