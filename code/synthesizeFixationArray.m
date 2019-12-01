@@ -52,8 +52,14 @@ fixZeroY = medianEyePose(2);
 % Get the "fixation" positions of the ellipseArrayList, which are
 % essentially the eye rotation values centered by the center of the
 % distribution of all eye rotations.
-xTargetDegrees = (pupilData.radiusSmoothed.eyePoses.values(ellipseArrayList,1) - fixZeroX)';
-yTargetDegrees = (pupilData.radiusSmoothed.eyePoses.values(ellipseArrayList,2) - fixZeroY)';
+xTargetDegrees = [];
+yTargetDegrees = [];
+for ii=1:length(ellipseArrayList)
+    eyePose = pupilProjection_inv(pupilData.sceneConstrained.ellipses.values(ellipseArrayList(ii),:), ...
+    sceneGeometryIn,'x0',pupilData.sceneConstrained.eyePoses.values(ellipseArrayList(ii),:));
+    xTargetDegrees(ii) = eyePose(1) - fixZeroX;
+    yTargetDegrees(ii) = eyePose(2) - fixZeroY;
+end
 
 % Remove any targets which have nan values
 goodTargets = ~isnan(xTargetDegrees);
