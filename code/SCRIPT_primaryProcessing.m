@@ -60,9 +60,10 @@ fprintf('\t16. Create a final fit video (11)\n');
 fprintf('\t17. Perimeter definition to end, including video (3-6, 8-11)\n');
 fprintf('\t18. Control file to end, including video (4-6, 8-11)\n');
 fprintf('\t19. Scene-constrained fitting, Bayesx2, video (8-11)\n');
-fprintf('\t20. Glint selection and final fit video (2, 11)\n');
-fprintf('\t21. Glint selection only (2)\n');
-fprintf('\t22. Sync sceneGeometry to acquisition\n');
+fprintf('\t20. Scene-constrained fitting, Bayesx2, No video (8-10)\n');
+fprintf('\t21. Glint selection and final fit video (2, 11)\n');
+fprintf('\t22. Glint selection only (2)\n');
+fprintf('\t23. Sync sceneGeometry to acquisition\n');
 
 stageChoice = input('\nYour choice: ','s');
 switch stageChoice
@@ -158,14 +159,18 @@ switch stageChoice
         lastStageByNumber = 11;
         makeFitVideoByNumber = [];
     case '20'
+        skipStageByNumber = 1:7;
+        lastStageByNumber = 10;
+        makeFitVideoByNumber = [];
+    case '21'
         skipStageByNumber = [1,3:9];
         lastStageByNumber = 11;
         makeFitVideoByNumber = [];
-    case '21'
+    case '22'
         skipStageByNumber = [1];
         lastStageByNumber = 2;
         makeFitVideoByNumber = [];
-    case '22'
+    case '23'
         skipStageByNumber = [];
         lastStageByNumber = 1;
         universalKeyValues = [universalKeyValues, ...
