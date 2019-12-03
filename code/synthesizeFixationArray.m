@@ -67,9 +67,9 @@ ellipseArrayList = ellipseArrayList(goodTargets);
 xTargetDegrees = xTargetDegrees(goodTargets);
 yTargetDegrees = yTargetDegrees(goodTargets);
 
-% Generate a msg with these values
-outLine1='ellipseArrayList: [ ';
-outLine2='target array deg: [ ';
+% Generate a msg with the values needed for the params table
+outLine1='[ ';
+outLine2='[ ';
 outLine3=' ';
 for ii=1:length(ellipseArrayList)
     outLine1 = [outLine1 num2str(ellipseArrayList(ii))];
@@ -85,8 +85,9 @@ outLineB = [outLine1 ' ]'];
 outLineC = [outLine2 ' ;' outLine3 ']'];
 
 sceneGeometryFileNameToSync
-fprintf([outLineB ' \n']);
-fprintf([outLineC ' \n']);
+outLineA = sprintf('[%2.2f; %2.2f; %2.2f; %2.2f; %2.2f; %2.2f]',sceneGeometryIn.meta.estimateSceneParams.search.x);
+outLineAll = [outLineA char(9) outLineB char(9) outLineC '\n'];
+fprintf(outLineAll);
 
 % Plot the synthesized fixation locations on the screen
 figure
