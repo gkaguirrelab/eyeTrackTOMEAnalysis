@@ -45,7 +45,7 @@ if p.Results.obtainTbConfig
             warning('There was a tb deploy error. Check the contents of tbConfigResult');
         end
     end
-    tbSnapshot=tbDeploymentSnapshot(tbConfigResult,'verbose',false);
+    tbSnapshot=tbDeploymentSnapshot(tbConfigResult,[],'verbose',false);
     clear tbConfigResult
 else
     tbSnapshot=[];
