@@ -118,7 +118,7 @@ switch stageChoice
         lastStageByNumber = 10;
         makeFitVideoByNumber = [];
     case '12'
-        skipStageByNumber = 1:12;
+        skipStageByNumber = 1:11;
         lastStageByNumber = 12;
         makeFitVideoByNumber = [];
     case '13'
