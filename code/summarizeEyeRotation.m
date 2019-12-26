@@ -181,8 +181,35 @@ xlim([0 3])
 ylabel('Rotation center depth [mm]');
 title('Azi and ele rotation centers. median +- IQR');
 
-% Figure 3 -- Across subjects, the correlation between azi and ele
+% Figure 3 -- Across subjects, the correlation between azi and ele, and the
+% correlation of mean rotation center with axial length
 figure
+subplot(1,2,1);
 idx = logical(double(~isnan(meanAziCenterP1)) .* double(~isnan(meanEleCenterP1)));
-h = scatter(-meanAziCenterP1(idx),-meanEleCenterP1(idx),200,'o','MarkerFaceColor','r','MarkerEdgeColor','r');
+h = scatter(-meanAziCenterP1(idx),-meanEleCenterP1(idx),'o','MarkerFaceColor','b','MarkerEdgeColor','none');
+h.MarkerFaceAlpha = 0.25;
+hold on
+xlim([8 16]);
+ylim([8 16]);
+axis square
+xlabel('Azimuth depth');
+ylabel('Elevation depth');
+b = robustfit(-meanAziCenterP1(idx),-meanEleCenterP1(idx));
+plot(8:15,b(1)+b(2).*(8:15),'r','LineWidth',0.5)
+title('Azimuth vs elevation rotation centers across subjects');
+
+subplot(1,2,2);
+meanRotationDeth = mean([meanAziCenterP1;meanEleCenterP1]);
+h = scatter(meanAL(idx),-meanRotationDeth(idx),'o','MarkerFaceColor','b','MarkerEdgeColor','none');
+h.MarkerFaceAlpha = 0.25;
+hold on
+xlim([20 28]);
+ylim([8 16]);
+axis square
+xlabel('Axial legnth [mm]');
+ylabel('Mean rotation depth [mm]');
+title('Mean rotation depth vs. axial length across subjectsa');
+b = robustfit(meanAL(idx),-meanRotationDeth(idx));
+plot(20:28,b(1)+b(2).*(20:28),'r','LineWidth',0.5)
+
 
