@@ -18,7 +18,6 @@ pathParams.eyeTrackingDir = 'EyeTracking';
 % Set parameters common to all analyses from this project
 universalKeyValues = {'intrinsicCameraMatrix',[2627.0 0 338.1; 0 2628.1 246.2; 0 0 1],...
     'radialDistortionVector',[-0.3517 3.5353],...
-    'constraintTolerance',0.05,...
     'eyeLaterality','right',...
     'rankScaling',[10 1 1], ...
     'spectralDomain','nir', ...
@@ -50,20 +49,19 @@ fprintf('\t6. Create a stage 6 fit video\n');
 fprintf('\t7. Create default sceneGeometry (7)\n');
 fprintf('\t8. Search to refine sceneGeometry (7)\n');
 fprintf('\t9. Scene-constrained pupil fitting (8)\n');
-fprintf('\t10. Empirical Bayes smoothing - force new (9)\n');
-fprintf('\t11. Empirical Bayes smoothing - allow iterative (9)\n');
-fprintf('\t12. Generate timebase only (1)\n');
-fprintf('\t13. Identify gaze cal frames and targets\n');
-fprintf('\t14. Align timebase with liveTrack report\n');
-fprintf('\t15. Create a stage 8 fit video\n');
-fprintf('\t16. Create a final fit video (11)\n');
-fprintf('\t17. Perimeter definition to end, including video (3-6, 8-11)\n');
-fprintf('\t18. Control file to end, including video (4-6, 8-11)\n');
-fprintf('\t19. Scene-constrained fitting, Bayesx2, video (8-11)\n');
-fprintf('\t20. Scene-constrained fitting, Bayesx2, No video (8-10)\n');
-fprintf('\t21. Glint selection and final fit video (2, 11)\n');
-fprintf('\t22. Glint selection only (2)\n');
-fprintf('\t23. Sync sceneGeometry to acquisition\n');
+fprintf('\t10. Empirical Bayes smoothing (9)\n');
+fprintf('\t11. Generate timebase only (1)\n');
+fprintf('\t12. Identify gaze cal frames and targets\n');
+fprintf('\t13. Align timebase with liveTrack report\n');
+fprintf('\t14. Create a stage 8 fit video\n');
+fprintf('\t15. Create a final fit video (11)\n');
+fprintf('\t16. Perimeter definition to end, including video (3-6, 8-10)\n');
+fprintf('\t17. Control file to end, including video (4-6, 8-10)\n');
+fprintf('\t18. Scene-constrained fitting, Bayes, video (8-10)\n');
+fprintf('\t19. Scene-constrained fitting, Bayes, No video (8-9)\n');
+fprintf('\t20. Glint selection and final fit video (2, 10)\n');
+fprintf('\t21. Glint selection only (2)\n');
+fprintf('\t22. Sync sceneGeometry to acquisition\n');
 
 stageChoice = input('\nYour choice: ','s');
 switch stageChoice
@@ -113,15 +111,7 @@ switch stageChoice
         skipStageByNumber = 1:8;
         lastStageByNumber = 9;
         makeFitVideoByNumber = [];
-    case '11'
-        skipStageByNumber = 1:9;
-        lastStageByNumber = 10;
-        makeFitVideoByNumber = [];
     case '12'
-        skipStageByNumber = 1:11;
-        lastStageByNumber = 12;
-        makeFitVideoByNumber = [];
-    case '13'
         skipStageByNumber = [];
         lastStageByNumber = 1;
         universalKeyValues = [universalKeyValues, ...
@@ -130,7 +120,7 @@ switch stageChoice
         makeFitVideoByNumber = [];
         consoleSelectAcquisition = false;
         sceneGeometryFlag = false;
-    case '14'
+    case '13'
         skipStageByNumber = [];
         lastStageByNumber = 1;
         universalKeyValues = [universalKeyValues, ...
@@ -138,39 +128,39 @@ switch stageChoice
             'savePlot',true,...
             'skipStageByName',{'deinterlaceVideo'}}];
         makeFitVideoByNumber = [];
-    case '15'
+    case '14'
         skipStageByNumber = 1:8;
         lastStageByNumber = 8;
         makeFitVideoByNumber = 8;
+    case '15'
+        skipStageByNumber = 1:19;
+        lastStageByNumber = 10;
+        makeFitVideoByNumber = [];
     case '16'
-        skipStageByNumber = 1:10;
-        lastStageByNumber = 11;
+        skipStageByNumber = [1:2,7];
+        lastStageByNumber = 10;
         makeFitVideoByNumber = [];
     case '17'
-        skipStageByNumber = [1:2,7];
-        lastStageByNumber = 11;
+        skipStageByNumber = [1:3,7];
+        lastStageByNumber = 10;
         makeFitVideoByNumber = [];
     case '18'
-        skipStageByNumber = [1:3,7];
-        lastStageByNumber = 11;
-        makeFitVideoByNumber = [];
-    case '19'
-        skipStageByNumber = 1:7;
-        lastStageByNumber = 11;
-        makeFitVideoByNumber = [];
-    case '20'
         skipStageByNumber = 1:7;
         lastStageByNumber = 10;
         makeFitVideoByNumber = [];
-    case '21'
-        skipStageByNumber = [1,3:9];
-        lastStageByNumber = 11;
+    case '19'
+        skipStageByNumber = 1:7;
+        lastStageByNumber = 9;
         makeFitVideoByNumber = [];
-    case '22'
+    case '20'
+        skipStageByNumber = [1,3:9];
+        lastStageByNumber = 10;
+        makeFitVideoByNumber = [];
+    case '21'
         skipStageByNumber = [1];
         lastStageByNumber = 2;
         makeFitVideoByNumber = [];
-    case '23'
+    case '22'
         skipStageByNumber = [];
         lastStageByNumber = 1;
         universalKeyValues = [universalKeyValues, ...
