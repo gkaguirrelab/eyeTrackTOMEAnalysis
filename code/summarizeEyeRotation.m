@@ -51,7 +51,7 @@ for ss = 1:2
             sessionLabel = fullfile(tmp{end-2},tmp{end-1});
             tmp = tmp{end-2};
             subjectID = str2double(tmp(8:9));
-                        
+            
             % Reset some inner loop variables
             sessionFvals = [];
             sessionSR = [];
@@ -65,18 +65,22 @@ for ss = 1:2
             for gg = 1:length(fileListStruct)
                 filePath = fullfile(fileListStruct(gg).folder,fileListStruct(gg).name);
                 load(filePath,'sceneGeometry');
-                sessionFvals(end+1,:)=sceneGeometry.meta.estimateSceneParams.search.fVal;
-                sessionSR(end+1,:)=sceneGeometry.eye.meta.sphericalAmetropia;
-                sessionAL(end+1,:)=sceneGeometry.eye.meta.axialLength;
-                sessionAziP1(end+1,:)=sceneGeometry.eye.rotationCenters.azi(1);
-                sessionEleP1(end+1,:)=sceneGeometry.eye.rotationCenters.ele(1);
-                sessionAziP2(end+1,:)=sceneGeometry.eye.rotationCenters.azi(2);
-                sessionEleP2(end+1,:)=sceneGeometry.eye.rotationCenters.ele(2);
-                % If this is a sceneGeometry that was not generated with
-                % fixation targets, then set the fVal to be vey high, as we
-                % do not wish it to be part of this analysis
-                if sceneGeometry.screenPosition.fixationAngles(1) == 0
-                    sessionFvals(end,:)=1e6;
+                if isfield(sceneGeometry.meta.estimateSceneParams,'rawErrors')
+                    sessionFvals(end+1,:)=sceneGeometry.meta.estimateSceneParams.rawErrors(3);
+                    sessionSR(end+1,:)=sceneGeometry.eye.meta.sphericalAmetropia;
+                    sessionAL(end+1,:)=sceneGeometry.eye.meta.axialLength;
+                    sessionAziP1(end+1,:)=sceneGeometry.eye.rotationCenters.azi(1);
+                    sessionEleP1(end+1,:)=sceneGeometry.eye.rotationCenters.ele(1);
+                    sessionAziP2(end+1,:)=sceneGeometry.eye.rotationCenters.azi(2);
+                    sessionEleP2(end+1,:)=sceneGeometry.eye.rotationCenters.ele(2);
+                else
+                    sessionFvals(end+1,:)=1e6;
+                    sessionSR(end+1,:)=nan;
+                    sessionAL(end+1,:)=nan;
+                    sessionAziP1(end+1,:)=nan;
+                    sessionEleP1(end+1,:)=nan;
+                    sessionAziP2(end+1,:)=nan;
+                    sessionEleP2(end+1,:)=nan;
                 end
             end
             
@@ -92,9 +96,10 @@ for ss = 1:2
             eleCenterP2(ss,subjectID) = sessionEleP2(bestIdx);
             
             % Report which GazeCal is the best for this session
-            msg = [sessionLabel ' - GazeCal0' num2str(bestIdx) '_sceneGeometry.mat\n'];
+            if sessionFvals(bestIdx) < 1e6
+            msg = [sessionLabel ' - GazeCal0' num2str(bestIdx) '_sceneGeometry.mat - fVal ' num2str(sessionFvals(bestIdx)) '\n'];
             fprintf(msg);
-
+            end            
         end
     end
 end
