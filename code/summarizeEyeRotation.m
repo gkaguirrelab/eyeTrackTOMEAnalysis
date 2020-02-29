@@ -28,6 +28,8 @@ eleCenterP2 = nan(2,46);
 % Loop over sessions
 for ss = 1:2
     
+    fprintf(['\n' sessionDirs{ss} '\n\n']);
+
     % Assemble the dataRootDr
     dataRootDir = fullfile(rootDir,sessionDirs{ss});
     
@@ -53,6 +55,7 @@ for ss = 1:2
             subjectID = str2double(tmp(8:9));
             
             % Reset some inner loop variables
+            xVals = [];
             sessionFvals = [];
             sessionSR = [];
             sessionAL = [];
@@ -73,14 +76,16 @@ for ss = 1:2
                     sessionEleP1(end+1,:)=sceneGeometry.eye.rotationCenters.ele(1);
                     sessionAziP2(end+1,:)=sceneGeometry.eye.rotationCenters.azi(2);
                     sessionEleP2(end+1,:)=sceneGeometry.eye.rotationCenters.ele(2);
+                    xVals(end+1,:) = sceneGeometry.meta.estimateSceneParams.x4;
                 else
-                    sessionFvals(end+1,:)=1e6;
+                    sessionFvals(end+1,:)=nan;
                     sessionSR(end+1,:)=nan;
                     sessionAL(end+1,:)=nan;
                     sessionAziP1(end+1,:)=nan;
                     sessionEleP1(end+1,:)=nan;
                     sessionAziP2(end+1,:)=nan;
                     sessionEleP2(end+1,:)=nan;
+                    xVals(end+1,:)=nan;
                 end
             end
             
@@ -95,9 +100,14 @@ for ss = 1:2
             aziCenterP2(ss,subjectID) = sessionAziP2(bestIdx);
             eleCenterP2(ss,subjectID) = sessionEleP2(bestIdx);
             
+            % Obtain the weighted xvals
+            medianXVals = medianw( xVals, 1./sessionFvals,1);
+
             % Report which GazeCal is the best for this session
             if sessionFvals(bestIdx) < 1e6
             msg = [sessionLabel ' - GazeCal0' num2str(bestIdx) '_sceneGeometry.mat - fVal ' num2str(sessionFvals(bestIdx)) '\n'];
+            fprintf(msg);
+            msg = sprintf('Weighted median (%d cals) rotation centers [%2.2f, %2.2f], cornea [%2.2f, %2.2f, %2.2f, %2.2f] \n',length(fileListStruct),medianXVals(5:10));
             fprintf(msg);
             end            
         end
