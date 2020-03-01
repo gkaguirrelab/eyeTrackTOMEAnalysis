@@ -85,7 +85,11 @@ for ss = 1:2
                     sessionEleP1(end+1,:)=nan;
                     sessionAziP2(end+1,:)=nan;
                     sessionEleP2(end+1,:)=nan;
-                    xVals(end+1,:)=nan;
+                    if gg == 1
+                        xVals = nan(1,10);
+                    else
+                        xVals(end+1,:)=nan;
+                    end
                 end
             end
             
