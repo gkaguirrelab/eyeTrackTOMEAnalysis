@@ -68,7 +68,8 @@ for ss = 1:2
             for gg = 1:length(fileListStruct)
                 filePath = fullfile(fileListStruct(gg).folder,fileListStruct(gg).name);
                 load(filePath,'sceneGeometry');
-                if isfield(sceneGeometry.meta.estimateSceneParams,'rawErrors')
+                if isfield(sceneGeometry.meta.estimateSceneParams,'rawErrors') && ...
+                    isfield(sceneGeometry.meta.estimateSceneParams,'x')
                     sessionFvals(end+1,:)=sceneGeometry.meta.estimateSceneParams.rawErrors(3);
                     sessionSR(end+1,:)=sceneGeometry.eye.meta.sphericalAmetropia;
                     sessionAL(end+1,:)=sceneGeometry.eye.meta.axialLength;
@@ -76,7 +77,7 @@ for ss = 1:2
                     sessionEleP1(end+1,:)=sceneGeometry.eye.rotationCenters.ele(1);
                     sessionAziP2(end+1,:)=sceneGeometry.eye.rotationCenters.azi(2);
                     sessionEleP2(end+1,:)=sceneGeometry.eye.rotationCenters.ele(2);
-                    xVals(end+1,:) = sceneGeometry.meta.estimateSceneParams.x4;
+                    xVals(end+1,:) = sceneGeometry.meta.estimateSceneParams.x;
                 else
                     sessionFvals(end+1,:)=nan;
                     sessionSR(end+1,:)=nan;
@@ -99,10 +100,15 @@ for ss = 1:2
             fvals(ss,subjectID) = sessionFvals(bestIdx);
             SR(ss,subjectID) = sessionSR(bestIdx);
             AL(ss,subjectID) = sessionAL(bestIdx);
-            aziCenterP1(ss,subjectID) = sessionAziP1(bestIdx);
-            eleCenterP1(ss,subjectID) = sessionEleP1(bestIdx);
-            aziCenterP2(ss,subjectID) = sessionAziP2(bestIdx);
-            eleCenterP2(ss,subjectID) = sessionEleP2(bestIdx);
+%             aziCenterP1(ss,subjectID) = sessionAziP1(bestIdx);
+%             eleCenterP1(ss,subjectID) = sessionEleP1(bestIdx);
+%             aziCenterP2(ss,subjectID) = sessionAziP2(bestIdx);
+%             eleCenterP2(ss,subjectID) = sessionEleP2(bestIdx);
+            aziCenterP1(ss,subjectID) = medianw(sessionAziP1,1./sessionFvals,1);
+            eleCenterP1(ss,subjectID) = medianw(sessionEleP1,1./sessionFvals,1);
+            aziCenterP2(ss,subjectID) = medianw(sessionAziP2,1./sessionFvals,1);
+            eleCenterP2(ss,subjectID) = medianw(sessionEleP2,1./sessionFvals,1);
+
             
             % Obtain the weighted xvals
             medianXVals = medianw( xVals, 1./sessionFvals,1);
