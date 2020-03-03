@@ -87,7 +87,7 @@ for ss = 1:2
                     sessionAziP2(end+1,:)=nan;
                     sessionEleP2(end+1,:)=nan;
                     if gg == 1
-                        xVals = nan(1,10);
+                        xVals = nan(1,11);
                     else
                         xVals(end+1,:)=nan;
                     end
@@ -138,8 +138,8 @@ figure
 subplot(1,2,1);
 h = scatter(-aziCenterP1(1,:),-aziCenterP1(2,:),100,'o','MarkerFaceColor','k','MarkerEdgeColor','none');
 h.MarkerFaceAlpha = 0.25;
-xlim([8 15]);
-ylim([8 15]);
+xlim([8 16]);
+ylim([8 16]);
 xlabel('Session 1');
 ylabel('Session 2');
 axis square
@@ -152,8 +152,8 @@ title(textString);
 subplot(1,2,2);
 h = scatter(-eleCenterP1(1,:),-eleCenterP1(2,:),100,'o','MarkerFaceColor','r','MarkerEdgeColor','none');
 h.MarkerFaceAlpha = 0.25;
-xlim([8 15]);
-ylim([8 15]);
+xlim([8 16]);
+ylim([8 16]);
 xlabel('Session 1');
 ylabel('Session 2');
 axis square
