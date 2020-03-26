@@ -1,0 +1,33 @@
+
+
+
+% Get the DropBox base directory
+dropboxBaseDir = getpref('eyeTrackTOMEAnalysis','dropboxBaseDir');
+
+% set common path params
+pathParams.dataSourceDirRoot = fullfile(dropboxBaseDir,'TOME_data');
+pathParams.dataOutputDirRoot = fullfile(dropboxBaseDir,'TOME_processing');
+pathParams.controlFileDirRoot = fullfile(dropboxBaseDir,'TOME_processing');
+pathParams.eyeTrackingDir = 'EyeTracking';
+
+videoStemSession1 = @(sub,date) fullfile(dropboxBaseDir,'TOME_processing','session1_restAndStructure',sub,date,'EyeTracking','GazeCal');
+videoStemSession2 = @(sub,date,idx) fullfile(dropboxBaseDir,'TOME_processing','session2_spatialStimuli',sub,date,'EyeTracking',['GazeCal0' num2str(idx)]);
+
+%% TOME_3015
+videoStemName = {...
+    videoStemSession1('TOME_3015','030117'), ...
+    videoStemSession2('TOME_3015','032417',1), ...
+    videoStemSession2('TOME_3015','032417',2), ...
+    videoStemSession2('TOME_3015','032417',3), ...
+    videoStemSession2('TOME_3015','032417',4)};
+
+% The order of parameters here is [0 0 torsion translationX translationY depth]
+sceneParamsX0 = {...
+    [0         0  -11.6168   -2.5423    2.4580  140], ...
+    [0         0   -4.7981   -2.2882    1.4291  140], ...
+    [0         0    0.3887   -2.1856    1.0091  140], ...
+    [0         0   10.2627   -3.3679    3.5300  140], ...
+    [0         0    7.7354   -0.8179   -2.7592  140]};
+
+
+
