@@ -22,6 +22,7 @@ videoStemSession2 = @(sub,date,idx) fullfile(dropboxBaseDir,'TOME_processing','s
 %% TOME_3003
 % no GazeCal files
 
+
 %% TOME_3004
 videoStemName = {...
     videoStemSession1('TOME_3004','101416'), ...
@@ -31,7 +32,7 @@ videoStemName = {...
     videoStemSession2('TOME_3004','101416',4)};
 
 % Every subject should have entries for axialLength and sphericalAmetropia.
-eyeArgs = {'axialLength', 22.18,'sphericalAmetropia',0.5 };
+eyeArgs = {'axialLength', 24.03,'sphericalAmetropia',0.25 };
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens. See
@@ -65,11 +66,16 @@ frameSet = {...
     [ 833, 906, 1045, 1164, 1264, 1379, 1496, 1713, 1788 ], ...
     [ 444, 555, 703, 825, 913, 1044, 1200, 1291, 1420 ]};
 
+submitSceneEstimation(videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, sceneParamsX0);
+
+
 %% TOME_3005
 % no GazeCal files
 
+
 %% TOME_3006
 % no GazeCal files
+
 
 %% TOME_3007
 videoStemName = {...
@@ -112,6 +118,8 @@ frameSet = {...
     [ 484, 752, 962, 1083, 1233, 1555, 2765, 3143, 3325 ], ...
     [ 509, 670, 791, 920, 1036, 1156, 1281, 1451, 1688 ], ...
     [ 971, 1628, 1717, 1824, 2065, 2259, 2579, 2771, 3233]};
+
+
 
 %% TOME_3008
 videoStemName = {...
@@ -197,6 +205,7 @@ frameSet = {...
     [ 578, 674, 795, 1062, 1197, 1298, 1397, 1533], ...
     [ 435, 1044, 1675, 1820, 1924, 2059, 2143, 2296, 2403]};
 
+
 %% TOME_3010
 % no GazeCal files
 
@@ -217,7 +226,7 @@ sceneParamsX0 = {...
     [0         0    22.50	5.00	-0.65	142.98]};
 
 gazeTargets = {...
-    [ -7, -7, 7, 0, 0, 7, 0, 7 ; 0, 7, -7, -7, 0, 7, 7, 0]]};
+    [ -7, -7, 7, 0, 0, 7, 0, 7 ; 0, 7, -7, -7, 0, 7, 7, 0] };
 
 frameSet = {...
     [ 698, 954, 1161, 1283, 1426, 1557, 1822, 2094]};
