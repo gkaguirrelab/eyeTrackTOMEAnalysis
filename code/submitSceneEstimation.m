@@ -8,6 +8,11 @@ function submitSceneEstimation(subjectIdx)
 %% Loop over the subjectIdx
 for ss = subjectIdx
     
+    %% If there is nothing in the cell array for this subject, continue
+    if isempty(videoStemName{ss})
+        continue
+    end
+    
     
     %% Adjust gaze targets for spectacle magnification
     % A spectacle lens has the property of magnifying / minifying the visual
