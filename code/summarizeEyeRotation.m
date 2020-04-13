@@ -12,11 +12,11 @@ dropboxBaseDir = getpref('eyeTrackTOMEAnalysis','dropboxBaseDir');
 
 % Define the data directory names
 rootDir = fullfile(dropboxBaseDir,'TOME_processing');
-sessionDir = 'session1_restAndStructure';
+experimentNames = {'session1_restAndStructure','session2_spatialStimuli'};
 
 % Set up some variables to hold the measurements
-gazePoseError=nan(1,46);
-vecPoseError=nan(1,46);
+gazePoseError=nan(2,4,46);
+vecPoseError=nan(2,4,46);
 SR = nan(1,46);
 AL = nan(1,46);
 aziCenterP1 = nan(1,46);
@@ -24,48 +24,73 @@ eleCenterP1 = nan(1,46);
 aziCenterP2 = nan(1,46);
 eleCenterP2 = nan(1,46);
 
-% Assemble the dataRootDr
-dataRootDir = fullfile(rootDir,sessionDir);
-
-% Get the set of "EyeTracking" directories
-sessionListStruct=dir(fullfile(dataRootDir,'*/*/*'));
-sessionListStruct = sessionListStruct(cellfun(@(x) strcmp(x,'EyeTracking'), {sessionListStruct.name}));
-
-% Loop over the list of sessions
-for ii=1:length(sessionListStruct)
+% Loop over session types
+for ss = 1:length(experimentNames)
     
-    % Get the list of gaze sceneGeometry files in this directory
-    sessionDir = fullfile(sessionListStruct(ii).folder,sessionListStruct(ii).name);
-    fileListStruct=dir(fullfile(sessionDir,'GazeCal*sceneGeometry.mat'));
+    % Assemble the dataRootDr
+    dataRootDir = fullfile(rootDir,experimentNames{ss});
     
-    % If the list is not empty, load up the sceneGeom files and find the
-    % one with the best fVal
-    if ~isempty(fileListStruct)
+    % Get the set of "EyeTracking" directories
+    sessionListStruct=dir(fullfile(dataRootDir,'*/*/*'));
+    sessionListStruct = sessionListStruct(cellfun(@(x) strcmp(x,'EyeTracking'), {sessionListStruct.name}));
+    
+    % Loop over the list of sessions
+    for ii=1:length(sessionListStruct)
         
-        % Figure out which subject this is
-        tmp = strsplit(sessionDir,filesep);
-        sessionLabel = fullfile(tmp{end-2},tmp{end-1});
-        tmp = tmp{end-2};
-        subjectID = str2double(tmp(8:9));
+        % Get the list of gaze sceneGeometry files in this directory
+        sessionDir = fullfile(sessionListStruct(ii).folder,sessionListStruct(ii).name);
+        fileListStruct=dir(fullfile(sessionDir,'GazeCal*sceneGeometry.mat'));
+        
+        % If the list is not empty, load up the sceneGeom files and find the
+        % one with the best fVal
+        if ~isempty(fileListStruct)
+            
+            % Figure out which subject this is
+            tmp = strsplit(sessionDir,filesep);
+            sessionLabel = fullfile(tmp{end-2},tmp{end-1});
+            subjectIDtxt = tmp{end-2};
+            subjectID = str2double(subjectIDtxt(8:9));
+            
+            % Loop over any gaze cal files for this session
+            for gg = 1:length(fileListStruct)
                 
-        % Loop over any gaze cal files for this session
-        filePath = fullfile(fileListStruct.folder,fileListStruct.name);
-        load(filePath,'sceneGeometry');
+                filePath = fullfile(fileListStruct(gg).folder,fileListStruct(gg).name);
+                load(filePath,'sceneGeometry');
+                
+                aziCenterP1(subjectID) = sceneGeometry.eye.rotationCenters.azi(1);
+                aziCenterP2(subjectID) = sceneGeometry.eye.rotationCenters.azi(2);
+                eleCenterP1(subjectID) = sceneGeometry.eye.rotationCenters.ele(1);
+                eleCenterP2(subjectID) = sceneGeometry.eye.rotationCenters.ele(2);
+                AL(subjectID) = sceneGeometry.eye.meta.axialLength;
+                gazePoseError(ss,gg,subjectID) = sceneGeometry.meta.estimateSceneParams.rawErrors(3);
+                vecPoseError(ss,gg,subjectID) = sceneGeometry.meta.estimateSceneParams.rawErrors(4);
+                                
+            end
+            
+            % Report the gazeCal that has the lowest eyePose error from
+            % session 2
+            gazeVals = squeeze(gazePoseError(ss,:,subjectID));
+            vecVals = squeeze(vecPoseError(ss,:,subjectID));
+            if ~all(isnan(gazeVals))
+                [val,idx] = nanmin(gazeVals);
+                outline = sprintf([subjectIDtxt ': gazeCal0%d, gazeError = %2.2f, vecError = %2.2f \n'],idx,val,nanmin(vecVals));
+                fprintf(outline);
+            end
+        end
         
-        aziCenterP1(subjectID) = sceneGeometry.eye.rotationCenters.azi(1);
-        aziCenterP2(subjectID) = sceneGeometry.eye.rotationCenters.azi(2);
-        eleCenterP1(subjectID) = sceneGeometry.eye.rotationCenters.ele(1);
-        eleCenterP2(subjectID) = sceneGeometry.eye.rotationCenters.ele(2);
-        AL(subjectID) = sceneGeometry.eye.meta.axialLength;
-        gazePoseError(subjectID) = sceneGeometry.meta.estimateSceneParams.rawErrors(3);
-        vecPoseError(subjectID) = sceneGeometry.meta.estimateSceneParams.rawErrors(4);
     end
     
 end
 
 % Report the accuracy in fitting fixation position
-nanmedian(gazePoseError)
-nanmedian(vecPoseError)
+a = nanmedian(squeeze(nanmin(gazePoseError(1,:,:))));
+b = nanmedian(squeeze(nanmin(vecPoseError(1,:,:))));
+outline = sprintf('\nSession 1. Median best gaze error %2.2f, vec error %2.2f \n',a,b);
+fprintf(outline);
+a = nanmedian(squeeze(nanmin(gazePoseError(2,:,:))));
+b = nanmedian(squeeze(nanmin(vecPoseError(2,:,:))));
+outline = sprintf('nSession 2. Median best gaze error %2.2f, vec error %2.2f \n',a,b);
+fprintf(outline);
 
 
 % Report median rotation values
