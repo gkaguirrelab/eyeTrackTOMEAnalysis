@@ -44,10 +44,8 @@ for ss = subjectIdx
     
     
     %% Obtain the mean camera depth parameter
-    % While we have entie sceneParams, the scene estimation routine just need a
-    % reasonable estimate of camera depth. This can be the same for all scenes,
-    % and the routine will adjust this as needed in the search for each scene.
-    cameraDepth = round(mean(cellfun(@(x) x(end),sceneParamsX0{ss})));
+    % Grab the camera depth for each scene.
+    cameraDepth = cellfun(@(x) x(end),sceneParamsX0{ss}));
     
     
     %% Perform the search
