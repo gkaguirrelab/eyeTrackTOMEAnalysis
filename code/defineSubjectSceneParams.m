@@ -1,4 +1,4 @@
-function [videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, sceneParamsX0, cornealTorsion] = defineSubjectSceneParams()
+function [videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, sceneParamsX0, corneaTorsion] = defineSubjectSceneParams()
 
 
 
@@ -43,7 +43,7 @@ videoStemName{04} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{04} = {'axialLength', 24.03,'sphericalAmetropia',0.25 };
 
-cornealTorsion{04} = -27;
+corneaTorsion{04} = -27;
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens. See
@@ -97,7 +97,7 @@ videoStemName{07} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{07} = {'axialLength', 22.18,'sphericalAmetropia',0.5};
 
-cornealTorsion{07} = 84.5;
+corneaTorsion{07} = 84.5;
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -143,7 +143,7 @@ videoStemName{08} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{08} = {'axialLength', 26.05,'sphericalAmetropia',-8.5};
 
-cornealTorsion{08} = 0;
+corneaTorsion{08} = 0;
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -188,7 +188,7 @@ videoStemName{09} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{09} = {'axialLength', 24.90,'sphericalAmetropia',-3.75 };
 
-cornealTorsion{09} = 23;
+corneaTorsion{09} = 23;
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -237,7 +237,7 @@ videoStemName{11} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{11} = {'axialLength', 23.89,'sphericalAmetropia',-5.25};
 
-cornealTorsion{11} = 0.5;
+corneaTorsion{11} = 0.5;
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -265,7 +265,7 @@ videoStemName{12} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{12} = {'axialLength', 24.92,'sphericalAmetropia',-2};
 
-cornealTorsion{12} = 77.5;
+corneaTorsion{12} = 77.5;
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -309,7 +309,7 @@ videoStemName{13} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{13} = {'axialLength', 27.49,'sphericalAmetropia',-10.25};
 
-cornealTorsion{13} = 5.5;
+corneaTorsion{13} = 5.5;
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -353,7 +353,7 @@ videoStemName{14} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{14} = {'axialLength', 24.79,'sphericalAmetropia',-2};
 
-cornealTorsion{14} = 0;
+corneaTorsion{14} = 0;
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -398,7 +398,7 @@ videoStemName{15} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{15} = {'axialLength', 23.45,'sphericalAmetropia',-0.5};
 
-cornealTorsion{15} = 1;
+corneaTorsion{15} = 1;
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -442,7 +442,7 @@ videoStemName{16} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{16} = {'axialLength', 22.69,'sphericalAmetropia',-1.25};
 
-cornealTorsion{16} = 0;
+corneaTorsion{16} = 0;
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.

@@ -2,7 +2,7 @@ function submitSceneEstimation(subjectIdx)
 
 
 %% Obtain the scene analysis parameters
-[videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, sceneParamsX0, cornealTorsion] = defineSubjectSceneParams;
+[videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, sceneParamsX0, corneaTorsion] = defineSubjectSceneParams;
 
 
 %% Loop over the subjectIdx
@@ -53,7 +53,7 @@ for ss = subjectIdx
     estimateSceneParams(videoStemName{ss}, frameSet{ss}, gazeTargets{ss}, ...
         'searchStrategy','gazeCal',...
         'cameraDepth',cameraDepth,'cameraTorsion',cameraTorsion,...
-        'cornealTorsion',cornealTorsion{ss},...
+        'corneaTorsion',corneaTorsion{ss},...
         'eyeArgs',eyeArgs{ss},'sceneArgs',sceneArgs{ss});
     
 end % Loop over subjects
