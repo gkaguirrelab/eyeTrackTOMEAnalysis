@@ -2,7 +2,7 @@ function submitSceneEstimation(subjectIdx)
 
 
 %% Obtain the scene analysis parameters
-[videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, sceneParamsX0] = defineSubjectSceneParams;
+[videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, sceneParamsX0, corneaTorsion] = defineSubjectSceneParams;
 
 
 %% Loop over the subjectIdx
@@ -43,14 +43,17 @@ for ss = subjectIdx
     end
     
     
-    %% Obtain the mean camera depth parameter
+    %% Obtain camera depth and cameraTorsion vectors
     % Grab the camera depth for each scene.
-    cameraDepth = cellfun(@(x) x(end),sceneParamsX0{ss}));
+    cameraDepth = cellfun(@(x) x(end),sceneParamsX0{ss});
+    cameraTorsion = cellfun(@(x) x(3),sceneParamsX0{ss});
     
     
     %% Perform the search
     estimateSceneParams(videoStemName{ss}, frameSet{ss}, gazeTargets{ss}, ...
-        'searchStrategy','gazeCal','cameraDepth',cameraDepth,...
+        'searchStrategy','gazeCal',...
+        'cameraDepth',cameraDepth,'cameraTorsion',cameraTorsion,...
+        'corneaTorsion',corneaTorsion{ss},...
         'eyeArgs',eyeArgs{ss},'sceneArgs',sceneArgs{ss});
     
 end % Loop over subjects
