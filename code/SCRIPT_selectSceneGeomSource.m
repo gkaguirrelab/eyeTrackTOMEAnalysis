@@ -182,7 +182,7 @@ for ss = 1:length(subjectIndexList)
                     plot([round(imSize(2)/2),round(imSize(2)/2)],[1 imSize(1)],'-b');
                     
                     % Add a text label to name the acquisition
-                    text(40,40,fmriAcqList(gg).name,'FontSize',24,'Color','y','Interpreter','none');
+                    text(40,40,fmriAcqList(aa).name,'FontSize',24,'Color','y','Interpreter','none');
                     
                     % Add a text label to indicate the frame number
                     str = sprintf('frame = %d',absIdx);
