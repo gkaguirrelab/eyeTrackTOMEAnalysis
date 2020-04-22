@@ -176,6 +176,10 @@ for ss = 1:length(subjectIndexList)
                     
                     % Add a text label to name the acquisition
                     text(40,40,fmriAcqList(gg).name,'FontSize',24,'Color','y','Interpreter','none');
+
+                    % Add a text label to indicate the frame number
+                    str = sprintf('frame = %d',absIdx);
+                    text(40,80,str,'FontSize',24,'Color','w','Interpreter','none');
                     
                     % Get the frame
                     drawnow
