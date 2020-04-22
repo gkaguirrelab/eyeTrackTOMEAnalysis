@@ -117,11 +117,11 @@ for ss = 1:length(subjectIndexList)
                 plot([round(imSize(2)/2),round(imSize(2)/2)],[1 imSize(1)],'-b');
                 
                 % Add a text label to indicate the gazeCal
-                text(40,40,gazeSceneGeomList(gg).name,'FontSize',16,'Color','y','Interpreter','none');
+                text(40,40,gazeSceneGeomList(gg).name,'FontSize',24,'Color','y','Interpreter','none');
                 
                 % Add a text label to indicate the fVal
                 str = sprintf('fVal = %2.4f',sceneGeometry.meta.estimateSceneParams.fVal);
-                text(40,80,str,'FontSize',16,'Color','w','Interpreter','none');
+                text(40,80,str,'FontSize',24,'Color','w','Interpreter','none');
                 
                 % Get the frame
                 drawnow
@@ -175,7 +175,7 @@ for ss = 1:length(subjectIndexList)
                     plot([round(imSize(2)/2),round(imSize(2)/2)],[1 imSize(1)],'-b');
                     
                     % Add a text label to name the acquisition
-                    text(40,40,fmriAcqList(gg).name,'FontSize',16,'Color','y','Interpreter','none');
+                    text(40,40,fmriAcqList(gg).name,'FontSize',24,'Color','y','Interpreter','none');
                     
                     % Get the frame
                     drawnow
