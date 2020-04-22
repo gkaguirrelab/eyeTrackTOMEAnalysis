@@ -98,18 +98,20 @@ for ss = 1:length(subjectIndexList)
                 videoFileName = fullfile(gazeSceneGeomList(gg).folder,strrep(gazeSceneGeomList(gg).name,'_sceneGeometry.mat','_gray.avi'));
                 videoFrame = makeMedianVideoImage(videoFileName,'startFrame',absIdx,'nFrames',1);
                 
-                % Empty the framesToMontage varable
-                if gg==1
-                    imSize = size(videoFrame);
-                    dims = [imSize 3 4];
-                    framesToMontage = uint8(zeros(dims)+128);
-                end
-                
                 % Activate the invisible figure
                 set(0, 'CurrentFigure', tmpFigHandle)
                 
                 % Show the frame
                 imshow(uint8(videoFrame),'Border', 'tight');
+                
+                % Empty the framesToMontage varable
+                if gg==1
+                    % Make it pixel-for-pixel
+                    truesize(tmpFigHandle)
+                    imSize = size(videoFrame);
+                    dims = [imSize 3 4];
+                    framesToMontage = uint8(zeros(dims)+128);
+                end
                 
                 % Add cross-hairs
                 hold on;
@@ -133,6 +135,8 @@ for ss = 1:length(subjectIndexList)
             
             % Get the montage image
             tmpHandle = montage(framesToMontage);
+            
+            % Save the montage image
             selectionMontage(:,:,:,1) = tmpHandle.CData;
             
             % Set up a figure that will display the selection montage, and
@@ -168,6 +172,9 @@ for ss = 1:length(subjectIndexList)
                     % Show the frame
                     imshow(uint8(videoFrame),'Border', 'tight');
                     
+                    % Make it pixel-for-pixel
+                    truesize(tmpFigHandle)
+                    
                     % Add cross-hairs
                     hold on;
                     imSize = size(videoFrame);
@@ -176,7 +183,7 @@ for ss = 1:length(subjectIndexList)
                     
                     % Add a text label to name the acquisition
                     text(40,40,fmriAcqList(gg).name,'FontSize',24,'Color','y','Interpreter','none');
-
+                    
                     % Add a text label to indicate the frame number
                     str = sprintf('frame = %d',absIdx);
                     text(40,80,str,'FontSize',24,'Color','w','Interpreter','none');
@@ -198,12 +205,15 @@ for ss = 1:length(subjectIndexList)
                     % Show the selection image
                     imshow(selectionImage,'Border', 'tight');
                     
+                    % Make it pixel-for-pixel
+                    truesize(figHandle)
+                    
                     % Prompt the user to select a gazeCal
-                    pos = get(gcf, 'Position');
+                    selectImageSize = size(selectionImage);
                     roi = drawpoint();
                     
-                    xFrame = ceil(roi.Position(1)/pos(3)*2);
-                    yFrame = ceil(roi.Position(2)/pos(4));
+                    xFrame = ceil(roi.Position(1)/(selectImageSize(2)/4));
+                    yFrame = ceil(roi.Position(2)/(selectImageSize(1)/2));
                     
                     % Handle while behavior depending upon the click
                     % position
