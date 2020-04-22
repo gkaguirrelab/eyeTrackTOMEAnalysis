@@ -38,6 +38,13 @@ subjectChoice = input('\nYour choice: ','s');
 % This is an array of indices that refer back to the subjectList
 subjectIndexList = eval(subjectChoice);
 
+% Make an invisible figure
+tmpFigHandle = figure('Visible','off');
+
+% Set up a figure that will display the selection montage, and
+% the acquisition to be matched
+figHandle = figure();
+
 % Loop through the selected subjects
 for ss = 1:length(subjectIndexList)
     
@@ -78,10 +85,7 @@ for ss = 1:length(subjectIndexList)
         
         % If there are decisions to make, let's get going
         if length(gazeSceneGeomList)>1 && ~isempty(fmriAcqList)
-            
-            % Make an invisible figure
-            tmpFigHandle = figure('Visible','off');
-            
+                        
             % Loop through the sceneGeometry files and identify the frame
             % corresponding to the fixation condition
             for gg = 1:length(gazeSceneGeomList)
@@ -123,7 +127,7 @@ for ss = 1:length(subjectIndexList)
                 
                 % Add a text label to indicate the fVal
                 str = sprintf('fVal = %2.4f',sceneGeometry.meta.estimateSceneParams.fVal);
-                text(40,80,str,'FontSize',24,'Color','w','Interpreter','none');
+                text(40,80,str,'FontSize',36,'Color','w','Interpreter','none');
                 
                 % Get the frame
                 drawnow
@@ -138,11 +142,7 @@ for ss = 1:length(subjectIndexList)
             
             % Save the montage image
             selectionMontage(:,:,:,1) = tmpHandle.CData;
-            
-            % Set up a figure that will display the selection montage, and
-            % the acquisition to be matched
-            figHandle = figure();
-            
+                        
             % Loop over the acquisitions
             for aa = 1:length(fmriAcqList)
                 
@@ -246,4 +246,10 @@ for ss = 1:length(subjectIndexList)
         end
         
     end % loop over session dates
+
 end % loop over subjects
+
+% Close the figures
+close(tmpFigHandle);
+close(figHandle);
+
