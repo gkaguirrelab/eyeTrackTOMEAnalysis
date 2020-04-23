@@ -119,8 +119,8 @@ for ss = 1:length(subjectIndexList)
                 
                 % Add cross-hairs
                 hold on;
-                plot([1 imSize(2)],[round(imSize(1)/2),round(imSize(1)/2)],'-b');
-                plot([round(imSize(2)/2),round(imSize(2)/2)],[1 imSize(1)],'-b');
+                plot([1 imSize(2)],[round(imSize(1)/2),round(imSize(1)/2)],'-b','LineWidth',2);
+                plot([round(imSize(2)/2),round(imSize(2)/2)],[1 imSize(1)],'-b','LineWidth',2);
                 
                 % Add a text label to indicate the gazeCal
                 text(40,40,gazeSceneGeomList(gg).name,'FontSize',24,'Color','y','Interpreter','none');
