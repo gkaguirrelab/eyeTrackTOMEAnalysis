@@ -53,9 +53,9 @@ for ss = subjectIdx
     if isempty(kvals{ss})
         % The mean corneal curvature in the TOME subjects, with 0 corneal
         % torsion, and 2.5 degrees of tilt
-        model.eye.x0 = [43.399, 44.33653846, 0, 2.5, 0, 1, 1];        
+        model.eye.x0 = [43.399, 44.33653846, 0, 2.5, 0, 0.91, 1.07];        
     else
-        model.eye.x0 = [kvals{ss}, 2.5, 0, 1, 1];
+        model.eye.x0 = [kvals{ss}, 2.5, 0, 0.91, 1.07];
     end
     model.eye.bounds = [0, 0, 0, 0, 0, 0.25, 0.25];
 
