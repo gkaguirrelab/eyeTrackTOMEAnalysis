@@ -17,12 +17,17 @@ experimentNames = {'session1_restAndStructure','session2_spatialStimuli'};
 % Set up some variables to hold the measurements
 gazePoseError=nan(2,4,46);
 vecPoseError=nan(2,4,46);
+
+
+
 SR = nan(1,46);
 AL = nan(1,46);
 aziCenterP1 = nan(1,46);
 eleCenterP1 = nan(1,46);
 aziCenterP2 = nan(1,46);
 eleCenterP2 = nan(1,46);
+
+cornealAstigmatism = nan(1,46);
 
 % Loop over session types
 for ss = 1:length(experimentNames)
@@ -62,9 +67,11 @@ for ss = 1:length(experimentNames)
                 eleCenterP1(subjectID) = sceneGeometry.eye.rotationCenters.ele(1);
                 eleCenterP2(subjectID) = sceneGeometry.eye.rotationCenters.ele(2);
                 AL(subjectID) = sceneGeometry.eye.meta.axialLength;
-                gazePoseError(ss,gg,subjectID) = sceneGeometry.meta.estimateSceneParams.rawErrors(3);
-                vecPoseError(ss,gg,subjectID) = sceneGeometry.meta.estimateSceneParams.rawErrors(4);
-                                
+                gazePoseError(ss,gg,subjectID) = sceneGeometry.meta.estimateSceneParams.obj.rawErrors(3);
+                vecPoseError(ss,gg,subjectID) = sceneGeometry.meta.estimateSceneParams.obj.rawErrors(4);
+
+                cornealAstigmatism(subjectID) = sceneGeometry.eye.cornea.kvals(2) - sceneGeometry.eye.cornea.kvals(1);
+                
             end
             
             % Report the gazeCal that has the lowest eyePose error from
