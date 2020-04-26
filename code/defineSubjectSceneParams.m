@@ -1,4 +1,4 @@
-function [videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, sceneParamsX0, corneaTorsion] = defineSubjectSceneParams()
+function [videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, sceneParamsX0, kvals] = defineSubjectSceneParams()
 
 
 
@@ -43,7 +43,7 @@ videoStemName{04} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{04} = {'axialLength', 24.03,'sphericalAmetropia',0.25 };
 
-corneaTorsion{04} = -27;
+kvals{04} = {[43.22,43.58,17]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens. See
@@ -97,7 +97,7 @@ videoStemName{07} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{07} = {'axialLength', 22.18,'sphericalAmetropia',0.5};
 
-corneaTorsion{07} = 84.5;
+kvals{07} = {[44.33,45.18,85]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -143,7 +143,7 @@ videoStemName{08} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{08} = {'axialLength', 26.05,'sphericalAmetropia',-8.5};
 
-corneaTorsion{08} = 0;
+kvals{08} = {};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -188,7 +188,7 @@ videoStemName{09} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{09} = {'axialLength', 24.90,'sphericalAmetropia',-3.75 };
 
-corneaTorsion{09} = 23;
+kvals{09} = {[44.26,44.88,23]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -237,7 +237,7 @@ videoStemName{11} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{11} = {'axialLength', 23.89,'sphericalAmetropia',-5.25};
 
-corneaTorsion{11} = 0.5;
+kvals{11} = {[45.58,46.33,1]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -265,7 +265,7 @@ videoStemName{12} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{12} = {'axialLength', 24.92,'sphericalAmetropia',-2};
 
-corneaTorsion{12} = 77.5;
+kvals{12} = {[43.55,43.98,78]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -309,7 +309,7 @@ videoStemName{13} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{13} = {'axialLength', 27.49,'sphericalAmetropia',-10.25};
 
-corneaTorsion{13} = 5.5;
+kvals{13} = {[41.59,43.58,6]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -353,7 +353,7 @@ videoStemName{14} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{14} = {'axialLength', 24.79,'sphericalAmetropia',-2};
 
-corneaTorsion{14} = 0;
+kvals{14} = {};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -398,7 +398,7 @@ videoStemName{15} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{15} = {'axialLength', 23.45,'sphericalAmetropia',-0.5};
 
-corneaTorsion{15} = 1;
+kvals{15} = {[41.85,42.88,1]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -442,7 +442,7 @@ videoStemName{16} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{16} = {'axialLength', 22.69,'sphericalAmetropia',-1.25};
 
-corneaTorsion{16} = 0;
+kvals{16} = {};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -482,7 +482,7 @@ videoStemName{17} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{17} = {'axialLength', 22.9,'sphericalAmetropia',0.75};
 
-corneaTorsion{17} = 0;
+kvals{17} = {};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -526,7 +526,7 @@ videoStemName{18} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{18} = {'axialLength', 24.83,'sphericalAmetropia',-1};
 
-corneaTorsion{18} = 43;
+kvals{18} = {[43.38,43.61,43]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -568,7 +568,7 @@ videoStemName{19} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{19} = {'axialLength', 25.35,'sphericalAmetropia',-0.5};
 
-corneaTorsion{19} = 7;
+kvals{19} = {[38.82,39.59,7]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -600,7 +600,7 @@ videoStemName{20} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{20} = {'axialLength', 25.35,'sphericalAmetropia',-1.5};
 
-corneaTorsion{20} = 21.5;
+kvals{20} = {[41.24,41.67,13]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -644,7 +644,7 @@ videoStemName{21} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{21} = {'axialLength', 25.29,'sphericalAmetropia',-5.25};
 
-corneaTorsion{21} = 9;
+kvals{21} = {[45.16,46.40,9]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -688,7 +688,7 @@ videoStemName{22} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{22} = {'axialLength', 22.64,'sphericalAmetropia',0};
 
-corneaTorsion{22} = 0;
+kvals{22} = {};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -732,7 +732,7 @@ videoStemName{23} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{23} = {'axialLength', 26.54,'sphericalAmetropia',-6};
 
-corneaTorsion{23} = 3;
+kvals{23} = {[42.72,43.16,3]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -768,7 +768,7 @@ videoStemName{24} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{24} = {'axialLength', 25.47,'sphericalAmetropia',-2};
 
-corneaTorsion{24} = 0;
+kvals{24} = {};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -813,7 +813,7 @@ videoStemName{25} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{25} = {'axialLength', 24.18,'sphericalAmetropia',-0.75};
 
-corneaTorsion{25} = 17;
+kvals{25} = {[42.11,43.19,17]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -858,7 +858,7 @@ videoStemName{26} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{26} = {'axialLength', 25.35,'sphericalAmetropia',-5};
 
-corneaTorsion{26} = 0;
+kvals{26} = {};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -906,7 +906,7 @@ videoStemName{28} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{28} = {'axialLength', 23.45,'sphericalAmetropia',-0.75};
 
-corneaTorsion{28} = 4;
+kvals{28} = {[44.38,45.43,4]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -950,7 +950,7 @@ videoStemName{29} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{29} = {'axialLength', 22.44,'sphericalAmetropia',0.5};
 
-corneaTorsion{29} = 2;
+kvals{29} = {[43.52,44.44,2]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -993,7 +993,7 @@ videoStemName{30} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{30} = {'axialLength', 22.88,'sphericalAmetropia',0.25};
 
-corneaTorsion{30} = 36.5;
+kvals{30} = {[45.42,45.58,37]};
 	
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1031,7 +1031,7 @@ videoStemName{31} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{31} = {'axialLength', 24.06,'sphericalAmetropia',-0.25};
 
-corneaTorsion{31} = 6;
+kvals{31} = {[42.08,42.56,6]};
 	
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1075,7 +1075,7 @@ videoStemName{32} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{32} = {'axialLength', 23.67,'sphericalAmetropia',0.5};
 
-corneaTorsion{32} = 6.5;
+kvals{32} = {[42.61,43.72,173]};
 	
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1119,7 +1119,7 @@ videoStemName{33} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{33} = {'axialLength', 23.73,'sphericalAmetropia',-0.25};
 
-corneaTorsion{33} = 10.5;
+kvals{33} = {[42.94,43.41,11]};
 	
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1159,7 +1159,7 @@ videoStemName{34} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{34} = {'axialLength', 24.01,'sphericalAmetropia',-1.75};
 
-corneaTorsion{34} = 7;
+kvals{34} = {[45.49,45.86,166]};
 	
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1203,7 +1203,7 @@ videoStemName{35} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{35} = {'axialLength', 24.5,'sphericalAmetropia',0.25};
 
-corneaTorsion{35} = 1;
+kvals{35} = {[41.29,42.32,1]};
 	
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1247,7 +1247,7 @@ videoStemName{36} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{36} = {'axialLength', 25.7,'sphericalAmetropia',-5.25};
 
-corneaTorsion{36} = 15.5;
+kvals{36} = {[41.87,42.91,16]};
 	
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1291,7 +1291,7 @@ videoStemName{37} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{37} = {'axialLength', 23.56,'sphericalAmetropia',-1};
 
-corneaTorsion{37} = 26;
+kvals{37} = {[45.61,45.86,26]};
 	
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1336,7 +1336,7 @@ videoStemName{38} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{38} = {'axialLength', 22.17,'sphericalAmetropia',-1};
 
-corneaTorsion{38} = 25.5;
+kvals{38} = {[46.40,47.08,26]};
 	
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1379,7 +1379,7 @@ videoStemName{39} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{39} = {'axialLength', 23.39,'sphericalAmetropia',-0.5};
 	
-corneaTorsion{39} = 9;
+kvals{39} = {[43.69,44.50,9]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1415,7 +1415,7 @@ videoStemName{40} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{40} = {'axialLength', 22.11,'sphericalAmetropia',0.25};
 	
-corneaTorsion{40} = 12.5;
+kvals{40} = {[45.92,46.91,13]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1458,7 +1458,7 @@ videoStemName{42} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{42} = {'axialLength', 24.23,'sphericalAmetropia',-1.5};
 	
-corneaTorsion{42} = 7;
+kvals{42} = {[43.14,44.68,7]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1502,7 +1502,7 @@ videoStemName{43} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{43} = {'axialLength', 21.89,'sphericalAmetropia',3.5};
 	
-corneaTorsion{43} = 7.5;
+kvals{43} = {[43.30,43.84,8]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1542,7 +1542,7 @@ videoStemName{44} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{44} = {'axialLength', 24.85,'sphericalAmetropia',-5};
 	
-corneaTorsion{44} = 5.5;
+kvals{44} = {[43.44,44.83,6]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1586,7 +1586,7 @@ videoStemName{45} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{45} = {'axialLength', 26.24,'sphericalAmetropia',-6.25};
 	
-corneaTorsion{45} = 18;
+kvals{45} = {[43.35,44.12,18]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
@@ -1627,7 +1627,7 @@ videoStemName{46} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{46} = {'axialLength', 26.57,'sphericalAmetropia',-5.25};
 	
-corneaTorsion{46} = 16;
+kvals{46} = {[42.70,43.75,16]};
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.

@@ -2,7 +2,7 @@ function submitSceneEstimation(subjectIdx)
 
 
 %% Obtain the scene analysis parameters
-[videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, sceneParamsX0, corneaTorsion] = defineSubjectSceneParams;
+[videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, sceneParamsX0, kvals] = defineSubjectSceneParams;
 
 
 %% Loop over the subjectIdx
@@ -43,17 +43,27 @@ for ss = subjectIdx
     end
     
     
-    %% Obtain camera depth and cameraTorsion vectors
-    % Grab the camera depth for each scene.
+    %% Obtain camera depth and torsion for each scene.
     cameraDepth = cellfun(@(x) x(end),sceneParamsX0{ss});
     cameraTorsion = cellfun(@(x) x(3),sceneParamsX0{ss});
+
     
+    %% Assemble the eye x0 params using the passed kvals
+    if isempty(kvals{ss})
+        % The mean corneal curvature in the TOME subjects, with 0 corneal
+        % torsion, and 2.5 degrees of tilt
+        model.eye.x0 = [43.399, 44.33653846, 0, 2.5, 0, 1, 1];        
+    else
+        model.eye.x0 = [kvals{ss}, 2.5, 0, 1, 1];
+    end
+    model.eye.bounds = [0, 0, 0, 0, 0, 0.25, 0.25];
+
     
     %% Perform the search
     estimateSceneParams(videoStemName{ss}, frameSet{ss}, gazeTargets{ss}, ...
         'searchStrategy','gazeCal',...
         'cameraDepth',cameraDepth,'cameraTorsion',cameraTorsion,...
-        'corneaTorsion',corneaTorsion{ss},...
+        'model',model,...
         'eyeArgs',eyeArgs{ss},'sceneArgs',sceneArgs{ss});
     
 end % Loop over subjects
