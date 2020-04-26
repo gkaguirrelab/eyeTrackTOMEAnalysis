@@ -49,6 +49,7 @@ for ss = subjectIdx
 
     
     %% Assemble the eye x0 params using the passed kvals
+    model=[];
     if isempty(kvals{ss})
         % The mean corneal curvature in the TOME subjects, with 0 corneal
         % torsion, and 2.5 degrees of tilt
