@@ -149,7 +149,8 @@ xlabel('Azimuth depth');
 ylabel('Elevation depth');
 b = robustfit(-aziCenterP1(idx),-eleCenterP1(idx));
 plot(8:15,b(1)+b(2).*(8:15),'r','LineWidth',0.5)
-title('Azimuth vs elevation rotation centers across subjects');
+str = sprintf('Azimuth vs elevation rotation centers across subjects, slope=%2.2f',b(2));
+title(str);
 
 subplot(1,2,2);
 meanRotationDeth = mean([aziCenterP1;aziCenterP1]);
