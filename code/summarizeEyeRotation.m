@@ -71,6 +71,15 @@ for ss = 1:length(experimentNames)
                 vecPoseError(ss,gg,subjectID) = sceneGeometry.meta.estimateSceneParams.obj.rawErrors(4);
 
                 cornealAstigmatism(subjectID) = sceneGeometry.eye.cornea.kvals(2) - sceneGeometry.eye.cornea.kvals(1);
+
+                % Report if a given gazeCal is missing a [0;0] fixation
+                % position
+%                 gazeTargets = sceneGeometry.meta.estimateSceneParams.obj.gazeTargets;
+%                 idx = logical((gazeTargets(1,:)==0).*(gazeTargets(2,:)==0));
+%                 if ~any(idx)
+%                     outline = sprintf([experimentNames{ss} ', ' subjectIDtxt ': ' fileListStruct(gg).name ' lacks a fixation gaze target \n']);
+%                     fprintf(outline);
+%                 end
                 
             end
             
@@ -81,7 +90,7 @@ for ss = 1:length(experimentNames)
             if ~all(isnan(gazeVals))
                 [val,idx] = nanmin(gazeVals);
                 outline = sprintf([subjectIDtxt ': gazeCal0%d, gazeError = %2.2f, vecError = %2.2f \n'],idx,val,nanmin(vecVals));
-                fprintf(outline);
+%                fprintf(outline);
             end
         end
         
