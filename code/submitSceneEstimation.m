@@ -60,11 +60,16 @@ for ss = subjectIdx
     end
 
     
+    %% Constrain the eyePose bounds in the errorArgs
+    errorArgs = {'eyePoseUB',[25,25,0,4],'eyePoseLB',[-25,-25,0,0.5]}; 
+
+    
     %% Perform the search
     estimateSceneParams(videoStemName{ss}, frameSet{ss}, gazeTargets{ss}, ...
         'searchStrategy','gazeCal',...
         'cameraDepth',cameraDepth,'cameraTorsion',cameraTorsion,...
         'model',model,...
+        'errorArgs',errorArgs,...
         'eyeArgs',eyeArgs{ss},'sceneArgs',sceneArgs{ss});
     
 end % Loop over subjects
