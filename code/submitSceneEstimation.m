@@ -58,6 +58,7 @@ for ss = subjectIdx
         model.eye.bounds = [3, 3, 180, 5, 2.5, 0.25, 0.25];
     else
         model.eye.x0 = [kvals{ss}, 2.5, 0, 0.91, 0.94];
+        model.eye.x0 = [kvals{ss}, 2.5, 0, 0.84, 0.94];
     end
 
     
