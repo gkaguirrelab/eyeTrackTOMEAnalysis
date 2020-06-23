@@ -14,6 +14,10 @@ for ss = subjectIdx
     end
     
     
+    %% Anounce we are working on the next subject
+    fprintf('\nEstimating scene parameters for subject %d \n',ss);
+    
+    
     %% Adjust gaze targets for spectacle magnification
     % A spectacle lens has the property of magnifying / minifying the visual
     % world from the perspective of the eye. This alteration scales the
