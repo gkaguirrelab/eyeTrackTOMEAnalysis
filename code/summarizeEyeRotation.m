@@ -90,7 +90,7 @@ for ss = 1:length(experimentNames)
             if ~all(isnan(gazeVals))
                 [val,idx] = nanmin(gazeVals);
                 outline = sprintf([subjectIDtxt ': gazeCal0%d, gazeError = %2.2f, vecError = %2.2f \n'],idx,val,nanmin(vecVals));
-%                fprintf(outline);
+                fprintf(outline);
             end
         end
         
