@@ -63,6 +63,9 @@ for ss = subjectIdx
         model.eye.x0 = [kvals{ss}, 2.5, 0, 0.91, 0.94, 0];
     end
 
+    if length(sceneParamsX0{ss})==1
+        model.scene.x0 = sceneParamsX0{ss}{1};
+    end
     
     %% Constrain the eyePose bounds in the errorArgs
     errorArgs = {'eyePoseUB',[25,25,0,4],'eyePoseLB',[-25,-25,0,0.5]}; 
