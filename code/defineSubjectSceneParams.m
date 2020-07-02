@@ -1632,21 +1632,21 @@ frameSet{45} = {...
 %% TOME_3046
 videoStemName{46} = {...
     videoStemSession1('TOME_3046','041019')};
-    % no session 2 GazeCal params
-    
+% no session 2 GazeCal params
+
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{46} = {'axialLength', 26.57,'sphericalAmetropia',-5.25};
-	
+
 kvals{46} = [42.70,43.75,16];
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
 sceneArgs{46} = {...
-    {'spectacleLens', -5.5}};    
+    {'spectacleLens', -5.5}};
 
 % The order of parameters here is [0 0 torsion translationX translationY depth]
 sceneParamsX0{46} = {...
-    [0         0	-4  	0.50	-7.00	140]};
+    [0         0	-4  	0.50	-7.00	160]};
 
 gazeTargets{46} = {...
     [ -7, 7, 7, 7, -7, 0, 0, -7, 0 ; 0, 7, -7, 0, -7, 0, -7, 7, 7]};
