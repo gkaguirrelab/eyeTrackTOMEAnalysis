@@ -28,9 +28,9 @@ for ss = subjectIdx
     for ii = 1:length(sceneArgs{ss})
         
         % Determine if this scene has a spectacle lens specified (which is
-        % assumed to be on both eyes) or a fixSpectaleLens (which is assumed to
-        % just be on the eye that is not being observed with the infrared
-        % camera)
+        % assumed to be on both eyes) or a fixSpectaleLens (which is
+        % assumed to just be on the eye that is not being observed with the
+        % infrared camera)
         theseArgs = sceneArgs{ss}{ii};
         idx = find(or(strcmp(theseArgs,{'spectacleLens'}),strcmp(theseArgs,{'fixSpectacleLens'})));
         if ~isempty(idx)
