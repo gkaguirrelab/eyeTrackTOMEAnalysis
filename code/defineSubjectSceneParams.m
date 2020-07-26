@@ -609,8 +609,7 @@ videoStemName{20} = {...
 % Every subject should have entries for axialLength and sphericalAmetropia.
 eyeArgs{20} = {'axialLength', 25.35,'sphericalAmetropia',-1.5};
 
-%kvals{20} = [41.24,41.67,13];
-kvals{20} = {};
+kvals{20} = [41.24,41.67,13];
 
 % The sceneArgs should have entries for each scene. The only entries that
 % are needed are for spectacleLens, contactLens, fixSpectacleLens.
