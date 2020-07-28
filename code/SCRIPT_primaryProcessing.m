@@ -164,7 +164,7 @@ end
 %% Ask the operator which project they would like to process
 choiceList = projectList;
 fprintf('Select a project:\n')
-for pp=1:length(choiceList)
+for pp=1:size(choiceList,1)
     optionName=['\t' char(pp+96) '. ' choiceList{pp} '\n'];
     fprintf(optionName);
 end
@@ -182,7 +182,7 @@ subjectList = unique(paramsTable{strcmp(paramsTable.projectSubfolder, pathParams
 %% Ask the operator which subject(s) they would like to process
 choiceList = subjectList;
 fprintf('\n\nSelect the subjects to process:\n')
-for pp=1:length(choiceList)
+for pp=1:size(choiceList,1)
     optionName=['\t' num2str(pp) '. ' choiceList{pp} '\n'];
     fprintf(optionName);
 end
