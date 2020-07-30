@@ -58,10 +58,10 @@ for ss = subjectIdx
         % torsion, and 2.5 degrees of tilt
 
         model.eye.x0 = [14.104, 43.399, 44.33653846, 0, 2.5, 0, 0.91, 0.94, 0];
-        model.eye.bounds = [3, 5, 5, 180, 5, 2.5, 0.25, 0.25, 30];
+        model.eye.bounds = [5, 5, 5, 180, 5, 2.5, 0.25, 0.25, 30];
     else
         model.eye.x0 = [14.104, kvals{ss}, 2.5, 0, 0.91, 0.94, 0];
-        model.eye.bounds = [3, 5, 5, 180, 5, 2.5, 0.25, 0.25, 30];
+        model.eye.bounds = [5, 5, 5, 180, 5, 2.5, 0.25, 0.25, 30];
     end
 
     
