@@ -142,28 +142,30 @@ idx = logical(double(~isnan(aziCenterP1)) .* double(~isnan(eleCenterP1)));
 h = scatter(-aziCenterP1(idx),-eleCenterP1(idx),'o','MarkerFaceColor','b','MarkerEdgeColor','none');
 h.MarkerFaceAlpha = 0.25;
 hold on
-xlim([8 16]);
-ylim([8 16]);
+xlim([10 16]);
+ylim([10 16]);
 axis square
 xlabel('Azimuth depth');
 ylabel('Elevation depth');
-b = robustfit(-aziCenterP1(idx),-eleCenterP1(idx));
-plot(8:15,b(1)+b(2).*(8:15),'r','LineWidth',0.5)
-str = sprintf('Azimuth vs elevation rotation centers across subjects, slope=%2.2f',b(2));
-title(str);
+[b, aziEleCorrStats] = robustfit(-aziCenterP1(idx),-eleCenterP1(idx));
+[rho,pval] = corr(-aziCenterP1(idx)',-eleCenterP1(idx)');
+plot(12:16,b(1)+b(2).*(12:16),'r','LineWidth',0.5)
+str = sprintf('slope=%2.2f, r=%2.2f, p=%2.2f',b(2),rho,pval);
+title({'Azi vs. ele centers',str});
 
 subplot(1,2,2);
 meanRotationDeth = mean([aziCenterP1;aziCenterP1]);
-h = scatter(AL(idx),-meanRotationDeth(idx),'o','MarkerFaceColor','b','MarkerEdgeColor','none');
+h = scatter(-meanRotationDeth(idx),AL(idx),'o','MarkerFaceColor','b','MarkerEdgeColor','none');
 h.MarkerFaceAlpha = 0.25;
 hold on
-xlim([20 28]);
-ylim([8 16]);
+xlim([10 17]);
+ylim([21 28]);
 axis square
-xlabel('Axial legnth [mm]');
-ylabel('Mean rotation depth [mm]');
-title('Mean rotation depth vs. axial length across subjectsa');
-b = robustfit(AL(idx),-meanRotationDeth(idx));
-plot(20:28,b(1)+b(2).*(20:28),'r','LineWidth',0.5)
-
+xlabel('Mean rotation depth [mm]');
+ylabel('Axial legnth [mm]');
+[b, axialLengthStats] = robustfit(-meanRotationDeth(idx),AL(idx));
+[rho,pval] = corr(-meanRotationDeth(idx)',AL(idx)');
+plot(12:16,b(1)+b(2).*(12:16),'r','LineWidth',0.5)
+str=sprintf('slope=%2.2f, r=%2.2f, p=%2.2f',b(2),rho,pval);
+title({'Rotation depth vs. axial length',str});
 
