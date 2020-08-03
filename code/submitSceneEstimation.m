@@ -64,6 +64,11 @@ for ss = subjectIdx
         model.eye.bounds = [5, 5, 5, 180, 5, 2.5, 0.25, 0.25, 30];
     end
 
+    %% Special case for TOME_3046
+    if ss==46
+        model.scene.x0 = [0, 0, cameraTorsion, -2.88, -8.00, cameraDepth ];
+    end
+    
     
     %% Constrain the eyePose bounds in the errorArgs
     errorArgs = {'eyePoseUB',[25,25,0,4],'eyePoseLB',[-25,-25,0,0.5]}; 
