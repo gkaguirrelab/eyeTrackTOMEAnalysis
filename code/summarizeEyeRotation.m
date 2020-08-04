@@ -105,7 +105,7 @@ fprintf('Median azimuth rotation center in mm (P1, P2): %2.2f, %2.2f \n', nanmed
 fprintf('Median elevation rotation center in mm (P1, P2): %2.2f, %2.2f \n', nanmedian(eleCenterP1),nanmedian(eleCenterP2));
 
 
-% Figure 2 -- Azi and Ele values, medians and IQRs
+% Figure 1 -- Azi and Ele values, medians and IQRs
 figure
 idx = ~isnan(aziCenterP1);
 h = scatter(zeros(1,sum(idx))+0.5,-aziCenterP1(idx),200,'o','MarkerFaceColor','k','MarkerEdgeColor','k');
@@ -129,12 +129,12 @@ m = median(-eleCenterP1(idx));
 q = iqr(-eleCenterP1(idx))/2;
 plot(2,m,'xr')
 plot([2 2],[m+q m-q],'-r');
-ylim([0 15])
-xlim([0 3])
+ylim([0 18])
+xlim([0 2.5])
 ylabel('Rotation center depth [mm]');
-title('Azi and ele rotation centers. median +- IQR');
+title('Azi and ele rotation centers. median ± IQR');
 
-% Figure 3 -- Across subjects, the correlation between azi and ele, and the
+% Figure 2 -- Across subjects, the correlation between azi and ele, and the
 % correlation of mean rotation center with axial length
 figure
 subplot(1,2,1);
@@ -142,8 +142,8 @@ idx = logical(double(~isnan(aziCenterP1)) .* double(~isnan(eleCenterP1)));
 h = scatter(-aziCenterP1(idx),-eleCenterP1(idx),'o','MarkerFaceColor','b','MarkerEdgeColor','none');
 h.MarkerFaceAlpha = 0.25;
 hold on
-xlim([10 16]);
-ylim([10 16]);
+xlim([10 17]);
+ylim([10 17]);
 axis square
 xlabel('Azimuth depth');
 ylabel('Elevation depth');
