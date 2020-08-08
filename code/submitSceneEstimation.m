@@ -64,6 +64,14 @@ for ss = subjectIdx
         model.eye.bounds = [5, 5, 5, 180, 5, 2.5, 0.25, 0.25, 30];
     end
 
+
+    %% Special case for TOME_3045
+    if ss==45
+        % 3045 seems to have quite a short corneal axial length, so
+        % starting with a shorter value to help the search along
+        model.eye.x0(1) = 9;
+    end
+    
     %% Special case for TOME_3046
     if ss==46
         model.scene.x0 = [0, 0, cameraTorsion, -2.88, -8.00, cameraDepth ];
