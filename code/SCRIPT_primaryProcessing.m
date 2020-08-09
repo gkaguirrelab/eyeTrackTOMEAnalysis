@@ -24,7 +24,7 @@ universalKeyValues = {'intrinsicCameraMatrix',[2627.0 0 338.1; 0 2628.1 246.2; 0
     'catchErrors', false};
 
 % Load analysis parameters table
-paramsFileName = 'eyeTrackingParams.xlsx';
+paramsFileName = 'eyeTrackingParams.xls';
 opts = detectImportOptions(paramsFileName);
 opts.VariableTypes(:)={'char'};
 paramsTable = readtable(paramsFileName, opts);
