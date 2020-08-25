@@ -8,7 +8,7 @@ dropboxBaseDir = getpref('eyeTrackTOMEAnalysis','dropboxBaseDir');
 videoStem = @(sub,date) fullfile(dropboxBaseDir,'TOME_processing','session2_spatialStimuli',sub,date,'EyeTracking');
 
 % Load the cleaned gazeData
-load('/Users/aguirre/Documents/MATLAB/projects/movieGazeTOMEAnalysis/data/gazeData_cleaned.mat')
+load('/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/pupilDataQAPlots_eyePose_MOVIE_July2020/gazeData_cleaned.mat')
 
 subjectList = {...
     'TOME_3001',...
@@ -77,7 +77,7 @@ for ss = 1:length(sessionList)
             case {3,4}
                 outlineVideo = [outlineVideo, 'videoStemMoviePA(''' subjectList{ss} ''',''' sessionList{ss} ''', ' num2str(aa) '), ...\n'];
         end
-        outlineGaze = [outlineGaze , '[ ' num2str(gazeTargets(1,:)) '; ' num2str(gazeTargets(1,:)) ' ], ...\n'];
+        outlineGaze = [outlineGaze , '[ ' num2str(gazeTargets(1,:)) '; ' num2str(gazeTargets(2,:)) ' ], ...\n'];
         outlineFrame = [outlineFrame , '[ ' num2str(thisFrameSet) ' ], ...\n'];
     end
     outlineGaze = [outlineGaze,'};\n\n'];
