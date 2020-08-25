@@ -55,7 +55,7 @@ for ss = 1:length(sessionList)
         % Find the frames in the pupil file that correspond to the time
         % points of frames of high agreement in the movie
         frameSetStandard = gazeData.(acqList{aa}).synthTargets.frameSet;
-        timeStamps = gazeData.timebase(frameSet);
+        timeStamps = gazeData.timebase(frameSetStandard);
         
         thisFrameSet = [];
         for tt = 1:length(timeStamps)
