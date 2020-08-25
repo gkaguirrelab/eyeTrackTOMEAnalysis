@@ -77,6 +77,12 @@ for ss = subjectIdx
         model.scene.x0 = [0, 0, cameraTorsion, -2.88, -8.00, cameraDepth ];
     end
     
+    %% Special case for the synthesized fixation subjects (01, 02, 03, 05)
+    if any([1 2 3 5]==ss)
+        searchStrategy = 'synthFix';
+    else
+        searchStrategy = 'gazeCal';
+    end
     
     %% Constrain the eyePose bounds in the errorArgs
     errorArgs = {'eyePoseUB',[25,25,0,4],'eyePoseLB',[-25,-25,0,0.5]}; 
@@ -84,7 +90,7 @@ for ss = subjectIdx
     
     %% Perform the search
     estimateSceneParams(videoStemName{ss}, frameSet{ss}, gazeTargets{ss}, ...
-        'searchStrategy','gazeCal',...
+        'searchStrategy',searchStrategy,...
         'cameraDepth',cameraDepth,'cameraTorsion',cameraTorsion,...
         'model',model,...
         'errorArgs',errorArgs,...
