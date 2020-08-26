@@ -1,4 +1,4 @@
-function submitSceneEstimation(subjectIdx)
+function submitSceneEstimation_CrossValidation(subjectIdx)
 
 
 %% Obtain the scene analysis parameters
@@ -51,20 +51,21 @@ for ss = subjectIdx
     cameraTorsion = cellfun(@(x) x(1),torsDepth{ss});
     cameraDepth = cellfun(@(x) x(2),torsDepth{ss});
     
+
     %% Assemble the eye x0 params using the passed kvals
     model=[];
     if isempty(kvals{ss})
         % The mean corneal curvature in the TOME subjects, with 0 corneal
         % torsion, and 2.5 degrees of tilt
-
+        
         model.eye.x0 = [14.104, 43.399, 44.33653846, 0, 2.5, 0, 0.91, 0.94, 0];
         model.eye.bounds = [5, 5, 5, 180, 5, 2.5, 0.25, 0.25, 30];
     else
         model.eye.x0 = [14.104, kvals{ss}, 2.5, 0, 0.91, 0.94, 0];
         model.eye.bounds = [5, 5, 5, 180, 5, 2.5, 0.25, 0.25, 30];
     end
-
-
+    
+    
     %% Special case for TOME_3045
     if ss==45
         % 3045 seems to have quite a short corneal axial length, so
@@ -85,14 +86,13 @@ for ss = subjectIdx
     end
     
     %% Constrain the eyePose bounds in the errorArgs
-    errorArgs = {'eyePoseUB',[25,25,0,4],'eyePoseLB',[-25,-25,0,0.5]}; 
-
+    errorArgs = {'eyePoseUB',[25,25,0,4],'eyePoseLB',[-25,-25,0,0.5]};
+    
     
     %% Assemble the args
     thisVideoSet = videoStemName{ss};
     thisFrameSet = frameSet{ss};
     thisGazeTargetSet = gazeTargets{ss};
-    thisEyeArgs = eyeArgs{ss};
     thisSceneArgs = sceneArgs{ss};
     
     %% Loop over the cross validations
@@ -108,7 +108,39 @@ for ss = subjectIdx
             'cameraDepth',cameraDepth(idx),'cameraTorsion',cameraTorsion(idx),...
             'model',model,...
             'errorArgs',errorArgs,...
-            'eyeArgs',thisEyeArgs(idx),'sceneArgs',thisSceneArgs(idx));
+            'eyeArgs',eyeArgs{ss},'sceneArgs',thisSceneArgs(idx));
+        
+        %% Identify the best match sceneGeometry
+        for jj = 1:4
+            sceneGeometryFileName = [thisVideoSet{jj} '_sceneGeometry' suffix '.mat'];
+            load(sceneGeometryFileName,'sceneGeometry');
+            cameraTrans{jj} = sceneGeometry.cameraPosition.translation;
+        end
+        cameraDisplace = cellfun(@(x) vecnorm(cameraTrans{cc}-x),cameraTrans(idx));
+        bestMatchIdx = idx(find(cameraDisplace==min(cameraDisplace),1));
+        
+        
+        %% Reload the best match sceneGeometry
+        sceneGeometryFileName = [thisVideoSet{bestMatchIdx} '_sceneGeometry' suffix '.mat'];
+        load(sceneGeometryFileName,'sceneGeometry');
+        
+        
+        %% Create a test model
+        testModel=[];
+        testModel.eye.x0 = sceneGeometry.meta.estimateSceneParams.xEye;
+        testModel.scene.x0 = sceneGeometry.meta.estimateSceneParams.xScene;
+        
+        
+        %% Validate these x0 params
+        suffix = sprintf('_CrossVal_test0%d',cc);
+        estimateSceneParams(thisVideoSet(cc), thisFrameSet(cc), thisGazeTargetSet(cc), ...
+            'outputFileSuffix',suffix,...
+            'searchStrategy','validate',...
+            'cameraDepth',cameraDepth(cc),'cameraTorsion',cameraTorsion(cc),...
+            'model',testModel,...
+            'errorArgs',errorArgs,...
+            'eyeArgs',eyeArgs{ss},'sceneArgs',thisSceneArgs(cc));
+        
     end
     
 end % Loop over subjects
