@@ -53,17 +53,10 @@ for ss = subjectIdx
     
 
     %% Assemble the eye x0 params using the passed kvals
+    % We won't use the passed kvals for this demo
     model=[];
-    if isempty(kvals{ss})
-        % The mean corneal curvature in the TOME subjects, with 0 corneal
-        % torsion, and 2.5 degrees of tilt
-        
-        model.eye.x0 = [14.104, 43.399, 44.33653846, 0, 2.5, 0, 0.91, 0.94, 0];
-        model.eye.bounds = [5, 5, 5, 180, 5, 2.5, 0.25, 0.25, 30];
-    else
-        model.eye.x0 = [14.104, kvals{ss}, 2.5, 0, 0.91, 0.94, 0];
-        model.eye.bounds = [5, 5, 5, 180, 5, 2.5, 0.25, 0.25, 30];
-    end
+    model.eye.x0 = [14.104, 43.399, 44.33653846, 0, 2.5, 0, 0.91, 0.94, 0];
+    model.eye.bounds = [5, 5, 5, 180, 5, 2.5, 0.25, 0.25, 30];
     
     
     %% Special case for TOME_3045
@@ -73,17 +66,6 @@ for ss = subjectIdx
         model.eye.x0(1) = 9;
     end
     
-    %% Special case for TOME_3046
-    if ss==46
-        model.scene.x0 = [0, 0, cameraTorsion, -2.88, -8.00, cameraDepth ];
-    end
-    
-    %% Special case for the synthesized fixation subjects (01, 02, 03, 05)
-    if any([1 2 3 5]==ss)
-        searchStrategy = 'synthFix';
-    else
-        searchStrategy = 'gazeCal';
-    end
     
     %% Constrain the eyePose bounds in the errorArgs
     errorArgs = {'eyePoseUB',[25,25,0,4],'eyePoseLB',[-25,-25,0,0.5]};
@@ -97,13 +79,16 @@ for ss = subjectIdx
     
     %% Loop over the cross validations
     for cc = 1:4
-        suffix = sprintf('_CrossVal_hold0%d',cc);
+        suffixCross = sprintf('_CrossVal_hold0%d',cc);
+        suffixTest = sprintf('_CrossVal_test0%d',cc);
+
+        % The indices that are the training set
         idx = 1:4;
         idx = idx(idx~=cc);
         
         %% Perform the search
         estimateSceneParams(thisVideoSet(idx), thisFrameSet(idx), thisGazeTargetSet(idx), ...
-            'outputFileSuffix',suffix,...
+            'outputFileSuffix',suffixCross,...
             'searchStrategy',searchStrategy,...
             'cameraDepth',cameraDepth(idx),'cameraTorsion',cameraTorsion(idx),...
             'model',model,...
@@ -112,7 +97,7 @@ for ss = subjectIdx
         
         %% Identify the best match sceneGeometry
         for jj = 1:4
-            sceneGeometryFileName = [thisVideoSet{jj} '_sceneGeometry' suffix '.mat'];
+            sceneGeometryFileName = [thisVideoSet{jj} '_sceneGeometry' suffixCross '.mat'];
             load(sceneGeometryFileName,'sceneGeometry');
             cameraTrans{jj} = sceneGeometry.cameraPosition.translation;
         end
@@ -121,7 +106,7 @@ for ss = subjectIdx
         
         
         %% Reload the best match sceneGeometry
-        sceneGeometryFileName = [thisVideoSet{bestMatchIdx} '_sceneGeometry' suffix '.mat'];
+        sceneGeometryFileName = [thisVideoSet{bestMatchIdx} '_sceneGeometry' suffixCross '.mat'];
         load(sceneGeometryFileName,'sceneGeometry');
         
         
@@ -132,9 +117,8 @@ for ss = subjectIdx
         
         
         %% Validate these x0 params
-        suffix = sprintf('_CrossVal_test0%d',cc);
         estimateSceneParams(thisVideoSet(cc), thisFrameSet(cc), thisGazeTargetSet(cc), ...
-            'outputFileSuffix',suffix,...
+            'outputFileSuffix',suffixTest,...
             'searchStrategy','validate',...
             'cameraDepth',cameraDepth(cc),'cameraTorsion',cameraTorsion(cc),...
             'model',testModel,...
