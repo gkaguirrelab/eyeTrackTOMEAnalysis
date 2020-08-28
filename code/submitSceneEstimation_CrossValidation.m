@@ -97,7 +97,11 @@ for ss = subjectIdx
         
         %% Identify the best match sceneGeometry
         for jj = 1:4
-            sceneGeometryFileName = [thisVideoSet{jj} '_sceneGeometry' suffixCross '.mat'];
+            if jj~=cc
+                sceneGeometryFileName = [thisVideoSet{jj} '_sceneGeometry' suffixCross '.mat'];
+            else
+                sceneGeometryFileName = [thisVideoSet{jj} '_sceneGeometry.mat'];
+            end
             load(sceneGeometryFileName,'sceneGeometry');
             cameraTrans{jj} = sceneGeometry.cameraPosition.translation;
         end
