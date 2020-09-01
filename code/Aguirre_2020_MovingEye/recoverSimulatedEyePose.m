@@ -14,7 +14,7 @@ xSet = -10:0.01:10;
 ySet = -10:0.01:10;
 
 % How many sims?
-nSims = 10;
+nSims = 100;
 
 % How much perimeter noise to add (sigma in units of pixels)?
 perimNoise = 1;
@@ -86,7 +86,7 @@ for cc = 1:4
     end
     
     alphaVal = min([20/nSims 1]);
-    figHandle = makeFig(eyePose,eyePoseRecovered,cameraTrans,cameraTransRecovered,alphaVal);
+    figHandle = makeFig(eyePose,eyePoseRecovered,cameraTrans,cameraTransRecovered,RMSE,alphaVal);
     fileName = ['/Users/aguirre/Desktop/sim_' caseLabels{cc} '.pdf'];
     saveas(figHandle,fileName)
     
@@ -97,13 +97,15 @@ warning('off','eyePoseEllipseFit:underconstrainedSearch')
 
 
 
-function figHandle = makeFig(eyePose,eyePoseRecovered,cameraTrans,cameraTransRecovered,alphaVal)
+function figHandle = makeFig(eyePose,eyePoseRecovered,cameraTrans,cameraTransRecovered,RMSE,alphaVal)
 
+
+lowRMSE = RMSE < 2;
 
 figHandle = figure();
 subplot(2,3,1)
-X = eyePose(:,1:2);
-Y = eyePoseRecovered(:,1:2);
+X = eyePose(lowRMSE,1:2);
+Y = eyePoseRecovered(lowRMSE,1:2);
 medianError = nanmedian(vecnorm((X-Y)'));
 scatter(X(:,1),Y(:,1),50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
@@ -119,8 +121,8 @@ str = sprintf('median absolute error = %2.2f',medianError);
 title(str)
 
 subplot(2,3,2)
-X = eyePose(:,4);
-Y = eyePoseRecovered(:,4);
+X = eyePose(lowRMSE,4);
+Y = eyePoseRecovered(lowRMSE,4);
 medianError = nanmedian(abs(X-Y));
 scatter(X,Y,50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
@@ -134,8 +136,8 @@ title(str)
 
 
 subplot(2,3,3)
-X = cameraTrans(1:2,:);
-Y = cameraTransRecovered(1:2,:);
+X = cameraTrans(1:2,lowRMSE);
+Y = cameraTransRecovered(1:2,lowRMSE);
 medianError = nanmedian(vecnorm((X-Y)));
 scatter(X(1,:),Y(1,:),50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
@@ -152,8 +154,8 @@ title(str)
 
 
 subplot(2,3,4)
-X = cameraTrans(3,:);
-Y = cameraTransRecovered(3,:);
+X = cameraTrans(3,lowRMSE);
+Y = cameraTransRecovered(3,lowRMSE);
 medianError = nanmedian(abs(X-Y));
 scatter(X,Y,50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
@@ -167,37 +169,35 @@ title(str)
 
 
 subplot(2,3,5)
-X = vecnorm(cameraTrans(1:2,:));
-Y = vecnorm(((eyePose(:,1:2)-eyePoseRecovered(:,1:2)))')';
-nanIdx = isnan(X);
-p = polyfit(X(~nanIdx),Y(~nanIdx),1);
+X = vecnorm(cameraTrans(1:2,lowRMSE));
+Y = vecnorm(((eyePose(lowRMSE,1:2)-eyePoseRecovered(lowRMSE,1:2)))')';
+mdlr = fitlm(X,Y,'RobustOpts','on');
 scatter(X,Y,50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
-plot(0:15,polyval(p,0:15),'-k','LineWidth',2)
+plot(X,mdlr.Fitted,'-k','LineWidth',2)
 xlim([0 15]);
 ylim([0 5]);
 axis square
 xlabel('simulated in-plane trans [mm]');
 ylabel('eye pose rotation error [deg]');
-str = sprintf('max error = %2.2f, #nan = %d',max(Y),sum(nanIdx));
+str = sprintf('max error = %2.2f',max(Y));
 title(str)
 
 subplot(2,3,6)
-X = abs(cameraTrans(3,:));
-Y = vecnorm(((eyePose(:,1:2)-eyePoseRecovered(:,1:2)))')';
-nanIdx = isnan(X);
-p = polyfit(X(~nanIdx),Y(~nanIdx),1);
+X = abs(cameraTrans(3,lowRMSE));
+Y = vecnorm(((eyePose(lowRMSE,1:2)-eyePoseRecovered(lowRMSE,1:2)))')';
+mdlr = fitlm(X,Y,'RobustOpts','on');
 scatter(X,Y,50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
-plot(0:10,polyval(p,0:10),'-k','LineWidth',2)
+plot(X,mdlr.Fitted,'-k','LineWidth',2)
 xlim([0 10]);
 ylim([0 5]);
 axis square
 xlabel('simulated depth trans [mm]');
 ylabel('eye pose rotation error [deg]');
-str = sprintf('max error = %2.2f',max(Y));
+str = sprintf('max error = %2.2f, bad fits = %d',max(Y),sum(~lowRMSE));
 title(str)
 
 
