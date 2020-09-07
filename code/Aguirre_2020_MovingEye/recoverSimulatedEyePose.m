@@ -173,7 +173,7 @@ for pp = 1:length(pctSet)
     plot(X,yVals,lineSpec{pp})
     hold on
 end
-xlim([0 4]);
+xlim([0.5 4]);
 ylim([-0.5 0.5]);
 xlabel('simulated stop radius [mm]');
 ylabel('error [mm]');
