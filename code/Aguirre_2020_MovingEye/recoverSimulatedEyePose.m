@@ -14,10 +14,13 @@ xSet = -10:0.01:10;
 ySet = -10:0.01:10;
 
 % How many sims?
-nSims = 100;
+nSims = 1000;
 
 % How much perimeter noise to add (sigma in units of pixels)?
-perimNoise = 1;
+perimNoise = 0.25;
+
+% Set a rmseThresh
+rmseThresh = max([1, perimNoise * 4]);
 
 % Explicitly define the search args
 searchArgs = {'eyePoseEllipseFitFunEvals',250,'glintTol',1,'eyePoseTol',1e-3};
@@ -25,9 +28,11 @@ searchArgs = {'eyePoseEllipseFitFunEvals',250,'glintTol',1,'eyePoseTol',1e-3};
 % Turn off warnings for an underconstrained eyePose search
 warning('off','eyePoseEllipseFit:underconstrainedSearch')
 
-caseLabels = {'TwoGlint','TwoGlintHalfPerim','OneGlint','OneGlintNoDepth'};
+caseLabels = {'TwoGlint','OneGlint','OneGlintNoDepth'};
 
-for cc = 1:4
+figHandle = figure();
+
+for cc = 1:3
     
     switch cc
         case 1
@@ -36,16 +41,11 @@ for cc = 1:4
             perimCut = false;
             cameraTransBounds = [20; 20; 20];
         case 2
-            sceneGeometry.cameraPosition.glintSourceRelative = [-14 14; 0 0; 0 0];
-            zSet = -10:0.01:10;
-            perimCut = true;
-            cameraTransBounds = [20; 20; 20];
-        case 3
             sceneGeometry.cameraPosition.glintSourceRelative = [-14; 0; 0];
             zSet = -10:0.01:10;
             perimCut = false;
             cameraTransBounds = [20; 20; 20];
-        case 4
+        case 3
             sceneGeometry.cameraPosition.glintSourceRelative = [-14; 0; 0];
             zSet = [0 0];
             perimCut = false;
@@ -55,150 +55,177 @@ for cc = 1:4
     % Loop though simulations
     simSet = [];
     for ss = 1:nSims
-        tag = '';
         eyePose(ss,:) = [randsample(aziSet,1) randsample(eleSet,1) 0 randsample(stopSet,1)];
         cameraTrans(:,ss) = [randsample(xSet,1); randsample(ySet,1); randsample(zSet,1)];
-        [ targetEllipse, glintCoord ] = projectModelEye(eyePose(ss,:),sceneGeometry,'cameraTrans',cameraTrans(:,ss));
+        [ targetEllipse, glintCoordOrig ] = projectModelEye(eyePose(ss,:),sceneGeometry,'cameraTrans',cameraTrans(:,ss));
         
-        % Remove the top-half of the points
-        if perimCut
-            [ Xp, Yp ] = ellipsePerimeterPoints( targetEllipse, 20, 0, perimNoise );
-            topIdx = Yp>mean(Yp);
-            Xp = Xp(~topIdx);
-            Yp = Yp(~topIdx);
-        else
-            [ Xp, Yp ] = ellipsePerimeterPoints( targetEllipse, 10, 0, perimNoise );
-        end
-
+        % Obtain the glintCoord and perimeter points of the ellipse, adding
+        % noise
+        glintCoord = glintCoordOrig + randn(size(glintCoordOrig)).*perimNoise;
+        [ Xp, Yp ] = ellipsePerimeterPoints( targetEllipse, 10, 0, perimNoise );
+            
         % Get the eye pose, and repeat if the error is above threshold
         [eyePoseRecovered(ss,:), cameraTransRecovered(:,ss), RMSE(ss)] = eyePoseEllipseFit(Xp, Yp, glintCoord, sceneGeometry,'cameraTransBounds',cameraTransBounds,searchArgs{:});
-%         if RMSE(ss)>0.1
-%             [eyePoseRecovered(ss,:), cameraTransRecovered(:,ss), RMSE(ss)] = eyePoseEllipseFit(Xp, Yp, glintCoord, sceneGeometry,'cameraTransBounds',cameraTransBounds,'eyePoseX0',eyePoseRecovered(ss,:),searchArgs{:});
-%             if RMSE(ss) > 0.1
-%                 fprintf('Damnit.\n')
-%                 eyePose(ss,:) = nan;
-%                 cameraTrans(:,ss) = nan;
-%                 eyePoseRecovered(ss,:) = nan;
-%                 cameraTransRecovered(:,ss) = nan;
-%             end
-%         end
+        if RMSE(ss)>rmseThresh
+            [eyePoseRecovered(ss,:), cameraTransRecovered(:,ss), RMSE(ss)] = eyePoseEllipseFit(Xp, Yp, glintCoord, sceneGeometry,'cameraTransBounds',cameraTransBounds,'eyePoseX0',eyePoseRecovered(ss,:),searchArgs{:});
+            if RMSE(ss) > rmseThresh
+                fprintf('Damnit.\n')
+                eyePose(ss,:) = nan;
+                cameraTrans(:,ss) = nan;
+                eyePoseRecovered(ss,:) = nan;
+                cameraTransRecovered(:,ss) = nan;
+            end
+        end
         
     end
     
-    alphaVal = min([20/nSims 1]);
-    figHandle = makeFig(eyePose,eyePoseRecovered,cameraTrans,cameraTransRecovered,RMSE,alphaVal);
-    fileName = ['/Users/aguirre/Desktop/sim_' caseLabels{cc} '.pdf'];
-    saveas(figHandle,fileName)
-    
+    stateSaveName = sprintf('/Users/aguirre/Desktop/simStateSave_%d.mat',cc);
+    save(stateSaveName)
+
+    makeFig(eyePose,eyePoseRecovered,cameraTrans,cameraTransRecovered,RMSE,rmseThresh,cc);
 end
+
+fileName = '/Users/aguirre/Desktop/simFig.pdf';
+print(figHandle,fileName)
 
 % Turn the warning back on
 warning('off','eyePoseEllipseFit:underconstrainedSearch')
 
 
 
-function figHandle = makeFig(eyePose,eyePoseRecovered,cameraTrans,cameraTransRecovered,RMSE,alphaVal)
+function makeFig(eyePose,eyePoseRecovered,cameraTrans,cameraTransRecovered,RMSE,rmseThresh,cc)
+
+alphaVal = min([20/size(eyePose,1) 1]);
+
+lowRMSE = RMSE < rmseThresh;
+
+deltaDepth = abs(cameraTrans(3,lowRMSE))';
+absRot = abs(eyePose(lowRMSE,1)) + abs(eyePose(lowRMSE,2));
+
+markerColor = [1 0.5 0.5];
+pctSet = [5,95,50];
+lineSpec = {'--k','--k','-k'};
 
 
-lowRMSE = RMSE < 2;
-
-figHandle = figure();
-subplot(2,3,1)
-X = eyePose(lowRMSE,1:2);
-Y = eyePoseRecovered(lowRMSE,1:2);
-medianError = nanmedian(vecnorm((X-Y)'));
-scatter(X(:,1),Y(:,1),50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
+subplot(3,4,(cc-1)*4+1)
+hold off
+error = vecnorm((eyePose(lowRMSE,1:2) - eyePoseRecovered(lowRMSE,1:2))')';
+medianError = nanmedian(error);
+errorByDepth = corr(deltaDepth,error);
+errorByRot = corr(absRot,error);
+sim = [ eyePose(lowRMSE,1); eyePose(lowRMSE,2) ];
+rec = [ eyePoseRecovered(lowRMSE,1); eyePoseRecovered(lowRMSE,2) ];
+scatter(sim,sim-rec,50,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
-scatter(X(:,2),Y(:,2),50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
-    'MarkerFaceAlpha',alphaVal);
-axis square
+D = [sim,sim-rec];
+X = -20:1:20;
+ctrs = {X -5:0.001:5};
+for pp = 1:length(pctSet)
+    yVals = countourLine(D,ctrs,pctSet(pp),4);
+    plot(X,yVals,lineSpec{pp})
+    hold on
+end
 xlim([-20 20])
-ylim([-20 20])
+ylim([-4 4])
 xlabel('simulated eye rotation [deg]');
-ylabel('recovered eye rotation [deg]');
-str = sprintf('median absolute error = %2.2f',medianError);
+ylabel('error [deg]');
+str = sprintf('error, Rd, Rr [%2.2f, %2.2f, %2.2f]',medianError,errorByDepth,errorByRot);
 title(str)
 
-subplot(2,3,2)
-X = eyePose(lowRMSE,4);
-Y = eyePoseRecovered(lowRMSE,4);
-medianError = nanmedian(abs(X-Y));
-scatter(X,Y,50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
+
+subplot(3,4,(cc-1)*4+2)
+hold off
+sim = eyePose(lowRMSE,4);
+rec = eyePoseRecovered(lowRMSE,4);
+error = abs(sim-rec);
+medianError = nanmedian(error);
+errorByDepth = corr(deltaDepth,error);
+errorByRot = corr(absRot,error);
+scatter(sim,sim-rec,50,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
-axis square
+hold on
+D = [sim,sim-rec];
+X = 0.5:0.25:4;
+ctrs = {X -1:0.01:1};
+for pp = 1:length(pctSet)
+    yVals = countourLine(D,ctrs,pctSet(pp),4);
+    plot(X,yVals,lineSpec{pp})
+    hold on
+end
 xlim([0 4]);
-ylim([0 4]);
+ylim([-0.5 0.5]);
 xlabel('simulated stop radius [mm]');
-ylabel('recovered stop radius [mm]');
-str = sprintf('median absolute error = %2.2f',medianError);
+ylabel('error [mm]');
+str = sprintf('error, Rd, Rr [%2.2f, %2.2f, %2.2f]',medianError,errorByDepth,errorByRot);
 title(str)
 
 
-subplot(2,3,3)
-X = cameraTrans(1:2,lowRMSE);
-Y = cameraTransRecovered(1:2,lowRMSE);
-medianError = nanmedian(vecnorm((X-Y)));
-scatter(X(1,:),Y(1,:),50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
+subplot(3,4,(cc-1)*4+3)
+hold off
+error = vecnorm((cameraTrans(1:2,lowRMSE)-cameraTransRecovered(1:2,lowRMSE)))';
+medianError = nanmedian(error);
+errorByDepth = corr(deltaDepth,error);
+errorByRot = corr(absRot,error);
+sim = [ cameraTrans(1,lowRMSE)'; cameraTrans(2,lowRMSE)' ];
+rec = [ cameraTransRecovered(1,lowRMSE)'; cameraTransRecovered(2,lowRMSE)' ];
+scatter(sim,sim-rec,50,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
-scatter(X(2,:),Y(2,:),50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
-    'MarkerFaceAlpha',alphaVal);
-axis square
-xlim([-10 10]);
-ylim([-10 10]);
+D = [sim,sim-rec];
+X = -10:0.5:10;
+ctrs = {X -5:0.001:5};
+for pp = 1:length(pctSet)
+    yVals = countourLine(D,ctrs,pctSet(pp),4);
+    plot(X,yVals,lineSpec{pp})
+    hold on
+end
+xlim([-10 10])
+ylim([-2 2])
 xlabel('simulated in-plane trans [mm]');
-ylabel('recovered in-plane trans [mm]');
-str = sprintf('median absolute error = %2.2f',medianError);
+ylabel('error [mm]');
+str = sprintf('error, Rd, Rr [%2.2f, %2.2f, %2.2f]',medianError,errorByDepth,errorByRot);
 title(str)
 
 
-subplot(2,3,4)
-X = cameraTrans(3,lowRMSE);
-Y = cameraTransRecovered(3,lowRMSE);
-medianError = nanmedian(abs(X-Y));
-scatter(X,Y,50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
-    'MarkerFaceAlpha',alphaVal);
-axis square
-xlim([-10 10]);
-ylim([-10 10]);
-xlabel('simulated depth trans [mm]');
-ylabel('recovered depth trans [mm]');
-str = sprintf('median absolute error = %2.2f',medianError);
-title(str)
-
-
-subplot(2,3,5)
-X = vecnorm(cameraTrans(1:2,lowRMSE));
-Y = vecnorm(((eyePose(lowRMSE,1:2)-eyePoseRecovered(lowRMSE,1:2)))')';
-mdlr = fitlm(X,Y,'RobustOpts','on');
-scatter(X,Y,50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
+subplot(3,4,(cc-1)*4+4)
+hold off
+error = abs(cameraTrans(3,lowRMSE)-cameraTransRecovered(3,lowRMSE))';
+medianError = nanmedian(error);
+errorByDepth = corr(deltaDepth,error);
+errorByRot = corr(absRot,error);
+sim = cameraTrans(3,lowRMSE)';
+rec = cameraTransRecovered(3,lowRMSE)';
+scatter(sim,sim-rec,50,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
-plot(X,mdlr.Fitted,'-k','LineWidth',2)
-xlim([0 15]);
-ylim([0 5]);
-axis square
-xlabel('simulated in-plane trans [mm]');
-ylabel('eye pose rotation error [deg]');
-str = sprintf('max error = %2.2f',max(Y));
-title(str)
-
-subplot(2,3,6)
-X = abs(cameraTrans(3,lowRMSE));
-Y = vecnorm(((eyePose(lowRMSE,1:2)-eyePoseRecovered(lowRMSE,1:2)))')';
-mdlr = fitlm(X,Y,'RobustOpts','on');
-scatter(X,Y,50,'MarkerFaceColor','r','MarkerEdgeColor','none',...
-    'MarkerFaceAlpha',alphaVal);
-hold on
-plot(X,mdlr.Fitted,'-k','LineWidth',2)
-xlim([0 10]);
-ylim([0 5]);
-axis square
+D = [sim,sim-rec];
+X = -10:0.5:10;
+ctrs = {X -10:0.001:10};
+for pp = 1:length(pctSet)
+    yVals = countourLine(D,ctrs,pctSet(pp),4);
+    plot(X,yVals,lineSpec{pp})
+    hold on
+end
+axis equal
+xlim([-10 10])
+ylim([-10 10])
 xlabel('simulated depth trans [mm]');
-ylabel('eye pose rotation error [deg]');
-str = sprintf('max error = %2.2f, bad fits = %d',max(Y),sum(~lowRMSE));
+ylabel('error [mm]');
+str = sprintf('error, Rd, Rr [%2.2f, %2.2f, %2.2f]',medianError,errorByDepth,errorByRot);
 title(str)
 
+
+end
+
+
+function [yValsFit, yVals] = countourLine(D,ctrs,percentile,polyOrder)
+
+[N,c] = hist3(D,'ctrs',ctrs);
+idx=sum(cumsum(N,2) < sum(N,2).*percentile/100,2)+2;
+yVals = [nan c{2}];
+yVals = yVals(idx);
+p=polyfit(c{1},yVals,polyOrder);
+yValsFit = polyval(p,c{1});
 
 end
