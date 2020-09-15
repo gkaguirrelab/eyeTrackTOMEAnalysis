@@ -32,51 +32,6 @@ x=C(1)+zeros(size(z)) ;
 eyeHandles(end+1)=patch(x,y,z,'k','FaceAlpha',0.5);
 
 
-% Add axes to indicate the centers of rotation
-swivelRadius = 3;
-cdr = 0.5;
-
-%% AZI
-aziAxisHandlesBit = gobjects(0);
-aziAxisHandlesVec = gobjects(0);
-azi = sceneGeometry.eye.rotationCenters.azi;
-aziAxisHandlesVec(end+1)=plot3([azi(1) azi(1)],[azi(2) azi(2)],[azi(3)-20 azi(3)+20],'-k');
-S = quadric.scale(quadric.unitSphere,[cdr cdr cdr]);
-S = quadric.translate(S,azi);
-boundingBox = [azi(1)-cdr azi(1)+cdr azi(2)-cdr azi(2)+cdr azi(3)-cdr azi(3)+cdr];
-aziAxisHandlesBit(end+1) = quadric.plotSurface(S, boundingBox, [0 0 0], 1);
-pointC = [azi(1), azi(2), azi(3)+20];
-pointA = [azi(1)-swivelRadius, azi(2), azi(3)+20];
-pointB = [azi(1), azi(2)-swivelRadius, azi(3)+20];
-aziAxisHandlesVec(end+1) = plotArc3D(pointA, pointB, pointC, 50,'k');
-pointB = [azi(1), azi(2)+swivelRadius, azi(3)+20];
-aziAxisHandlesVec(end+1) = plotArc3D(pointA, pointB, pointC, 50,'k');
-pointA = [azi(1)+swivelRadius, azi(2), azi(3)+20];
-aziAxisHandlesVec(end+1) = plotArc3D(pointB, pointA, pointC, 50,'k');
-pointB = [azi(1)+swivelRadius, azi(2)-2, azi(3)+20];
-aziAxisHandlesBit(end+1) = mArrow3(pointA,pointB,'stemWidth',0.1,'tipWidth',0.5,'color',[0 0 0],'FaceAlpha',0.5);
-
-%% ELE
-eleAxisHandlesBit = gobjects(0);
-eleAxisHandlesVec = gobjects(0);
-
-ele = sceneGeometry.eye.rotationCenters.ele;
-eleAxisHandlesVec(end+1) = plot3([ele(1) ele(1)],[ele(2)-20 ele(2)+20],[ele(3) ele(3)],'-b');
-S = quadric.scale(quadric.unitSphere,[cdr cdr cdr]);
-S = quadric.translate(S,ele);
-boundingBox = [ele(1)-cdr ele(1)+cdr ele(2)-cdr ele(2)+cdr ele(3)-cdr ele(3)+cdr];
-eleAxisHandlesBit(end+1) = quadric.plotSurface(S, boundingBox, [0 0 1], 1);pointC = [ele(1), ele(2)+20, ele(3)];
-pointB = [ele(1)-swivelRadius, ele(2)+20, ele(3)];
-pointA = [ele(1), ele(2)+20, ele(3)+swivelRadius];
-eleAxisHandlesVec(end+1) = plotArc3D(pointA, pointB, pointC, 50, 'b');
-pointB = [ele(1)+swivelRadius, ele(2)+20, ele(3)];
-eleAxisHandlesVec(end+1) = plotArc3D(pointA, pointB, pointC, 50, 'b');
-pointA = [ele(1), ele(2)+20, ele(3)-swivelRadius];
-eleAxisHandlesVec(end+1) = plotArc3D(pointB, pointA, pointC, 50, 'b');
-pointB = [ele(1)-2, ele(2)+20, ele(3)-swivelRadius];
-eleAxisHandlesBit(end+1) = mArrow3(pointA,pointB,'stemWidth',0.1,'tipWidth',0.5,'color',[0 0 1],'FaceAlpha',0.5);
-
-
 % Define an eye pose
 eyePose = [0 0 0 2];
 
@@ -175,22 +130,7 @@ for vv = 1:length(viewNames)
     % Display the alignPoint mark
     delete(alignHandle);
     alignHandle = plot3(alignPoint{vv}(1),alignPoint{vv}(2),alignPoint{vv}(3),'xm');    
-    
-    % Hide or show the ele and azi rotation components depending on the
-    % view
-    hidem(aziAxisHandlesVec)
-    hidem(eleAxisHandlesVec)
-    if viewEle(vv)
-        showm(eleAxisHandlesBit);
-    else
-        hidem(eleAxisHandlesBit);
-    end
-    if viewAzi(vv)
-        showm(aziAxisHandlesBit);
-    else
-        hidem(aziAxisHandlesBit);
-    end
-    
+        
     % Save figure
     showm(eyeHandles);
     showm(cameraHandles);
@@ -199,22 +139,7 @@ for vv = 1:length(viewNames)
     set(figHandle,'color','none');
     fileName = ['~/Desktop/Figure1_view' viewNames{vv} '.png'];
     export_fig(figHandle,fileName,'-r1200','-opengl');
-        
-    % Hide or show the ele and azi rotation components depending on the
-    % view
-    hidem(aziAxisHandlesBit)
-    hidem(eleAxisHandlesBit)
-    if viewEle(vv)
-        showm(eleAxisHandlesVec);
-    else
-        hidem(eleAxisHandlesVec);
-    end
-    
-    if viewAzi(vv)
-        showm(aziAxisHandlesVec);
-    else
-        hidem(aziAxisHandlesVec);
-    end
+       
     
     hidem(eyeHandles);
     hidem(cameraHandles);
