@@ -15,7 +15,7 @@ model.scene.bounds = [10 10 10 20 20 0];
 
 % Set up the eye params to vary in simulation
 valRange = model.eye.x0(1) - model.eye.bounds(1) : 0.1 : model.eye.x0(1) + model.eye.bounds(1);
-corneaAxialRadius = randsample(valRange,nBoots);
+corneaAxialRadius = repmat(14.104,nBoots,1);
 valRange = model.eye.x0(3) - model.eye.bounds(3) : 0.1 : model.eye.x0(3) + model.eye.bounds(3);
 kvals = [randsample(valRange,nBoots); randsample(valRange,nBoots)]';
 needSwap = kvals(:,1)>kvals(:,2);
@@ -84,7 +84,7 @@ for bb = 1:nBoots
         'searchStrategy','gazeCal','savePlots',false,'saveFiles',false, ...
         'model',model,'glintData',gCell,'perimeter',pCell);
     
-    corneaAxialRadiusRecovered(bb) = sceneObjects{1}.x(5);
+%    corneaAxialRadiusRecovered(bb) = sceneObjects{1}.x(5);
     kvalsRecovered(bb,:) = sceneObjects{1}.x(6:7);
     rotationCenterScalersRecovered(bb,:) = sceneObjects{1}.x(11:12);
     cameraTransRecovered(:,bb) = sceneObjects{1}.x(17:19)';
