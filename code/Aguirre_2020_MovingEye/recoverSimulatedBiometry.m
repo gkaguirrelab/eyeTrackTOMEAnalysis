@@ -10,7 +10,7 @@ nBoots = 10;
 
 % Constrain the bounds so that we do not search over depth
 model.eye.x0 = [14.104, 44.2410, 45.6302, 0, 2.5000, 0, 1, 1, 0];
-model.eye.bounds = [5, 5, 5, 180, 5, 2.5, 0.25, 0.25, 0];
+model.eye.bounds = [0, 5, 5, 180, 5, 2.5, 0.25, 0.25, 0];
 model.scene.bounds = [10 10 10 20 20 0];
 
 % Set up the eye params to vary in simulation
