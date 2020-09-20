@@ -6,7 +6,7 @@ close all
 
 % How many scenes and boots?
 nScenes = 1;
-nBoots = 10;
+nBoots = 100;
 
 % Constrain the bounds so that we do not search over depth
 model.eye.x0 = [14.104, 44.2410, 45.6302, 0, 2.5000, 0, 1, 1, 0];
@@ -14,18 +14,18 @@ model.eye.bounds = [0, 5, 5, 180, 5, 2.5, 0.25, 0.25, 0];
 model.scene.bounds = [10 10 10 20 20 0];
 
 % Set up the eye params to vary in simulation
-valRange = model.eye.x0(1) - model.eye.bounds(1) : 0.1 : model.eye.x0(1) + model.eye.bounds(1);
+valRange = model.eye.x0(1) - model.eye.bounds(1) : 0.01 : model.eye.x0(1) + model.eye.bounds(1);
 corneaAxialRadius = repmat(14.104,nBoots,1);
-valRange = model.eye.x0(3) - model.eye.bounds(3) : 0.1 : model.eye.x0(3) + model.eye.bounds(3);
-kvals = [randsample(valRange,nBoots); randsample(valRange,nBoots)]';
+valRange = model.eye.x0(3) - model.eye.bounds(3) : 0.01 : model.eye.x0(3) + model.eye.bounds(3);
+kvals = [randsample(valRange,nBoots,true); randsample(valRange,nBoots,true)]';
 needSwap = kvals(:,1)>kvals(:,2);
 kvals(needSwap,:) = fliplr(kvals(needSwap,:));
 valRange = 0.75:0.01:1.25;
-rotationCenterScalers = [randsample(valRange,nBoots); randsample(valRange,nBoots)]';
+rotationCenterScalers = [randsample(valRange,nBoots,true); randsample(valRange,nBoots,true)]';
 
 % Set up the scene params to vary in simulation
-valRange = -10:0.1:10;
-cameraTrans = [randsample(valRange,nBoots); randsample(valRange,nBoots); zeros(1,nBoots)];
+valRange = -10:0.01:10;
+cameraTrans = [randsample(valRange,nBoots,true); randsample(valRange,nBoots,true); zeros(1,nBoots)];
 
 % Define a set of gaze targets at ±7°
 frameSet = 1:9;
@@ -33,7 +33,7 @@ gazeTargets(1,:) = [-7 -7 -7 0 0 0 7 7 7];
 gazeTargets(2,:) = [-7 0 7 -7 0 7 -7 0 7];
 
 % How much noise are we adding to the glints and perimeters?
-perimNoise = 0;
+perimNoise = 0.25;
 
 % Define a save location for results
 dropboxBaseDir = getpref('eyeTrackTOMEAnalysis','dropboxBaseDir');
@@ -88,7 +88,7 @@ for bb = 1:nBoots
     kvalsRecovered(bb,:) = sceneObjects{1}.x(6:7);
     rotationCenterScalersRecovered(bb,:) = sceneObjects{1}.x(11:12);
     cameraTransRecovered(:,bb) = sceneObjects{1}.x(17:19)';
-    
+    meanGazeError(bb) = mean(vecnorm(sceneObjects{1}.modelPoseGaze-gazeTargets));
 end
 
 stateSaveName = tempname(outDir);
