@@ -93,3 +93,174 @@ end
 
 stateSaveName = tempname(outDir);
 save(stateSaveName)
+
+
+alphaVal = min([50/size(kvalsRecovered,2) 1]);
+markerSize = 10;
+
+markerColor = [1 0.5 0.5];
+pctSet = [5,95,50];
+lineSpec = {'--k','--k','-k'};
+
+
+subplot(4,3,1)
+hold off
+error = vecnorm((cameraTrans(1:2,1:bb)-cameraTransRecovered(1:2,1:bb)))';
+medianError = nanmedian(error);
+sim = [ cameraTrans(1,1:bb)'; cameraTrans(2,1:bb)' ];
+rec = [ cameraTransRecovered(1,1:bb)'; cameraTransRecovered(2,1:bb)' ];
+scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
+    'MarkerFaceAlpha',alphaVal);
+hold on
+D = [sim,sim-rec];
+X = -10:0.5:10;
+ctrs = {X -2:0.001:2};
+for pp = 1:length(pctSet)
+    yVals = countourLine(D,ctrs,pctSet(pp),4);
+    plot(X,yVals,lineSpec{pp})
+    hold on
+end
+xlim([-10 10])
+ylim([-2 2])
+xlabel('simulated in-plane trans [mm]');
+ylabel('error [mm]');
+axis square
+str = sprintf('error [%2.2f]',medianError);
+title(str)
+
+
+subplot(4,3,2)
+hold off
+error = abs(mean(kvals(1:bb,1:2),2)-mean(kvalsRecovered(1:bb,1:2),2));
+medianError = nanmedian(error);
+sim = mean(kvals(1:bb,1:2),2);
+rec = mean(kvalsRecovered(1:bb,1:2),2);
+scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
+    'MarkerFaceAlpha',alphaVal);
+hold on
+D = [sim,sim-rec];
+X = 41:0.5:50;
+ctrs = {X -5:0.001:5};
+for pp = 1:length(pctSet)
+    yVals = countourLine(D,ctrs,pctSet(pp),4);
+    plot(X,yVals,lineSpec{pp})
+    hold on
+end
+axis equal
+xlim([41 50])
+ylim([-5 5])
+xlabel('sphere [diopters]');
+ylabel('error [diopters]');
+axis square
+str = sprintf('error [%2.2f]',medianError);
+title(str)
+
+
+
+subplot(4,3,3)
+hold off
+error = abs( (kvals(1:bb,1)-kvals(1:bb,2)) - (kvalsRecovered(1:bb,1)-kvalsRecovered(1:bb,2)) );
+medianError = nanmedian(error);
+sim = kvals(1:bb,1)-kvals(1:bb,2);
+rec = kvalsRecovered(1:bb,1)-kvalsRecovered(1:bb,2);
+scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
+    'MarkerFaceAlpha',alphaVal);
+hold on
+D = [sim,sim-rec];
+X = -10:0.5:0;
+ctrs = {X -5:0.001:5};
+for pp = 1:length(pctSet)
+    yVals = countourLine(D,ctrs,pctSet(pp),4);
+    plot(X,yVals,lineSpec{pp})
+    hold on
+end
+axis equal
+xlim([-10 0])
+ylim([-5 5])
+xlabel('cylinder [diopters]');
+ylabel('error [diopters]');
+axis square
+str = sprintf('error [%2.2f]',medianError);
+title(str)
+
+
+% Convert the rotation scalers to absolute values of depth
+for ii = 1:nBoots
+    eye.meta.rotationCenterScalers = rotationCenterScalers(ii,:);
+    eye.meta.eyeLaterality = 'Right';
+    eye.meta.primaryPosition = [0 0];
+    rotationCenters = human.rotationCenters(eye);
+    rotMean(ii) = -mean([rotationCenters.azi(1), rotationCenters.ele(1)]);
+    rotDiff(ii) = -(rotationCenters.azi(1) - rotationCenters.ele(1));
+    eye.meta.rotationCenterScalers = rotationCenterScalersRecovered(ii,:);
+    rotationCenters = human.rotationCenters(eye);
+    rotMeanRecovered(ii) = -mean([rotationCenters.azi(1), rotationCenters.ele(1)]);
+    rotDiffRecovered(ii) = -(rotationCenters.azi(1) - rotationCenters.ele(1));
+end
+
+subplot(4,3,4)
+hold off
+error = abs( rotMean - rotMeanRecovered );
+medianError = nanmedian(error);
+sim = rotMean';
+rec = rotMeanRecovered';
+scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
+    'MarkerFaceAlpha',alphaVal);
+hold on
+D = [sim,sim-rec];
+X = 10:0.1:18;
+ctrs = {X -2:0.001:2};
+for pp = 1:length(pctSet)
+    yVals = countourLine(D,ctrs,pctSet(pp),4);
+    plot(X,yVals,lineSpec{pp})
+    hold on
+end
+axis equal
+xlim([10 18])
+ylim([-2 2])
+xlabel('mean rotation center depth [mm]');
+ylabel('error [mm]');
+axis square
+str = sprintf('error [%2.2f]',medianError);
+title(str)
+
+
+subplot(4,3,5)
+hold off
+error = abs( rotDiff - rotDiffRecovered );
+medianError = nanmedian(error);
+sim = rotDiff';
+rec = rotDiffRecovered';
+scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
+    'MarkerFaceAlpha',alphaVal);
+hold on
+D = [sim,sim-rec];
+X = -5:0.1:10;
+ctrs = {X -2:0.001:2};
+for pp = 1:length(pctSet)
+    yVals = countourLine(D,ctrs,pctSet(pp),4);
+    plot(X,yVals,lineSpec{pp})
+    hold on
+end
+axis equal
+xlim([-5 10])
+ylim([-2 2])
+xlabel('mean rotation center depth [mm]');
+ylabel('error [mm]');
+axis square
+str = sprintf('error [%2.2f]',medianError);
+title(str)
+
+
+function [yValsFit, yVals] = countourLine(D,ctrs,percentile,polyOrder)
+
+[N,c] = hist3(D,'ctrs',ctrs);
+idx=sum(cumsum(N,2) < sum(N,2).*percentile/100,2)+2;
+yVals = [nan c{2}];
+yVals = yVals(idx);
+xVals = c{1};
+validX = sum(N,2)>0;
+p=polyfit(xVals(validX),yVals(validX),polyOrder);
+yValsFit = polyval(p,xVals);
+
+end
