@@ -8,92 +8,106 @@ close all
 nScenes = 1;
 nBoots = 100;
 
-% Constrain the bounds so that we do not search over depth
-model.eye.x0 = [14.104, 44.2410, 45.6302, 0, 2.5000, 0, 1, 1, 0];
-model.eye.bounds = [0, 5, 5, 180, 5, 2.5, 0.25, 0.25, 0];
-model.scene.bounds = [10 10 10 20 20 0];
-
-% Set up the eye params to vary in simulation
-valRange = model.eye.x0(1) - model.eye.bounds(1) : 0.01 : model.eye.x0(1) + model.eye.bounds(1);
-corneaAxialRadius = repmat(14.104,nBoots,1);
-valRange = model.eye.x0(3) - model.eye.bounds(3) : 0.01 : model.eye.x0(3) + model.eye.bounds(3);
-kvals = [randsample(valRange,nBoots,true); randsample(valRange,nBoots,true)]';
-needSwap = kvals(:,1)>kvals(:,2);
-kvals(needSwap,:) = fliplr(kvals(needSwap,:));
-valRange = 0.75:0.01:1.25;
-rotationCenterScalers = [randsample(valRange,nBoots,true); randsample(valRange,nBoots,true)]';
-
-% Set up the scene params to vary in simulation
-valRange = -10:0.01:10;
-cameraTrans = [randsample(valRange,nBoots,true); randsample(valRange,nBoots,true); zeros(1,nBoots)];
-
-% Define a set of gaze targets at ±7°
-frameSet = 1:9;
-gazeTargets(1,:) = [-7 -7 -7 0 0 0 7 7 7];
-gazeTargets(2,:) = [-7 0 7 -7 0 7 -7 0 7];
-
-% How much noise are we adding to the glints and perimeters?
-perimNoise = 0.25;
-
 % Define a save location for results
 dropboxBaseDir = getpref('eyeTrackTOMEAnalysis','dropboxBaseDir');
 outDir = fullfile(dropboxBaseDir,'TOME_analysis','modelSimulations','recoverSimulatedBiometry');
 
-% Loop over simulations
-for bb = 1:nBoots
+% Set the reCalcFlag
+recalcFlag = true;
+
+if recalcFlag
+    % Constrain the bounds so that we do not search over depth
+    model.eye.x0 = [14.104, 44.2410, 45.6302, 0, 2.5000, 0, 1, 1, 0];
+    model.eye.bounds = [0, 5, 5, 180, 5, 2.5, 0.25, 0.25, 0];
+    model.scene.bounds = [10 10 10 20 20 0];
     
-    % Create a sceneGeometry with these parameters
-    sceneGeometry=createSceneGeometry(...
-        'corneaAxialRadius',corneaAxialRadius(bb),...
-        'kvals',kvals(bb,:),...
-        'rotationCenterScalers',rotationCenterScalers(bb,:));
-    sceneGeometry.cameraPosition.translation = ...
-        sceneGeometry.cameraPosition.translation + cameraTrans(:,bb);
+    % Set up the eye params to vary in simulation
+    valRange = model.eye.x0(1) - model.eye.bounds(1) : 0.01 : model.eye.x0(1) + model.eye.bounds(1);
+    corneaAxialRadius = repmat(14.104,nBoots,1);
+    valRange = model.eye.x0(3) - model.eye.bounds(3) : 0.01 : model.eye.x0(3) + model.eye.bounds(3);
+    kvals = [randsample(valRange,nBoots,true); randsample(valRange,nBoots,true)]';
+    needSwap = kvals(:,1)>kvals(:,2);
+    kvals(needSwap,:) = fliplr(kvals(needSwap,:));
+    valRange = 11:0.01:16;
+    aziCenter = randsample(valRange,nBoots,true);
+    eleCenter = randsample(valRange,nBoots,true);
+    ele0 = 12; azi0 = 14.7;
+    rotDiff = @(azi,ele) ((azi.*ele0)./(azi0.*ele)).^(1/2);
+    rotJoint = @(azi,ele) (ele.*((azi.*ele0)/(azi0.*ele)).^(1/2))./ele0;
+    rotationCenterScalers = [rotDiff(aziCenter,eleCenter); rotJoint(aziCenter,eleCenter)]';
+    
+    % Set up the scene params to vary in simulation
+    valRange = -10:0.01:10;
+    cameraTrans = [randsample(valRange,nBoots,true); randsample(valRange,nBoots,true); zeros(1,nBoots)];
+    
+    % Define a set of gaze targets at ±7°
+    frameSet = 1:9;
+    gazeTargets(1,:) = [-7 -7 -7 0 0 0 7 7 7];
+    gazeTargets(2,:) = [-7 0 7 -7 0 7 -7 0 7];
+    
+    % How much noise are we adding to the glints and perimeters?
+    perimNoise = 0.25;
+    
+    % Loop over simulations
+    for bb = 1:nBoots
         
-    % Assemble a set of scenes
-    for ss = 1:nScenes
+        bb
         
-        glintData = [];
-        perimeter = [];
+        % Create a sceneGeometry with these parameters
+        sceneGeometry=createSceneGeometry(...
+            'corneaAxialRadius',corneaAxialRadius(bb),...
+            'kvals',kvals(bb,:),...
+            'rotationCenterScalers',rotationCenterScalers(bb,:));
+        sceneGeometry.cameraPosition.translation = ...
+            sceneGeometry.cameraPosition.translation + cameraTrans(:,bb);
         
-        % Loop over the gaze targets and get 
-        for pp = 1:size(gazeTargets,2)
-                        
-            eyePose = [gazeTargets(1,pp),gazeTargets(2,pp),0,2];
-            [ targetEllipse, glintCoordOrig ] = projectModelEye(eyePose,sceneGeometry);
+        % Assemble a set of scenes
+        for ss = 1:nScenes
             
-            % Obtain the glintCoord and perimeter points of the ellipse, adding
-            % noise
-            glintCoord = glintCoordOrig + randn(size(glintCoordOrig)).*perimNoise;
-            [ Xp, Yp ] = ellipsePerimeterPoints( targetEllipse, 10, 0, perimNoise );
+            glintData = [];
+            perimeter = [];
             
-            glintData.X(pp,1) = glintCoord(1);
-            glintData.Y(pp,1) = glintCoord(2);
+            % Loop over the gaze targets and get
+            for pp = 1:size(gazeTargets,2)
+                
+                eyePose = [gazeTargets(1,pp),gazeTargets(2,pp),0,2];
+                [ targetEllipse, glintCoordOrig ] = projectModelEye(eyePose,sceneGeometry);
+                
+                % Obtain the glintCoord and perimeter points of the ellipse, adding
+                % noise
+                glintCoord = glintCoordOrig + randn(size(glintCoordOrig)).*perimNoise;
+                [ Xp, Yp ] = ellipsePerimeterPoints( targetEllipse, 10, 0, perimNoise );
+                
+                glintData.X(pp,1) = glintCoord(1);
+                glintData.Y(pp,1) = glintCoord(2);
+                
+                perimeter.data{pp}.Xp = Xp;
+                perimeter.data{pp}.Yp = Yp;
+                
+            end
             
-            perimeter.data{pp}.Xp = Xp;
-            perimeter.data{pp}.Yp = Yp;
+            pCell{ss}=perimeter;
+            gCell{ss}=glintData;
             
         end
         
-        pCell{ss}=perimeter;
-        gCell{ss}=glintData;
-        
+        sceneObjects = estimateSceneParams(repmat({'simulate'},nScenes,1), repmat({frameSet},nScenes,1),repmat({gazeTargets},nScenes,1), ...
+            'searchStrategy','simulateBio','savePlots',false,'saveFiles',false, ...
+            'model',model,'glintData',gCell,'perimeter',pCell);
+        kvalsRecovered(bb,:) = sceneObjects{1}.x(6:7);
+        rotationCenterScalersRecovered(bb,:) = sceneObjects{1}.x(11:12);
+        cameraTransRecovered(:,bb) = sceneObjects{1}.x(17:19)';
+        meanGazeError(bb) = mean(vecnorm(sceneObjects{1}.modelPoseGaze-gazeTargets));
     end
     
-    sceneObjects = estimateSceneParams(repmat({'simulate'},nScenes,1), repmat({frameSet},nScenes,1),repmat({gazeTargets},nScenes,1), ...
-        'searchStrategy','gazeCal','savePlots',false,'saveFiles',false, ...
-        'model',model,'glintData',gCell,'perimeter',pCell);
+    stateSaveName = tempname(outDir);
+    save(stateSaveName)
+else
     
-%    corneaAxialRadiusRecovered(bb) = sceneObjects{1}.x(5);
-    kvalsRecovered(bb,:) = sceneObjects{1}.x(6:7);
-    rotationCenterScalersRecovered(bb,:) = sceneObjects{1}.x(11:12);
-    cameraTransRecovered(:,bb) = sceneObjects{1}.x(17:19)';
-    meanGazeError(bb) = mean(vecnorm(sceneObjects{1}.modelPoseGaze-gazeTargets));
+    stateSaveName = fullfile(outDir,'tp11fa516a_c8c4_4e48_89be_6e658b7c0f63.mat');
+    load(stateSaveName)
+    
 end
-
-stateSaveName = tempname(outDir);
-save(stateSaveName)
-
 
 alphaVal = min([50/size(kvalsRecovered,2) 1]);
 markerSize = 10;
@@ -190,6 +204,8 @@ for ii = 1:nBoots
     eye.meta.eyeLaterality = 'Right';
     eye.meta.primaryPosition = [0 0];
     rotationCenters = human.rotationCenters(eye);
+    rotAzi(ii) = rotationCenters.azi(1);
+    rotEle(ii) = rotationCenters.ele(1);
     rotMean(ii) = -mean([rotationCenters.azi(1), rotationCenters.ele(1)]);
     rotDiff(ii) = -(rotationCenters.azi(1) - rotationCenters.ele(1));
     eye.meta.rotationCenterScalers = rotationCenterScalersRecovered(ii,:);
