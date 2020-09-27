@@ -33,7 +33,7 @@ if recalcFlag
     eleCenter = randsample(valRange,nBoots,true);
     ele0 = 12; azi0 = 14.7;
     rotDiff = @(azi,ele) ((azi.*ele0)./(azi0.*ele)).^(1/2);
-    rotJoint = @(azi,ele) (ele.*((azi.*ele0)/(azi0.*ele)).^(1/2))./ele0;
+    rotJoint = @(azi,ele) (ele.*((azi.*ele0)./(azi0.*ele)).^(1/2))./ele0;
     rotationCenterScalers = [rotDiff(aziCenter,eleCenter); rotJoint(aziCenter,eleCenter)]';
     
     % Set up the scene params to vary in simulation
@@ -104,9 +104,9 @@ if recalcFlag
     save(stateSaveName)
 else
     
-    stateSaveName = fullfile(outDir,'tp11fa516a_c8c4_4e48_89be_6e658b7c0f63.mat');
+    stateSaveName = fullfile(outDir,'tp786eba98_f3ab_49e5_911e_48eb000aea39.mat');
     load(stateSaveName)
-    
+    bb=60
 end
 
 alphaVal = min([50/size(kvalsRecovered,2) 1]);
@@ -198,33 +198,27 @@ str = sprintf('error [%2.2f]',medianError);
 title(str)
 
 
-% Convert the rotation scalers to absolute values of depth
+% Grab the rotation depths
 for ii = 1:nBoots
     eye.meta.rotationCenterScalers = rotationCenterScalers(ii,:);
     eye.meta.eyeLaterality = 'Right';
     eye.meta.primaryPosition = [0 0];
     rotationCenters = human.rotationCenters(eye);
-    rotAzi(ii) = rotationCenters.azi(1);
-    rotEle(ii) = rotationCenters.ele(1);
-    rotMean(ii) = -mean([rotationCenters.azi(1), rotationCenters.ele(1)]);
-    rotDiff(ii) = -(rotationCenters.azi(1) - rotationCenters.ele(1));
-    eye.meta.rotationCenterScalers = rotationCenterScalersRecovered(ii,:);
-    rotationCenters = human.rotationCenters(eye);
-    rotMeanRecovered(ii) = -mean([rotationCenters.azi(1), rotationCenters.ele(1)]);
-    rotDiffRecovered(ii) = -(rotationCenters.azi(1) - rotationCenters.ele(1));
+    aziCenterRecovered(ii) = -rotationCenters.azi(1);
+    eleCenterRecovered(ii) = -rotationCenters.ele(1);
 end
 
 subplot(4,3,4)
 hold off
-error = abs( rotMean - rotMeanRecovered );
+error = abs( aziCenter - aziCenterRecovered );
 medianError = nanmedian(error);
-sim = rotMean';
-rec = rotMeanRecovered';
+sim = aziCenter';
+rec = aziCenterRecovered';
 scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
 D = [sim,sim-rec];
-X = 10:0.1:18;
+X = 11:0.1:16;
 ctrs = {X -2:0.001:2};
 for pp = 1:length(pctSet)
     yVals = countourLine(D,ctrs,pctSet(pp),4);
@@ -232,9 +226,9 @@ for pp = 1:length(pctSet)
     hold on
 end
 axis equal
-xlim([10 18])
+xlim([11 16])
 ylim([-2 2])
-xlabel('mean rotation center depth [mm]');
+xlabel('azi center depth [mm]');
 ylabel('error [mm]');
 axis square
 str = sprintf('error [%2.2f]',medianError);
@@ -243,15 +237,15 @@ title(str)
 
 subplot(4,3,5)
 hold off
-error = abs( rotDiff - rotDiffRecovered );
+error = abs( eleCenter - eleCenterRecovered );
 medianError = nanmedian(error);
-sim = rotDiff';
-rec = rotDiffRecovered';
+sim = eleCenter';
+rec = eleCenterRecovered';
 scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
 D = [sim,sim-rec];
-X = -5:0.1:10;
+X = 11:0.1:16;
 ctrs = {X -2:0.001:2};
 for pp = 1:length(pctSet)
     yVals = countourLine(D,ctrs,pctSet(pp),4);
@@ -259,9 +253,9 @@ for pp = 1:length(pctSet)
     hold on
 end
 axis equal
-xlim([-5 10])
+xlim([11 16])
 ylim([-2 2])
-xlabel('mean rotation center depth [mm]');
+xlabel('ele center depth [mm]');
 ylabel('error [mm]');
 axis square
 str = sprintf('error [%2.2f]',medianError);
