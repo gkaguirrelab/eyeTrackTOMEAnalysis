@@ -6,7 +6,7 @@ close all
 
 % How many scenes and boots?
 nScenes = 1;
-nBoots = 100;
+nBoots = 250;
 
 % Define a save location for results
 dropboxBaseDir = getpref('eyeTrackTOMEAnalysis','dropboxBaseDir');
