@@ -34,7 +34,7 @@ if recalcFlag
     ele0 = 12; azi0 = 14.7;
     rotDiff = @(azi,ele) ((azi.*ele0)./(azi0.*ele)).^(1/2);
     rotJoint = @(azi,ele) (ele.*((azi.*ele0)./(azi0.*ele)).^(1/2))./ele0;
-    rotationCenterScalers = [rotDiff(aziCenter,eleCenter); rotJoint(aziCenter,eleCenter)]';
+    rotationCenterScalers = [rotJoint(aziCenter,eleCenter); rotDiff(aziCenter,eleCenter)]';
     
     % Set up the scene params to vary in simulation
     valRange = -10:0.01:10;
@@ -104,9 +104,10 @@ if recalcFlag
     save(stateSaveName)
 else
     
-    stateSaveName = fullfile(outDir,'tp786eba98_f3ab_49e5_911e_48eb000aea39.mat');
+    stateSaveName = fullfile(outDir,'tp5421a0e2_e178_4236_8bdf_68d54f0dcd01.mat');
     load(stateSaveName)
-    bb=60
+    bb=15;
+    nBoots = 15;
 end
 
 alphaVal = min([50/size(kvalsRecovered,2) 1]);
@@ -119,10 +120,10 @@ lineSpec = {'--k','--k','-k'};
 
 subplot(4,3,1)
 hold off
-error = vecnorm((cameraTrans(1:2,1:bb)-cameraTransRecovered(1:2,1:bb)))';
+error = vecnorm((cameraTrans(1:2,1:nBoots)-cameraTransRecovered(1:2,1:nBoots)))';
 medianError = nanmedian(error);
-sim = [ cameraTrans(1,1:bb)'; cameraTrans(2,1:bb)' ];
-rec = [ cameraTransRecovered(1,1:bb)'; cameraTransRecovered(2,1:bb)' ];
+sim = [ cameraTrans(1,1:nBoots)'; cameraTrans(2,1:nBoots)' ];
+rec = [ cameraTransRecovered(1,1:nBoots)'; cameraTransRecovered(2,1:nBoots)' ];
 scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
@@ -145,25 +146,25 @@ title(str)
 
 subplot(4,3,2)
 hold off
-error = abs(mean(kvals(1:bb,1:2),2)-mean(kvalsRecovered(1:bb,1:2),2));
+error = abs(kvals(1:nBoots,1) - kvalsRecovered(1:nBoots,1) );
 medianError = nanmedian(error);
-sim = mean(kvals(1:bb,1:2),2);
-rec = mean(kvalsRecovered(1:bb,1:2),2);
+sim = kvals(1:nBoots,1);
+rec = kvalsRecovered(1:nBoots,1);
 scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
 D = [sim,sim-rec];
-X = 41:0.5:50;
-ctrs = {X -5:0.001:5};
+X = 39:0.5:50;
+ctrs = {X -2:0.001:2};
 for pp = 1:length(pctSet)
     yVals = countourLine(D,ctrs,pctSet(pp),4);
     plot(X,yVals,lineSpec{pp})
     hold on
 end
 axis equal
-xlim([41 50])
-ylim([-5 5])
-xlabel('sphere [diopters]');
+xlim([39 50])
+ylim([-2 2])
+xlabel('k1 [diopters]');
 ylabel('error [diopters]');
 axis square
 str = sprintf('error [%2.2f]',medianError);
@@ -173,25 +174,25 @@ title(str)
 
 subplot(4,3,3)
 hold off
-error = abs( (kvals(1:bb,1)-kvals(1:bb,2)) - (kvalsRecovered(1:bb,1)-kvalsRecovered(1:bb,2)) );
+error = abs(kvals(1:nBoots,2) - kvalsRecovered(1:nBoots,2) );
 medianError = nanmedian(error);
-sim = kvals(1:bb,1)-kvals(1:bb,2);
-rec = kvalsRecovered(1:bb,1)-kvalsRecovered(1:bb,2);
+sim = kvals(1:nBoots,2);
+rec = kvalsRecovered(1:nBoots,2);
 scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
 D = [sim,sim-rec];
-X = -10:0.5:0;
-ctrs = {X -5:0.001:5};
+X = 39:0.5:50;
+ctrs = {X -2:0.001:2};
 for pp = 1:length(pctSet)
     yVals = countourLine(D,ctrs,pctSet(pp),4);
     plot(X,yVals,lineSpec{pp})
     hold on
 end
 axis equal
-xlim([-10 0])
-ylim([-5 5])
-xlabel('cylinder [diopters]');
+xlim([39 50])
+ylim([-2 2])
+xlabel('k2 [diopters]');
 ylabel('error [diopters]');
 axis square
 str = sprintf('error [%2.2f]',medianError);
@@ -210,16 +211,16 @@ end
 
 subplot(4,3,4)
 hold off
-error = abs( aziCenter - aziCenterRecovered );
+error = abs( aziCenter(1:nBoots) - aziCenterRecovered(1:nBoots) );
 medianError = nanmedian(error);
-sim = aziCenter';
-rec = aziCenterRecovered';
+sim = aziCenter(1:nBoots)';
+rec = aziCenterRecovered(1:nBoots)';
 scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
 D = [sim,sim-rec];
 X = 11:0.1:16;
-ctrs = {X -2:0.001:2};
+ctrs = {X -1:0.001:1};
 for pp = 1:length(pctSet)
     yVals = countourLine(D,ctrs,pctSet(pp),4);
     plot(X,yVals,lineSpec{pp})
@@ -227,7 +228,7 @@ for pp = 1:length(pctSet)
 end
 axis equal
 xlim([11 16])
-ylim([-2 2])
+ylim([-1 1])
 xlabel('azi center depth [mm]');
 ylabel('error [mm]');
 axis square
@@ -237,16 +238,16 @@ title(str)
 
 subplot(4,3,5)
 hold off
-error = abs( eleCenter - eleCenterRecovered );
+error = abs( eleCenter(1:nBoots) - eleCenterRecovered(1:nBoots) );
 medianError = nanmedian(error);
-sim = eleCenter';
-rec = eleCenterRecovered';
+sim = eleCenter(1:nBoots)';
+rec = eleCenterRecovered(1:nBoots)';
 scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','none',...
     'MarkerFaceAlpha',alphaVal);
 hold on
 D = [sim,sim-rec];
 X = 11:0.1:16;
-ctrs = {X -2:0.001:2};
+ctrs = {X -1:0.001:1};
 for pp = 1:length(pctSet)
     yVals = countourLine(D,ctrs,pctSet(pp),4);
     plot(X,yVals,lineSpec{pp})
@@ -254,7 +255,7 @@ for pp = 1:length(pctSet)
 end
 axis equal
 xlim([11 16])
-ylim([-2 2])
+ylim([-1 1])
 xlabel('ele center depth [mm]');
 ylabel('error [mm]');
 axis square
