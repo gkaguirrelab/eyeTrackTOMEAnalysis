@@ -13,7 +13,7 @@ dropboxBaseDir = getpref('eyeTrackTOMEAnalysis','dropboxBaseDir');
 outDir = fullfile(dropboxBaseDir,'TOME_analysis','modelSimulations','recoverSimulatedBiometry');
 
 % Set the reCalcFlag
-recalcFlag = true;
+recalcFlag = false;
 
 if recalcFlag
     % Constrain the bounds so that we do not search over depth
@@ -104,13 +104,32 @@ if recalcFlag
     save(stateSaveName)
 else
     
-    stateSaveName = fullfile(outDir,'tp5421a0e2_e178_4236_8bdf_68d54f0dcd01.mat');
-    load(stateSaveName)
-    bb=15;
-    nBoots = 15;
+    fileNames = {'tp5b16f1d4_52b6_4b39_999e_4093592aba0b.mat','tp6e876ca7_0af8_42bc_aaba_960e9f716fe0.mat','tpe931fa2a_feb4_4d62_ac5d_7b026f9af1da.mat','tpe3436800_610d_4166_8c3b_5ea5e65dbac0.mat'};
+    cameraTrans = [];
+    cameraTransRecovered = [];
+    kvals = [];
+    kvalsRecovered = [];
+    rotationCenterScalersRecovered = [];
+    aziCenter = [];
+    eleCenter = [];
+    for ii = 1:length(fileNames)
+        stateSaveName = fullfile(outDir,fileNames{ii});
+        dataLoad = load(stateSaveName);
+        cameraTrans = [cameraTrans dataLoad.cameraTrans];
+        cameraTransRecovered = [cameraTransRecovered dataLoad.cameraTransRecovered];
+        kvals = [kvals; dataLoad.kvals];
+        kvalsRecovered = [kvalsRecovered; dataLoad.kvalsRecovered];
+        rotationCenterScalersRecovered = [rotationCenterScalersRecovered; dataLoad.rotationCenterScalersRecovered];
+        aziCenter = [aziCenter dataLoad.aziCenter];
+        eleCenter = [eleCenter dataLoad.eleCenter];
+    end
+    
+    nBoots = 1000;
+    bb = 1000;
+    
 end
 
-alphaVal = min([50/size(kvalsRecovered,2) 1]);
+alphaVal = min([100/nBoots 1]);
 markerSize = 10;
 
 markerColor = [1 0.5 0.5];
@@ -128,15 +147,15 @@ scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','
     'MarkerFaceAlpha',alphaVal);
 hold on
 D = [sim,sim-rec];
-X = -10:0.5:10;
-ctrs = {X -2:0.001:2};
+X = -10:1:10;
+ctrs = {X -1:0.0001:1};
 for pp = 1:length(pctSet)
     yVals = countourLine(D,ctrs,pctSet(pp),4);
     plot(X,yVals,lineSpec{pp})
     hold on
 end
 xlim([-10 10])
-ylim([-2 2])
+ylim([-1 1])
 xlabel('simulated in-plane trans [mm]');
 ylabel('error [mm]');
 axis square
@@ -154,7 +173,7 @@ scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','
     'MarkerFaceAlpha',alphaVal);
 hold on
 D = [sim,sim-rec];
-X = 39:0.5:50;
+X = 40:0.5:49;
 ctrs = {X -2:0.001:2};
 for pp = 1:length(pctSet)
     yVals = countourLine(D,ctrs,pctSet(pp),4);
@@ -162,7 +181,7 @@ for pp = 1:length(pctSet)
     hold on
 end
 axis equal
-xlim([39 50])
+xlim([40 49])
 ylim([-2 2])
 xlabel('k1 [diopters]');
 ylabel('error [diopters]');
@@ -182,7 +201,7 @@ scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','
     'MarkerFaceAlpha',alphaVal);
 hold on
 D = [sim,sim-rec];
-X = 39:0.5:50;
+X = 41:0.5:51;
 ctrs = {X -2:0.001:2};
 for pp = 1:length(pctSet)
     yVals = countourLine(D,ctrs,pctSet(pp),4);
@@ -190,7 +209,7 @@ for pp = 1:length(pctSet)
     hold on
 end
 axis equal
-xlim([39 50])
+xlim([41 51])
 ylim([-2 2])
 xlabel('k2 [diopters]');
 ylabel('error [diopters]');
@@ -201,7 +220,7 @@ title(str)
 
 % Grab the rotation depths
 for ii = 1:nBoots
-    eye.meta.rotationCenterScalers = rotationCenterScalers(ii,:);
+    eye.meta.rotationCenterScalers = rotationCenterScalersRecovered(ii,:);
     eye.meta.eyeLaterality = 'Right';
     eye.meta.primaryPosition = [0 0];
     rotationCenters = human.rotationCenters(eye);
@@ -219,8 +238,8 @@ scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','
     'MarkerFaceAlpha',alphaVal);
 hold on
 D = [sim,sim-rec];
-X = 11:0.1:16;
-ctrs = {X -1:0.001:1};
+X = 11:0.5:16;
+ctrs = {X -1:0.0001:1};
 for pp = 1:length(pctSet)
     yVals = countourLine(D,ctrs,pctSet(pp),4);
     plot(X,yVals,lineSpec{pp})
@@ -246,7 +265,7 @@ scatter(sim,sim-rec,markerSize,'MarkerFaceColor',markerColor,'MarkerEdgeColor','
     'MarkerFaceAlpha',alphaVal);
 hold on
 D = [sim,sim-rec];
-X = 11:0.1:16;
+X = 11:0.5:16;
 ctrs = {X -1:0.001:1};
 for pp = 1:length(pctSet)
     yVals = countourLine(D,ctrs,pctSet(pp),4);
