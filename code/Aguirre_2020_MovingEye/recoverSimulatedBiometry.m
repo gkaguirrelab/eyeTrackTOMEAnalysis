@@ -112,6 +112,7 @@ else
     rotationCenterScalersRecovered = [];
     aziCenter = [];
     eleCenter = [];
+    meanGazeError = []
     for ii = 1:length(fileNames)
         stateSaveName = fullfile(outDir,fileNames{ii});
         dataLoad = load(stateSaveName);
@@ -122,6 +123,7 @@ else
         rotationCenterScalersRecovered = [rotationCenterScalersRecovered; dataLoad.rotationCenterScalersRecovered];
         aziCenter = [aziCenter dataLoad.aziCenter];
         eleCenter = [eleCenter dataLoad.eleCenter];
+        meanGazeError = [meanGazeError dataLoad.meanGazeError];
     end
     
     nBoots = 1000;
@@ -136,6 +138,7 @@ markerColor = [1 0.5 0.5];
 pctSet = [5,95,50];
 lineSpec = {'--k','--k','-k'};
 
+median(meanGazeError)
 
 subplot(4,3,1)
 hold off
