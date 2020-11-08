@@ -140,6 +140,8 @@ lineSpec = {'--k','--k','-k'};
 
 median(meanGazeError)
 
+figHandle = figure();
+
 subplot(4,3,1)
 hold off
 error = vecnorm((cameraTrans(1:2,1:nBoots)-cameraTransRecovered(1:2,1:nBoots)))';
@@ -283,6 +285,12 @@ ylabel('error [mm]');
 axis square
 str = sprintf('error [%2.2f]',medianError);
 title(str)
+
+
+% Save the figure
+fileName = '/Users/aguirre/Desktop/simBiometry.pdf';
+print(figHandle,fileName,'-dpdf')
+
 
 
 function [yValsFit, yVals] = countourLine(D,ctrs,percentile,polyOrder)

@@ -78,5 +78,5 @@ set(t,'Matrix',m)
 S = quadric.scale(quadric.unitSphere,[300 300 50000]);
 S = quadric.translate(S,[-100 32 0]);
 boundingBox = [-400 400 -400 400 -200 1000];
-boreHandle = quadric.plotSurface(S, boundingBox, [0.5 0.5 1], 0.5);
+boreHandle = quadric.plotSurface(S, boundingBox, [0.5 0.5 1], 0.2);
 
