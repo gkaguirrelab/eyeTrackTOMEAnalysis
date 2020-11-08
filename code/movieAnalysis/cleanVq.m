@@ -3,23 +3,61 @@
 
 % Do we wish to correct for scaling differences between subjects in gaze
 % amplitude?
-affineCorrectFlag = false;
 
 % Do we wish to impute missing values using the mean measure?
-imputeFlag = false;
 
-dataType = 'MOVIE';
+% Do we wish to temporally align the vectors?
+
+
+%dataType = 'REST';
+%dataType = 'MOVIE';
 %dataType = 'RETINO';
+dataType = 'FLASH';
 
 % Load the gaze data file from my local disk
-gazeDataSource = ['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/pupilDataQAPlots_eyePose_' dataType '_July2020/gazeData.mat'];
-gazeDataSave = ['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/pupilDataQAPlots_eyePose_' dataType '_July2020/gazeData_cleaned.mat'];
-
 switch dataType
+    case 'REST'
+        
+        % Data location settings
+        gazeDataSource = ['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session1_restAndStructure/pupilDataQAPlots_eyePose_July2020/gazeData.mat'];
+        gazeDataSave = ['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session1_restAndStructure/pupilDataQAPlots_eyePose_July2020/gazeData_cleaned.mat'];
+        fieldNames = {'rfMRI_REST_AP_run01','rfMRI_REST_PA_run02','rfMRI_REST_AP_run03','rfMRI_REST_PA_run04'};
+        
+        % Adjustment settings
+        affineCorrectFlag = false;
+        imputeFlag = false;
+        temporalAlignFlag = false;
+        
     case 'MOVIE'
+        gazeDataSource = ['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/pupilDataQAPlots_eyePose_MOVIE_July2020/gazeData.mat'];
+        gazeDataSave = ['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/pupilDataQAPlots_eyePose_MOVIE_July2020/gazeData_cleaned.mat'];
         fieldNames = {'tfMRI_MOVIE_AP_run01','tfMRI_MOVIE_AP_run02','tfMRI_MOVIE_PA_run03','tfMRI_MOVIE_PA_run04'};
+
+        % Adjustment settings
+        affineCorrectFlag = false;
+        imputeFlag = false;
+        temporalAlignFlag = true;
+        
     case'RETINO'
+        gazeDataSource = ['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/pupilDataQAPlots_eyePose_RETINO_July2020/gazeData.mat'];
+        gazeDataSave = ['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/pupilDataQAPlots_eyePose_RETINO_July2020/gazeData_cleaned.mat'];
         fieldNames = {'tfMRI_RETINO_PA_run01','tfMRI_RETINO_PA_run02','tfMRI_RETINO_AP_run03','tfMRI_RETINO_AP_run04'};
+
+        % Adjustment settings
+        affineCorrectFlag = false;
+        imputeFlag = false;
+        temporalAlignFlag = false;
+
+     case'FLASH'
+        gazeDataSource = ['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/pupilDataQAPlots_eyePose_FLASH_July2020/gazeData.mat'];
+        gazeDataSave = ['/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/pupilDataQAPlots_eyePose_FLASH_July2020/gazeData_cleaned.mat'];
+        fieldNames = {'tfMRI_FLASH_AP_run01','tfMRI_FLASH_PA_run02'};
+
+        % Adjustment settings
+        affineCorrectFlag = false;
+        imputeFlag = false;
+        temporalAlignFlag = false;
+        
 end
 
 load(gazeDataSource,'gazeData')
@@ -58,37 +96,44 @@ for ff = 1:length(fieldNames)
     
     % Find the phase shift in the first measure that best aligns all
     % vectors
-    frameSearch = -20:20;
-    cc = nan(nSubs,nSubs);
-    cr = nan(nSubs,nSubs);
-    corVals = [];
-    for xx=1:nSubs
-        for yy = 1:nSubs
-            if xx==yy
-                continue
+    if temporalAlignFlag
+        frameSearch = -20:20;
+        cc = nan(nSubs,nSubs);
+        cr = nan(nSubs,nSubs);
+        corVals = [];
+        for xx=1:nSubs
+            for yy = 1:nSubs
+                if xx==yy
+                    continue
+                end
+                vecA = squeeze(vqCentered(xx,1,:));
+                vecB = squeeze(vqCentered(yy,1,:));
+                for tt = 1:length(frameSearch)
+                    corVals(tt) = corr(vecA,circshift(vecB,frameSearch(tt)),'Rows','pairwise');
+                end
+                cr(xx,yy) = max(corVals);
+                cc(xx,yy) = frameSearch(find(corVals==max(corVals),1));
             end
-            vecA = squeeze(vqCentered(xx,1,:));
-            vecB = squeeze(vqCentered(yy,1,:));
-            for tt = 1:length(frameSearch)
-                corVals(tt) = corr(vecA,circshift(vecB,frameSearch(tt)),'Rows','pairwise');
+        end
+        
+        % Apply the shift to temporally align the subjects
+        frameShifts = [];
+        for xx=1:nSubs
+            for mm=1:nMeasures
+                vec = squeeze(vqCentered(xx,1,:));
+                frameShifts(xx) = round(nanmean(cc(:,xx)));
+                vqCentered(xx,1,:)=circshift(vec,frameShifts(xx));
             end
-            cr(xx,yy) = max(corVals);
-            cc(xx,yy) = frameSearch(find(corVals==max(corVals),1));
         end
+        
+        % Store the shift values
+        gazeData.(fieldNames{ff}).frameShifts = frameShifts;
+        
+    else
+        
+        gazeData.(fieldNames{ff}).frameShifts = nan;
+        
     end
-    
-    % Apply the shift to temporally align the subjects
-    frameShifts = [];
-    for xx=1:nSubs
-        for mm=1:nMeasures
-            vec = squeeze(vqCentered(xx,1,:));
-            frameShifts(xx) = round(nanmean(cc(:,xx)));
-            vqCentered(xx,1,:)=circshift(vec,frameShifts(xx));
-        end
-    end
-    
-    % Store the shift values
-    gazeData.(fieldNames{ff}).frameShifts = frameShifts;
     
     % Correct for scaling gaze differences between subjects
     if affineCorrectFlag
@@ -164,9 +209,15 @@ for ff = 1:length(fieldNames)
                         % screen
                         vqCleaned(ii,mm,:) = vqCleaned(ii,mm,:) - nanmean(vqCleaned(ii,mm,:));
                     case 'MOVIE'
-                        % For the MOVIE data, we assume that everyone tends
-                        % to look in the same place
+                        % For the MOVIE data, let people look wherever they
+                        % want
                         vqCleaned(ii,mm,:) = vqCleaned(ii,mm,:) + vqMeanValByMeasure(mm);
+                    case 'REST'
+                        % For the REST data, we mean center the vector, as
+                        % gaze position is arbitrary, and this helps us to
+                        % display the variation in gaze position across
+                        % subjects.
+                        vqCleaned(ii,mm,:) = vqCleaned(ii,mm,:) - nanmean(vqCleaned(ii,mm,:));
                 end
             end
         end
@@ -183,8 +234,8 @@ for ff = 1:length(fieldNames)
     gazeData.(fieldNames{ff}).synthTargets.gazeDisagreement = gazeDisagreement;
     
     % Create a display of the synthesized targets
-    figure
-    plot(gazeTargets(1,:),gazeTargets(2,:),'ok');
+%    figure
+%    plot(gazeTargets(1,:),gazeTargets(2,:),'ok');
     
     % Create a display of the data
     figure
