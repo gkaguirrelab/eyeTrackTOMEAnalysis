@@ -62,7 +62,7 @@ eleCenterP1 = nanmedian(eleCenterP1,2);
 
 
 %% Figure 5b -- Azi and Ele values, across subject medians and IQRs
-figure
+figHandle = figure();
 idx = ~isnan(aziCenterP1);
 h = scatter(zeros(1,sum(idx))+0.5,-aziCenterP1(idx),200,'o','MarkerFaceColor','k','MarkerEdgeColor','k');
 h.MarkerFaceAlpha = 0.10;
@@ -90,21 +90,36 @@ xlim([0 2.5])
 ylabel('Rotation center depth [mm]');
 title('Azi and ele rotation centers. median ± IQR');
 
-
-%% Figure 5e -- Gaze error by subject
-figure
-scatter(1:45,sort(nanmedian(gazeError,2)),200,'o','MarkerEdgeColor','none',...
-    'MarkerFaceColor',[1 0 0],'MarkerFaceAlpha',0.5);
-ylim([0 1.5])
-xlabel('Subject number')
-ylabel('Median cross-validated absolute gaze error [deg]')
-title(sprintf('Median across subject error %2.2f deg',nanmedian(nanmedian(gazeError,2))));
+fileName = ['~/Desktop/Figure5b_rotationCenters.pdf'];
+saveas(figHandle,fileName);
 
 
+%% Figure 5d -- Gaze error by subject
+figHandle = figure();
+[N,edges] = histcounts(nanmedian(gazeError,2),0:0.25:1.5);
+for nn=1:length(N)
+    for cc=1:N(nn)
+        scatter(nn,cc,300,'o','MarkerEdgeColor','none',...
+        'MarkerFaceColor',[0.5 0.5 0.5],'MarkerFaceAlpha',0.5);
+        hold on
+    end
+    tickLabels{nn} = [num2str(edges(nn)) ' — ' num2str(edges(nn+1))];
+end
+xlim([0 length(N)*3])
+xticks(1:length(N))
+xticklabels(tickLabels)
+xtickangle(90)
+box off
+xlabel('Median absolute gaze error [deg]')
+ylabel('Number of subjects')
+title('Median gaze error each subject');
+fileName = ['~/Desktop/Figure5d_GazeErrorHistogram.pdf'];
+saveas(figHandle,fileName);
 
-%% Figure 5f -- Recovered gaze location across subjects for the median performing gaze cal
 
-figure
+%% Figure 5c -- Recovered gaze location across subjects for the median performing gaze cal
+
+figHandle = figure();
 targetGaze(1,:) = [-7 -7 -7 0 0 0 7 7 7];
 targetGaze(2,:) = [-7 0 7 -7 0 7 -7 0 7];
 plot(targetGaze(1,:),targetGaze(2,:),'ok','MarkerSize',20);
@@ -145,7 +160,12 @@ for ss = 1:45
 end
 
 plot(targetGaze(1,:),targetGaze(2,:),'ok','MarkerSize',20,'LineWidth',2);
+title(sprintf('Median across subject error %2.2f deg',nanmedian(nanmedian(gazeError,2))));
 
 xlim([-11 11]);
 ylim([-11 11]);
 axis square
+
+fileName = ['~/Desktop/Figure5c_GazeErrorOverlay.pdf'];
+saveas(figHandle,fileName);
+
