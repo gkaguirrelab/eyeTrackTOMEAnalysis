@@ -1,6 +1,10 @@
 
 
-function [h] = plotArc3D(from, to, center, count, color)
+function [h] = plotArc3D(from, to, center, count, color,lw)
+
+if nargin == 5
+lw = 1;    
+end
 
 center = center(:); from = from(:); to = to(:);
 
@@ -35,5 +39,5 @@ end
 X = intermediates(1,:);
 Y = intermediates(2,:);
 Z = intermediates(3,:);
-h = line(X,Y,Z,'Color',color);
+h = line(X,Y,Z,'Color',color,'LineWidth',lw);
 end
