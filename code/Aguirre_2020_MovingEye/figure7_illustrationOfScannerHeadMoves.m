@@ -53,23 +53,31 @@ stlFileBrain = '/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/_Papers/Aguirre_20
 fv = stlread(stlFileBrain);
 
 % Plot the object, and set the rotation and transparency
-brainObj = patch(fv,'FaceColor',       [1.0 0.5 0.5], ...
+brainRightObj = patch(fv,'FaceColor',       [1.0 0.85 0.85], ...
     'EdgeColor',       'none',        ...
+    'EdgeAlpha',       0,        ...
+    'SpecularStrength',   0.5, ...
     'FaceLighting',    'gouraud',     ...
-    'AmbientStrength', 0.25);
-brainObj.FaceAlpha = 0.1;
+    'FaceAlpha',    1,     ...
+    'AmbientStrength', 0.55);
 direction = [0 0 -1];
-rotate(brainObj,direction,90)
+rotate(brainRightObj,direction,90)
 
 % Translate the brain to be in the proper position in the head
-m = eye(4,4);
-m(1,4) = -25;
-m(2,4) = 80;
-m(3,4) = -8;
-
+m = makehgtform('translate',[-25 80 -8],'zrotate',deg2rad(-2));
 t = hgtransform('Parent',gca);
-set(brainObj,'Parent',t)
+set(brainRightObj,'Parent',t)
 set(t,'Matrix',m)
+
+
+% Make a copy of the brain, mirror reverse it, trnaslate
+brainLeftObj = copyobj(brainRightObj,gca);
+set(brainLeftObj, 'YData', -1*get(brainLeftObj,'YData'));
+m = makehgtform('translate',[-25 -15 -8]);
+t = hgtransform('Parent',gca);
+set(brainLeftObj,'Parent',t)
+set(t,'Matrix',m)
+
 
 % Set the lighting
 camlight
@@ -111,7 +119,7 @@ set(t,'Matrix',m)
 %% Mirror
 % There is a cold mirror positioned at a 45° angle above the head
 
-X = [80 80 120 120];
+X = [120 120 80 80];
 Y = [40 -40 -40 40];
 Z = [-20 -20 20 20];
 
@@ -124,9 +132,9 @@ arrowHandles = gobjects(0);
 lineHandles = gobjects(0);
 color = 'r';
 
-c = [-300 32 -8];
-l = 40;
-a = 40;
+c = [-100 32 40];
+l = 80;
+a = 80;
 sw = 1;
 tw = 5;
 
@@ -168,7 +176,10 @@ boreHandle = quadric.plotSurface(S, boundingBox, [0.5 0.5 1], 0.2);
 
 
 %% Clean up
-view(-37,30);
+view(56,16);
+xlim([-306.6659  130.0000]);
+ylim([ -128.0000  238.6659]);
+zlim([-166.6659  200.0000]);
 box off
 axis off
 
@@ -176,5 +187,8 @@ axis off
 %% Save figure
 
 set(figHandle,'color','none');
-fileName = ['~/Desktop/Figure7_scannerIllo.png'];
+fileName = ['~/Desktop/Figure7_scannerIlloHeadMoves.png'];
 export_fig(figHandle,fileName,'-r1200','-opengl');
+
+%% Close the figure
+close(figHandle);
