@@ -117,7 +117,7 @@ for tt = 1:2
     yVals = relativeCameraPosition.radiusSmoothed.values(tt,:);
     yVals = yVals - nanmean(yVals) + meanDisplace;
     p=plot(timebaseEye(goodFrames),yVals(goodFrames),'-','Color',sColors{tt},'LineWidth',0.5);
-%    p.Color(4) = 0.5;
+    %    p.Color(4) = 0.5;
     
     y1 = relativeCameraPosition.estimateSceneParams.values(tt,eyeFrameIdxGood);
     y2 = relativeCameraPosition.radiusSmoothed.values(tt,eyeFrameIdxGood);
@@ -147,19 +147,25 @@ aziCorr = nan(45,4);
 eleCorr = nan(45,4);
 aziRange = nan(45,4);
 eleRange = nan(45,4);
+respRate = nan(45,4);
+respR2 = nan(45,5);
 
 movieFileNames = {'tfMRI_MOVIE_AP_run01','tfMRI_MOVIE_AP_run02','tfMRI_MOVIE_PA_run03','tfMRI_MOVIE_PA_run04'};
 
 %% Loop over the subjectIdx
-counter=0;
+
+% Define some anonymous functions for fitting a Gaussian
+fun=@(x,scale,mu,sd) scale/sqrt(2*pi*sd^2)*exp(-(x-mu).^2/(2*sd^2));
+
 for ss = 1:45
+    
     
     %% If there is nothing in the cell array for this subject, continue
     if isempty(videoStemName{ss})
         continue
     end
     
-    counter=counter+1;
+    
     %% Loop over the movie runs
     for mm = 1:4
         tmp=strsplit(videoStemName{ss}{mm},filesep);
@@ -187,7 +193,7 @@ for ss = 1:45
             testSet(3,:) = pupilData.radiusSmoothed.ellipses.uniformity < 0.75;
             testSet(4,:) = isnan(relativeCameraPosition.radiusSmoothed.values(1,:));
             goodFrames = ~(testSet(1,:)|testSet(2,:)|testSet(3,:)|testSet(4,:));
-                       
+            
             eyeFrameIdxGood = eyeFrameIdx(goodFrames(eyeFrameIdx));
             
             % Get the correlation and range for horizontal eye position
@@ -197,27 +203,35 @@ for ss = 1:45
                     y2 = relativeCameraPosition.radiusSmoothed.values(1,eyeFrameIdxGood);
                     aziCorr(ss,mm) = corr(y1',y2','Rows','complete');
                     aziRange(ss,mm) = range(y1);
-
-%                     % Get the one-sided PSD of the full resolution data
-%                     x = timebase.values(goodFrames);
-%                     y = relativeCameraPosition.radiusSmoothed.values(1,goodFrames);
-%                     evenStop = floor(length(x)/2)*2;
-%                     [psd, psdSupport] = calcOneSidedPSD( y(1:evenStop), x(1:evenStop) );                    
                     
                     % Get the correlation and range for horizontal eye position
                     y1 = relativeCameraPosition.initial.values(2,eyeFrameIdxGood);
                     y2 = relativeCameraPosition.radiusSmoothed.values(2,eyeFrameIdxGood);
                     eleCorr(ss,mm) = corr(y1',y2','Rows','complete');
                     eleRange(ss,mm) = range(y1);
+                    
+                    %{
+                    % Get the one-sided PSD of the full resolution data
+                    x = timebase.values(goodFrames);
+                    y = relativeCameraPosition.radiusSmoothed.values(2,goodFrames);
+                    evenStop = floor(length(x)/2)*2;
+                    [psd, psdSupport] = calcOneSidedPSD( y(1:evenStop), x(1:evenStop) );
 
-%                     % Get the one-sided PSD of the full resolution data
-%                     x = timebase.values(goodFrames);
-%                     y = relativeCameraPosition.radiusSmoothed.values(2,goodFrames);
-%                     evenStop = floor(length(x)/2)*2;
-%                     [psd, psdSupport] = calcOneSidedPSD( y(1:evenStop), x(1:evenStop) );                
+                    % Fit a Gaussian to the response in the range of 0.1 to
+                    % 0.5 Hz and see if there is a respiratory signal.
+                    [~,freqStart] = min(abs(psdSupport-0.1));
+                    [~,freqStop] = min(abs(psdSupport-0.5));
+                    x = psdSupport(freqStart:freqStop);
+                    y = psd(freqStart:freqStop);
+                    [maxY,idx]=max(y);
+                    myObj = @(p) norm(y - fun(x,p(1),p(2),p(3)));
+                    p = fminsearch(myObj,[maxY x(idx) 0.1]);
+                    respRate(ss,mm) = p(2);
+                    respR2(ss,mm) = corr(y',fun(x,p(1),p(2),p(3))');
+                    %}
+                    
                 end
-            end
-            
+            end            
         end
     end
 end

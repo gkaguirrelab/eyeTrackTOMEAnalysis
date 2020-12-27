@@ -6,6 +6,9 @@
 gazeError = nan(45,4);
 aziCenterP1 = nan(45,4);
 eleCenterP1 = nan(45,4);
+SR = nan(1,45);
+AL = nan(1,45);
+
 
 %% Loop over the subjectIdx
 for ss = 1:45
@@ -46,14 +49,17 @@ for ss = 1:45
         gazeError(ss,cc) = sceneGeometry.meta.estimateSceneParams.obj.rawErrors(3);
         
     end
+
+    % Save the axial length for this subject
+    AL(ss) = sceneGeometry.eye.meta.axialLength;
     
 end % Loop over subjects
 
 
 % Report the median SEM for estimation of the rotation centers given three
 % gaze calibration measurements
-fprintf('The median SEM for estimation of the azi rotation center with 3 gaze cal measures is %2.2f \n',nanmedian(nanstd(aziCenterP1')));
-fprintf('The median SEM for estimation of the ele rotation center with 3 gaze cal measures is %2.2f \n',nanmedian(nanstd(eleCenterP1')));
+fprintf('The median SD for estimation of the azi rotation center with 3 gaze cal measures is %2.2f \n',nanmedian(nanstd(aziCenterP1')));
+fprintf('The median SD for estimation of the ele rotation center with 3 gaze cal measures is %2.2f \n',nanmedian(nanstd(eleCenterP1')));
 
 % Now take the median across the four estimates of the rotation centers,
 % each of which used a sub-set of 3 of the measurments.
@@ -92,6 +98,46 @@ title('Azi and ele rotation centers. median ± IQR');
 
 fileName = ['~/Desktop/Figure5b_rotationCenters.pdf'];
 saveas(figHandle,fileName);
+
+
+
+
+%% Figure 5x -- Across subjects, the correlation between azi and ele
+% and the correlation of mean rotation center with axial length
+figHandle = figure();
+subplot(1,2,1);
+idx = logical(double(~isnan(aziCenterP1)) .* double(~isnan(eleCenterP1)));
+h = scatter(-aziCenterP1(idx),-eleCenterP1(idx),'o','MarkerFaceColor','b','MarkerEdgeColor','none');
+h.MarkerFaceAlpha = 0.25;
+hold on
+xlim([10 17]);
+ylim([10 17]);
+axis square
+xlabel('Azimuth depth');
+ylabel('Elevation depth');
+[b, aziEleCorrStats] = robustfit(-aziCenterP1(idx),-eleCenterP1(idx));
+[rho,pval] = corr(-aziCenterP1(idx),-eleCenterP1(idx));
+plot(12:16,b(1)+b(2).*(12:16),'r','LineWidth',0.5)
+str = sprintf('slope=%2.2f, r=%2.2f, p=%2.2f',b(2),rho,aziEleCorrStats.p(2));
+title({'Azi vs. ele centers',str});
+
+subplot(1,2,2);
+meanRotationDeth = mean([aziCenterP1,eleCenterP1],2);
+h = scatter(-meanRotationDeth(idx),AL(idx),'o','MarkerFaceColor','b','MarkerEdgeColor','none');
+h.MarkerFaceAlpha = 0.25;
+hold on
+xlim([10 17]);
+ylim([21 28]);
+axis square
+xlabel('Mean rotation depth [mm]');
+ylabel('Axial legnth [mm]');
+[b, axialLengthStats] = robustfit(-meanRotationDeth(idx),AL(idx)');
+[rho,pval] = corr(-meanRotationDeth(idx),AL(idx)');
+plot(12:16,b(1)+b(2).*(12:16),'r','LineWidth',0.5)
+str=sprintf('slope=%2.2f, r=%2.2f, p=%2.2f',b(2),rho,axialLengthStats.p(2));
+title({'Rotation depth vs. axial length',str});
+
+
 
 
 %% Figure 5d -- Gaze error by subject
