@@ -125,6 +125,7 @@ q = iqr(k2(idx))/2;
 plot(2,m,'xb')
 plot([2 2],[m+q m-q],'-b');
 ylim([40 50])
+yticks(40:2:50)
 xlim([0 2.5])
 ylabel('Curvature [Diopters]');
 title('k1 and k2 curvature. median ± IQR');
@@ -143,6 +144,8 @@ h(3).LineStyle = '-';
 h(4).LineStyle = '-';
 xlim([40 50]);
 ylim([40 50]);
+xticks(40:2:50)
+yticks(40:2:50)
 axis square
 xlabel('k1 measured [diopters]');
 ylabel('k1 recovered [diopters]');
@@ -164,6 +167,8 @@ h(3).LineStyle = '-';
 h(4).LineStyle = '-';
 xlim([40 50]);
 ylim([40 50]);
+xticks(40:2:50)
+yticks(40:2:50)
 axis square
 xlabel('k2 measured [diopters]');
 ylabel('k2 recovered [diopters]');
@@ -229,6 +234,7 @@ h(3).LineStyle = '-';
 h(4).LineStyle = '-';
 xlim([20 28]);
 ylim([10 16]);
+yticks(10:2:16)
 axis square
 xlabel('Axial length [mm]');
 ylabel('Azi rotation depth [mm]');
@@ -250,6 +256,7 @@ h(3).LineStyle = '-';
 h(4).LineStyle = '-';
 xlim([20 28]);
 ylim([10 16]);
+yticks(10:2:16)
 axis square
 xlabel('Axial length [mm]');
 ylabel('Ele rotation depth [mm]');
