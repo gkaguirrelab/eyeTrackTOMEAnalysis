@@ -4,6 +4,8 @@
 brainMotionStem = '/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_analysis/deriveCameraPositionFromHeadMotion/session2_spatialStimuli/';
 eyeMotionStem = '/Users/aguirre/Dropbox (Aguirre-Brainard Lab)/TOME_processing/session2_spatialStimuli/';
 
+% The stage of pupil fitting that we will plot
+fitStage = 'sceneConstrained';
 
 %% Make some plots for an example subject
 % TOME_3029, movie run 2
@@ -67,7 +69,7 @@ timebaseEye = timebase.values/1000;
 % or bad ellipse fits (startFrame:endFrame)
 clear testSet
 testSet(1,:) = isnan(glintData.X);
-testSet(2,:) = pupilData.radiusSmoothed.ellipses.RMSE > 2;
+testSet(2,:) = pupilData.(fitStage).ellipses.RMSE > 2;
 testSet(3,:) = pupilData.radiusSmoothed.ellipses.uniformity < 0.75;
 goodFrames = ~(testSet(1,:)|testSet(2,:)|testSet(3,:));
 
@@ -114,13 +116,13 @@ for tt = 1:2
     hold on
     
     meanDisplace = mean(relativeCameraPosition.initial.values(tt,eyeFrameIdx));
-    yVals = relativeCameraPosition.radiusSmoothed.values(tt,:);
+    yVals = relativeCameraPosition.(fitStage).values(tt,:);
     yVals = yVals - nanmean(yVals) + meanDisplace;
     p=plot(timebaseEye(goodFrames),yVals(goodFrames),'-','Color',sColors{tt},'LineWidth',0.5);
     %    p.Color(4) = 0.5;
     
     y1 = relativeCameraPosition.estimateSceneParams.values(tt,eyeFrameIdxGood);
-    y2 = relativeCameraPosition.radiusSmoothed.values(tt,eyeFrameIdxGood);
+    y2 = relativeCameraPosition.(fitStage).values(tt,eyeFrameIdxGood);
     
     corr(y1',y2','Rows','complete')
     
@@ -189,9 +191,9 @@ for ss = 1:45
             % or bad ellipse fits (startFrame:endFrame)
             clear testSet
             testSet(1,:) = isnan(glintData.X);
-            testSet(2,:) = pupilData.radiusSmoothed.ellipses.RMSE > 2;
+            testSet(2,:) = pupilData.(fitStage).ellipses.RMSE > 2;
             testSet(3,:) = pupilData.radiusSmoothed.ellipses.uniformity < 0.75;
-            testSet(4,:) = isnan(relativeCameraPosition.radiusSmoothed.values(1,:));
+            testSet(4,:) = isnan(relativeCameraPosition.(fitStage).values(1,:));
             goodFrames = ~(testSet(1,:)|testSet(2,:)|testSet(3,:)|testSet(4,:));
             
             eyeFrameIdxGood = eyeFrameIdx(goodFrames(eyeFrameIdx));
@@ -200,20 +202,20 @@ for ss = 1:45
             if ~isempty(eyeFrameIdxGood)
                 if length(eyeFrameIdxGood)>(0.25 * length(eyeFrameIdx))
                     y1 = relativeCameraPosition.initial.values(1,eyeFrameIdxGood);
-                    y2 = relativeCameraPosition.radiusSmoothed.values(1,eyeFrameIdxGood);
+                    y2 = relativeCameraPosition.(fitStage).values(1,eyeFrameIdxGood);
                     aziCorr(ss,mm) = corr(y1',y2','Rows','complete');
                     aziRange(ss,mm) = range(y1);
                     
                     % Get the correlation and range for horizontal eye position
                     y1 = relativeCameraPosition.initial.values(2,eyeFrameIdxGood);
-                    y2 = relativeCameraPosition.radiusSmoothed.values(2,eyeFrameIdxGood);
+                    y2 = relativeCameraPosition.(fitStage).values(2,eyeFrameIdxGood);
                     eleCorr(ss,mm) = corr(y1',y2','Rows','complete');
                     eleRange(ss,mm) = range(y1);
                     
                     %{
                     % Get the one-sided PSD of the full resolution data
                     x = timebase.values(goodFrames);
-                    y = relativeCameraPosition.radiusSmoothed.values(2,goodFrames);
+                    y = relativeCameraPosition.(fitStage).values(2,goodFrames);
                     evenStop = floor(length(x)/2)*2;
                     [psd, psdSupport] = calcOneSidedPSD( y(1:evenStop), x(1:evenStop) );
 
