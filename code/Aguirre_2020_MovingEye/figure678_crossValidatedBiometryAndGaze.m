@@ -95,7 +95,7 @@ k1 = nanmedian(k1,2);
 k2 = nanmedian(k2,2);
 
 
-%% Figure 5a -- k1 and k2 values, across subject medians and IQRs
+%% Figure 6a -- k1 and k2 values, across subject medians and IQRs
 figHandle = figure();
 t=tiledlayout(2,2);
 t.TileSpacing = 'compact';
@@ -130,49 +130,58 @@ ylabel('Curvature [Diopters]');
 title('k1 and k2 curvature. median ± IQR');
 
 
-%% Figure 5b -- k1,k2, measured vs. fit
+%% Figure 6b -- k1,k2, measured vs. fit
 nexttile;
 idx = ~isnan(k1) & ~isnan(k1Measured');
-h = scatter(k1(idx),k1Measured(idx),'o','MarkerFaceColor','k','MarkerEdgeColor','none');
-h.MarkerFaceAlpha = 0.25;
-hold on
+mdl = fitlm(k1(idx),k1Measured(idx),'linear','RobustOpts','on');
+h = mdl.plot;
+h(1).Marker = 'o';
+h(1).MarkerEdgeColor = 'none';
+h(1).MarkerFaceColor = [0.1 0 0];
+h(2).LineWidth = 2;
+h(3).LineStyle = '-';
+h(4).LineStyle = '-';
 xlim([40 50]);
 ylim([40 50]);
 axis square
 xlabel('k1 measured [diopters]');
 ylabel('k1 recovered [diopters]');
-[b, k1stats] = robustfit(k1(idx),k1Measured(idx));
-rho = corr(k1(idx),k1Measured(idx)');
-plot(40:50,b(1)+b(2).*(40:50),'r','LineWidth',0.5)
-str = sprintf('n=%d, slope=%2.2f, r=%2.2f, p=%2.2f',sum(idx),b(2),rho,k1stats.p(2));
+ci = mdl.coefCI;
+ci = ci(2,:);
+str = sprintf('n=%d, slope [95%% CI]=%2.2f [%2.2f-%2.2f], p=%2.3f',sum(idx),mdl.Coefficients{2,1},ci,mdl.coefTest);
 title({'k1 recovered, ',str});
+legend('off')
 
 nexttile;
 idx = ~isnan(k2) & ~isnan(k2Measured');
-h = scatter(k2(idx),k2Measured(idx),'o','MarkerFaceColor','b','MarkerEdgeColor','none');
-h.MarkerFaceAlpha = 0.25;
-hold on
+mdl = fitlm(k2(idx),k2Measured(idx),'linear','RobustOpts','on');
+h = mdl.plot;
+h(1).Marker = 'o';
+h(1).MarkerEdgeColor = 'none';
+h(1).MarkerFaceColor = [0.1 0 1];
+h(2).LineWidth = 2;
+h(3).LineStyle = '-';
+h(4).LineStyle = '-';
 xlim([40 50]);
 ylim([40 50]);
 axis square
 xlabel('k2 measured [diopters]');
 ylabel('k2 recovered [diopters]');
-[b, k2stats] = robustfit(k2(idx),k2Measured(idx));
-rho = corr(k2(idx),k2Measured(idx)');
-plot(40:50,b(1)+b(2).*(40:50),'r','LineWidth',0.5)
-str = sprintf('n=%d, slope=%2.2f, r=%2.2f, p=%2.2f',sum(idx),b(2),rho,k2stats.p(2));
+ci = mdl.coefCI;
+ci = ci(2,:);
+str = sprintf('n=%d, slope [95%% CI]=%2.2f [%2.2f-%2.2f], p=%2.3f',sum(idx),mdl.Coefficients{2,1},ci,mdl.coefTest);
 title({'k2 recovered, ',str});
+legend('off')
 
 
-
-fileName = ['~/Desktop/Figure5_k1k2.pdf'];
+fileName = ['~/Desktop/Figure6_k1k2.pdf'];
 saveas(figHandle,fileName);
 
 
 
 
 
-%% Figure 6a -- Azi and Ele values, across subject medians and IQRs
+%% Figure 7a -- Azi and Ele values, across subject medians and IQRs
 figHandle = figure();
 t=tiledlayout(2,2);
 t.TileSpacing = 'compact';
@@ -207,44 +216,56 @@ ylabel('Rotation center depth [mm]');
 title('Azi and ele rotation centers. median ± IQR');
 
 
-%% Figure 6b -- Correlation between azi and ele with axial length
+%% Figure 7b -- Correlation between azi and ele with axial length
+
 nexttile;
-h = scatter(AL(idx),-aziCenterP1(idx),'o','MarkerFaceColor','k','MarkerEdgeColor','none');
-h.MarkerFaceAlpha = 0.25;
-hold on
-xlim([21 28]);
-ylim([10 17]);
+mdl = fitlm(AL(idx),-aziCenterP1(idx),'linear','RobustOpts','on');
+h = mdl.plot;
+h(1).Marker = 'o';
+h(1).MarkerEdgeColor = 'none';
+h(1).MarkerFaceColor = [0.1 0 0];
+h(2).LineWidth = 2;
+h(3).LineStyle = '-';
+h(4).LineStyle = '-';
+xlim([20 28]);
+ylim([10 16]);
 axis square
-xlabel('Axial legnth [mm]');
+xlabel('Axial length [mm]');
 ylabel('Azi rotation depth [mm]');
-[b, axialLengthStats] = robustfit(AL(idx)',-aziCenterP1(idx));
-[rho,pval] = corr(AL(idx)',-aziCenterP1(idx));
-plot(20:30,b(1)+b(2).*(20:30),'r','LineWidth',0.5)
-str=sprintf('n=%d, slope=%2.2f, r=%2.2f, p=%2.2f',sum(idx),b(2),rho,axialLengthStats.p(2));
+ci = mdl.coefCI;
+ci = ci(2,:);
+str = sprintf('n=%d, slope [95%% CI]=%2.2f [%2.2f-%2.2f], p=%2.3f',sum(idx),mdl.Coefficients{2,1},ci,mdl.coefTest);
 title({'Azi rotation depth vs. axial length',str});
+legend('off')
+
 
 nexttile;
-h = scatter(AL(idx),-eleCenterP1(idx),'o','MarkerFaceColor','b','MarkerEdgeColor','none');
-h.MarkerFaceAlpha = 0.25;
-hold on
-xlim([21 28]);
-ylim([10 17]);
+mdl = fitlm(AL(idx),-eleCenterP1(idx),'linear','RobustOpts','on');
+h = mdl.plot;
+h(1).Marker = 'o';
+h(1).MarkerEdgeColor = 'none';
+h(1).MarkerFaceColor = [0.1 0 1];
+h(2).LineWidth = 2;
+h(3).LineStyle = '-';
+h(4).LineStyle = '-';
+xlim([20 28]);
+ylim([10 16]);
 axis square
-xlabel('Axial legnth [mm]');
-ylabel('ele rotation depth [mm]');
-[b, axialLengthStats] = robustfit(AL(idx)',-eleCenterP1(idx));
-[rho,pval] = corr(AL(idx)',-eleCenterP1(idx));
-plot(20:30,b(1)+b(2).*(20:30),'r','LineWidth',0.5)
-str=sprintf('n=%d, slope=%2.2f, r=%2.2f, p=%2.2f',sum(idx),b(2),rho,axialLengthStats.p(2));
+xlabel('Axial length [mm]');
+ylabel('Ele rotation depth [mm]');
+ci = mdl.coefCI;
+ci = ci(2,:);
+str = sprintf('n=%d, slope [95%% CI]=%2.2f [%2.2f-%2.2f], p=%2.3f',sum(idx),mdl.Coefficients{2,1},ci,mdl.coefTest);
 title({'Ele rotation depth vs. axial length',str});
+legend('off')
 
 
-fileName = ['~/Desktop/Figure6_rotationCenters.pdf'];
+fileName = ['~/Desktop/Figure7_rotationCenters.pdf'];
 saveas(figHandle,fileName);
 
 
 
-%% Figure 7 -- Gaze error by subject
+%% Figure 8a -- Gaze error by subject
 figHandle = figure();
 [N,edges] = histcounts(nanmedian(gazeError,2),0:0.25:1.5);
 for nn=1:length(N)
@@ -263,11 +284,11 @@ box off
 xlabel('Median absolute gaze error [deg]')
 ylabel('Number of subjects')
 title('Median gaze error each subject');
-fileName = ['~/Desktop/Figure7a_GazeErrorHistogram.pdf'];
+fileName = ['~/Desktop/Figure8a_GazeErrorHistogram.pdf'];
 saveas(figHandle,fileName);
 
 
-%% Figure 5c -- Recovered gaze location across subjects for the median performing gaze cal
+%% Figure 8b -- Recovered gaze location across subjects for the median performing gaze cal
 
 figHandle = figure();
 targetGaze(1,:) = [-7 -7 -7 0 0 0 7 7 7];
@@ -316,6 +337,6 @@ xlim([-11 11]);
 ylim([-11 11]);
 axis square
 
-fileName = ['~/Desktop/Figure7b_GazeErrorOverlay.pdf'];
+fileName = ['~/Desktop/Figure8b_GazeErrorOverlay.pdf'];
 saveas(figHandle,fileName);
 

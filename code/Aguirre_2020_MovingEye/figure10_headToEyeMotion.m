@@ -47,7 +47,7 @@ ylim([-1 1]);
 ylabel('displacement [deg]');
 xlabel('time [secs]');
 
-fileName = ['~/Desktop/Figure7_headMotionExample.pdf'];
+fileName = ['~/Desktop/Figure9_headMotionExample.pdf'];
 saveas(figHandle1,fileName);
 close(figHandle1);
 
@@ -96,7 +96,7 @@ xlim([0 360]);
 ylabel('displacement [mm]');
 xlabel('time [secs]');
 
-fileName = ['~/Desktop/Figure7_eyeMotionExample.pdf'];
+fileName = ['~/Desktop/Figure9_eyeMotionExample.pdf'];
 saveas(figHandle2,fileName);
 close(figHandle2);
 
@@ -133,7 +133,7 @@ ylabel('displacement [mm]');
 xlabel('time [secs]');
 
 
-fileName = ['~/Desktop/Figure7_fittedEyeMotionExample.pdf'];
+fileName = ['~/Desktop/Figure10_fittedEyeMotionExample.pdf'];
 saveas(figHandle3,fileName);
 close(figHandle3);
 
@@ -290,7 +290,7 @@ scatter(aziRange(29,2),aziCorr(29,2),100,'o', ...
     'MarkerFaceColor', sColors{1});
 
 
-fileName = ['~/Desktop/Figure7_rangeVsCorrelation.pdf'];
+fileName = ['~/Desktop/Figure10_rangeVsCorrelation.pdf'];
 saveas(figHandle4,fileName);
 close(figHandle4);
 
