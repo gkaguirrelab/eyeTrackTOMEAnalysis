@@ -148,7 +148,7 @@ else
     % Plot the raw error
     nexttile([1 1]);
     errorScale = [25 0.25 10 50];
-    bAx = bar(1:4,log10(50*sceneObject{1}.rawErrors([1 2 3 5])./errorScale),'FaceColor',[0.5 0.5 0.5]);
+    bAx = bar(1:4,log10(50*rawErrors([1 2 3 5])./errorScale),'FaceColor',[0.5 0.5 0.5]);
     xlim([0.5 4.5]);
     ylim([0 2]);
     title('log_1_0 error')
@@ -160,10 +160,9 @@ else
     % Setup or update the gif
     if ii==0
         gif(gifSaveName,'frame',figHandle);
-        gif('frame',figHandle);
         for jj=1:10; gif('frame',figHandle); end        
     elseif ii==size(xHist,1)
-        for jj=1:10; gif('frame',figHandle); end        
+        for jj=1:30; gif('frame',figHandle); end        
     else
         gif('frame',figHandle);
         gif('frame',figHandle);
