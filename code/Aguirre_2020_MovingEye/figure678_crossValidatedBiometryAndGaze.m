@@ -3,7 +3,8 @@
 %% Obtain the scene analysis parameters
 [videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, torsDepth, kvals] = defineSubjectSceneParams_CrossValidation;
 
-gazeError = nan(45,4);
+gazeErrorTrain = nan(45,4);
+gazeErrorTest = nan(45,4);
 aziCenterP1 = nan(45,4);
 eleCenterP1 = nan(45,4);
 k1 = nan(45,4);
@@ -12,6 +13,7 @@ SR = nan(1,45);
 AL = nan(1,45);
 k1Measured = nan(1,45);
 k2Measured = nan(1,45);
+corneaAngles = nan(45,4,3);
 
 % Load the subject data table
 subjectTableFileName = fullfile(getpref('eyeTrackTOMEAnalysis','dropboxBaseDir'),'TOME_subject','TOME-AOSO_SubjectInfo.xlsx');
@@ -55,6 +57,17 @@ for ss = 1:45
         % Store the k1, k2 values for this training set
         k1(ss,cc) = sceneGeometry.eye.cornea.kvals(1);
         k2(ss,cc) = sceneGeometry.eye.cornea.kvals(2);
+        corneaAngles(ss,cc,:) = sceneGeometry.eye.cornea.rotation;
+        
+        % Load the three training set sceneGeoms and get the median gaze
+        % error
+        tmpGazeError=[];
+        for ii=1:length(idx)
+            sceneGeometryFileName = [videoStemName{ss}{idx(ii)} '_sceneGeometry' suffixCross '.mat'];
+            load(sceneGeometryFileName,'sceneGeometry');
+            tmpGazeError(end+1)=sceneGeometry.meta.estimateSceneParams.obj.rawErrors(3);
+        end
+        gazeErrorTrain(ss,cc)=median(tmpGazeError);
         
         % Load the test sceneGeometry
         suffixTest = sprintf('_CrossVal_test0%d',cc);
@@ -64,7 +77,7 @@ for ss = 1:45
         end
         load(sceneGeometryFileName,'sceneGeometry');
         
-        gazeError(ss,cc) = sceneGeometry.meta.estimateSceneParams.obj.rawErrors(3);
+        gazeErrorTest(ss,cc) = sceneGeometry.meta.estimateSceneParams.obj.rawErrors(3);
         
     end
 
@@ -76,13 +89,13 @@ end % Loop over subjects
 
 % Report the median SEM for estimation of the rotation centers given three
 % gaze calibration measurements
-fprintf('The median SEM for estimation of the azi rotation center with 3 gaze cal measures is %2.2f \n',nanmedian(nanstd(aziCenterP1')));
-fprintf('The median SEM for estimation of the ele rotation center with 3 gaze cal measures is %2.2f \n',nanmedian(nanstd(eleCenterP1')));
+fprintf('The median jacknife SEM for estimation of the azi rotation center with 4 gaze cal measures is %2.2f \n',nanmedian(sqrt(3).*nanstd(aziCenterP1')));
+fprintf('The median jacknife SEM for estimation of the ele rotation center with 4 gaze cal measures is %2.2f \n',nanmedian(sqrt(3).*nanstd(eleCenterP1')));
 
 % Report the median SEM for estimation of the corneal curvature given three
 % gaze calibration measurements
-fprintf('The median SEM for estimation of k1 with 3 gaze cal measures is %2.2f \n',nanmedian(nanstd(k1')));
-fprintf('The median SEM for estimation of k2 with 3 gaze cal measures is %2.2f \n',nanmedian(nanstd(k2')));
+fprintf('The median jacknife SEM for estimation of k1 with 3 gaze cal measures is %2.2f \n',nanmedian(sqrt(3).*nanstd(k1')));
+fprintf('The median jacknife SEM for estimation of k2 with 3 gaze cal measures is %2.2f \n',nanmedian(sqrt(3).*nanstd(k2')));
 
 % Now take the median across the four estimates of the rotation centers,
 % each of which used a sub-set of 3 of the measurments.
@@ -127,7 +140,8 @@ plot([2 2],[m+q m-q],'-b');
 ylim([40 50])
 yticks(40:2:50)
 xlim([0 2.5])
-ylabel('Curvature [Diopters]');
+set(gca,'TickDir','out');
+ylabel('Corneal curvature [Diopters]','FontSize',12);
 title('k1 and k2 curvature. median ± IQR');
 
 
@@ -147,8 +161,9 @@ ylim([40 50]);
 xticks(40:2:50)
 yticks(40:2:50)
 axis square
-xlabel('k1 measured [diopters]');
-ylabel('k1 recovered [diopters]');
+set(gca,'TickDir','out');
+xlabel('k1 by keratometry [diopters]','FontSize',12);
+ylabel('k1 current model [diopters]','FontSize',12);
 ci = mdl.coefCI;
 ci = ci(2,:);
 str = sprintf('n=%d, slope [95%% CI]=%2.2f [%2.2f-%2.2f], p=%2.3f',sum(idx),mdl.Coefficients{2,1},ci,mdl.coefTest);
@@ -170,8 +185,9 @@ ylim([40 50]);
 xticks(40:2:50)
 yticks(40:2:50)
 axis square
-xlabel('k2 measured [diopters]');
-ylabel('k2 recovered [diopters]');
+set(gca,'TickDir','out');
+xlabel('k2 by keratometry [diopters]','FontSize',12);
+ylabel('k2 current model [diopters]','FontSize',12);
 ci = mdl.coefCI;
 ci = ci(2,:);
 str = sprintf('n=%d, slope [95%% CI]=%2.2f [%2.2f-%2.2f], p=%2.3f',sum(idx),mdl.Coefficients{2,1},ci,mdl.coefTest);
@@ -207,17 +223,23 @@ q = iqr(-aziCenterP1(idx))/2;
 plot(1,m,'xk')
 plot([1 1],[m+q m-q],'-k');
 
+fprintf('The median (±IQR) of the azi rotation center is %2.2f ± %2.2f \n',m,q);
+
 idx = ~isnan(eleCenterP1);
 h = scatter(zeros(1,sum(idx))+1.5,-eleCenterP1(idx),200,'o','MarkerFaceColor','b','MarkerEdgeColor','b');
 h.MarkerFaceAlpha = 0.10;
 h.MarkerEdgeAlpha = 0.15;
 m = median(-eleCenterP1(idx));
 q = iqr(-eleCenterP1(idx))/2;
+
+fprintf('The median (±IQR) of the ele rotation center is %2.2f ± %2.2f \n',m,q);
+
 plot(2,m,'xb')
 plot([2 2],[m+q m-q],'-b');
 ylim([0 18])
 xlim([0 2.5])
-ylabel('Rotation center depth [mm]');
+set(gca,'TickDir','out');
+ylabel('Rotation center depth [mm]','FontSize',12);
 title('Azi and ele rotation centers. median ± IQR');
 
 
@@ -236,8 +258,9 @@ xlim([20 28]);
 ylim([10 16]);
 yticks(10:2:16)
 axis square
-xlabel('Axial length [mm]');
-ylabel('Azi rotation depth [mm]');
+set(gca,'TickDir','out');
+xlabel('Axial length [mm]','FontSize',12);
+ylabel('Azi rotation depth [mm]','FontSize',12);
 ci = mdl.coefCI;
 ci = ci(2,:);
 str = sprintf('n=%d, slope [95%% CI]=%2.2f [%2.2f-%2.2f], p=%2.3f',sum(idx),mdl.Coefficients{2,1},ci,mdl.coefTest);
@@ -258,8 +281,9 @@ xlim([20 28]);
 ylim([10 16]);
 yticks(10:2:16)
 axis square
-xlabel('Axial length [mm]');
-ylabel('Ele rotation depth [mm]');
+set(gca,'TickDir','out');
+xlabel('Axial length [mm]','FontSize',12);
+ylabel('Ele rotation depth [mm]','FontSize',12);
 ci = mdl.coefCI;
 ci = ci(2,:);
 str = sprintf('n=%d, slope [95%% CI]=%2.2f [%2.2f-%2.2f], p=%2.3f',sum(idx),mdl.Coefficients{2,1},ci,mdl.coefTest);
@@ -274,7 +298,7 @@ saveas(figHandle,fileName);
 
 %% Figure 8a -- Gaze error by subject
 figHandle = figure();
-[N,edges] = histcounts(nanmedian(gazeError,2),0:0.25:1.5);
+[N,edges] = histcounts(nanmedian(gazeErrorTest,2),0:0.25:1.5);
 for nn=1:length(N)
     for cc=1:N(nn)
         scatter(nn,cc,300,'o','MarkerEdgeColor','none',...
@@ -290,6 +314,7 @@ xtickangle(90)
 box off
 xlabel('Median absolute gaze error [deg]')
 ylabel('Number of subjects')
+set(gca,'TickDir','out');
 title('Median gaze error each subject');
 fileName = ['~/Desktop/Figure8a_GazeErrorHistogram.pdf'];
 saveas(figHandle,fileName);
@@ -305,7 +330,7 @@ hold on
 
 % The idx of the gaze calibration that had the accuracy closest to the
 % median accuracy for that subject
-[~, idx] = min(abs(gazeError - nanmedian(gazeError,2))');
+[~, idx] = min(abs(gazeErrorTest - nanmedian(gazeErrorTest,2))');
 
 for ss = 1:45
     
@@ -338,10 +363,11 @@ for ss = 1:45
 end
 
 plot(targetGaze(1,:),targetGaze(2,:),'ok','MarkerSize',20,'LineWidth',2);
-title(sprintf('Median across subject error %2.2f deg',nanmedian(nanmedian(gazeError,2))));
+title(sprintf('Median across subject error %2.2f deg',nanmedian(nanmedian(gazeErrorTest,2))));
 
 xlim([-11 11]);
 ylim([-11 11]);
+set(gca,'TickDir','out');
 axis square
 
 fileName = ['~/Desktop/Figure8b_GazeErrorOverlay.pdf'];
