@@ -145,13 +145,20 @@ close(figHandle3);
 %% Obtain the scene analysis parameters
 [videoStemName, frameSet, gazeTargets, eyeArgs, sceneArgs, torsDepth, kvals] = defineSubjectSceneParams_CrossValidation;
 
+
+% Define a fixed frequency support for an average PSD
+fixedSupportPSD = 1./(1/15:1/15:336);
+
+% Set up some variables for the loop
 aziCorr = nan(45,4);
 eleCorr = nan(45,4);
 aziRange = nan(45,4);
 eleRange = nan(45,4);
 respRate = nan(45,4);
-respR2 = nan(45,5);
+respR2 = nan(45,4);
+psdSet = nan(45,4,length(fixedSupportPSD));
 
+% The movies to load
 movieFileNames = {'tfMRI_MOVIE_AP_run01','tfMRI_MOVIE_AP_run02','tfMRI_MOVIE_PA_run03','tfMRI_MOVIE_PA_run04'};
 
 %% Loop over the subjectIdx
@@ -212,13 +219,16 @@ for ss = 1:45
                     eleCorr(ss,mm) = corr(y1',y2','Rows','complete');
                     eleRange(ss,mm) = range(y1);
                     
-                    %{
                     % Get the one-sided PSD of the full resolution data
                     x = timebase.values(goodFrames);
-                    y = relativeCameraPosition.(fitStage).values(2,goodFrames);
+                    y = relativeCameraPosition.(fitStage).values(1,goodFrames);
                     evenStop = floor(length(x)/2)*2;
                     [psd, psdSupport] = calcOneSidedPSD( y(1:evenStop), x(1:evenStop) );
 
+                    % Resample to fixed psdSupport and store
+                    psdSet(ss,mm,:) = interp1(psdSupport,psd,fixedSupportPSD);                    
+                    
+                    %{
                     % Fit a Gaussian to the response in the range of 0.1 to
                     % 0.5 Hz and see if there is a respiratory signal.
                     [~,freqStart] = min(abs(psdSupport-0.1));
