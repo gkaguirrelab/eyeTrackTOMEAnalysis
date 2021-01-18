@@ -22,15 +22,6 @@ opticalSystem.surfaceLabels = opticalSystem.surfaceLabels(notLens);
 
 [figHandle, eyeHandles] = plotOpticalSystem('surfaceSet',opticalSystem,'addLighting',true);
 
-% Fill in the stop
-C = [-3.9,0,0] ;   % center of circle
-R = 2. ;    % Radius of circle
-theta=0:0.01:2*pi ;
-y=C(2)+R*cos(theta);
-z=C(3)+R*sin(theta) ;
-x=C(1)+zeros(size(z)) ;
-eyeHandles(end+1)=patch(x,y,z,'k','FaceAlpha',0.5);
-
 
 % Define an eye pose
 eyePose = [0 0 0 2];
@@ -110,11 +101,11 @@ scaleHandles(end+1)=plot3([-30 -30],[-20 -10],[-20 -20],'-k');
 scaleHandles(end+1)=plot3([-30 -20],[-20 -20],[-20 -20],'-k');
 
 
-viewNames = {'A','B','C'};
-viewAngles = {[0,90],[0,0],[26,36]};
-alignPoint = {[-30 30 40],[-30 30 40],[-30 -30 40]};
-viewEle = [false,true,true];
-viewAzi = [true,false,true];
+viewNames = {'A','B','C','D'};
+viewAngles = {[0,90],[0,0],[26,36],[10 50]};
+alignPoint = {[-30 30 40],[-30 30 40],[-30 -30 40],[7.15 15 15]};
+viewEle = [false,true,true,true];
+viewAzi = [true,false,true,true];
 xlim([-30 130]);
 ylim([-30 30]);
 zlim([-30 40]);
@@ -124,14 +115,21 @@ alignHandle = plot3(alignPoint{1}(1),alignPoint{1}(2),alignPoint{1}(3),'xm');
 
 for vv = 1:length(viewNames)
     
+    % Set the plot limits
+    if vv == length(viewNames)
+        xlim([-5 7.5]);
+        ylim([-15 15]);
+        zlim([-15 15]);
+    end
+    
     % Set the 3D view position
     view(viewAngles{vv}(1),viewAngles{vv}(2));
     
     % Display the alignPoint mark
     delete(alignHandle);
-    alignHandle = plot3(alignPoint{vv}(1),alignPoint{vv}(2),alignPoint{vv}(3),'xm');    
-        
-    % Save figure
+    alignHandle = plot3(alignPoint{vv}(1),alignPoint{vv}(2),alignPoint{vv}(3),'xm');
+    
+    % Save figure with rendered components
     showm(eyeHandles);
     showm(cameraHandles);
     hidem(rayHandles);
@@ -139,8 +137,8 @@ for vv = 1:length(viewNames)
     set(figHandle,'color','none');
     fileName = ['~/Desktop/Figure1_view' viewNames{vv} '.png'];
     export_fig(figHandle,fileName,'-r1200','-opengl');
-       
     
+    % Save figure with vector components
     hidem(eyeHandles);
     hidem(cameraHandles);
     showm(rayHandles);
@@ -150,6 +148,7 @@ for vv = 1:length(viewNames)
     export_fig(figHandle,fileName,'-Painters');
     
 end
+
 
 close(figHandle)
 

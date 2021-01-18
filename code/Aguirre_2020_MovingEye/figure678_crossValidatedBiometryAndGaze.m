@@ -14,6 +14,8 @@ AL = nan(1,45);
 k1Measured = nan(1,45);
 k2Measured = nan(1,45);
 corneaAngles = nan(45,4,3);
+isContactLens = false(1,45);
+isSpectacleLens = false(1,45);
 
 % Load the subject data table
 subjectTableFileName = fullfile(getpref('eyeTrackTOMEAnalysis','dropboxBaseDir'),'TOME_subject','TOME-AOSO_SubjectInfo.xlsx');
@@ -58,6 +60,10 @@ for ss = 1:45
         k1(ss,cc) = sceneGeometry.eye.cornea.kvals(1);
         k2(ss,cc) = sceneGeometry.eye.cornea.kvals(2);
         corneaAngles(ss,cc,:) = sceneGeometry.eye.cornea.rotation;
+        
+        % Note if there is a contact or spectacle lens in the simulation
+        isSpectacleLens(ss) = ~isempty(sceneGeometry.meta.createSceneGeometry.spectacleLens);
+        isContactLens(ss) = ~isempty(sceneGeometry.meta.createSceneGeometry.contactLens);
         
         % Load the three training set sceneGeoms and get the median gaze
         % error
@@ -298,9 +304,10 @@ saveas(figHandle,fileName);
 
 %% Figure 8a -- Gaze error by subject
 figHandle = figure();
-[N,edges] = histcounts(nanmedian(gazeErrorTest,2),0:0.25:1.5);
+vals = nanmedian(gazeErrorTest,2);
+[N,edges] = histcounts(vals,0:0.25:1.5);
 for nn=1:length(N)
-    for cc=1:N(nn)
+    for cc=1:N(nn)        
         scatter(nn,cc,300,'o','MarkerEdgeColor','none',...
         'MarkerFaceColor',[0.5 0.5 0.5],'MarkerFaceAlpha',0.5);
         hold on
