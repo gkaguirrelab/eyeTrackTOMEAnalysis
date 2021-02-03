@@ -4,7 +4,7 @@ clear
 close all
 
 % Use the sceneGeometry from an example subject (TOME_3021)
-dropboxBaseDir = getpref('eyeTrackTOMEAnalysis','dropboxBaseDir'); 
+dropboxBaseDir = getpref('eyeTrackTOMEAnalysis','dropboxBaseDir');
 processingBaseDir = fullfile(dropboxBaseDir,'TOME_processing');
 videoStemName = fullfile(processingBaseDir,'/session2_spatialStimuli/TOME_3021/060917/EyeTracking/GazeCal01');
 load([videoStemName '_sceneGeometry.mat'],'sceneGeometry');
@@ -41,19 +41,19 @@ gifSaveName = '~/Desktop/sceneSearch.gif';
 for ii = 0:size(xHist,1)
     
     fileNameSuffix = sprintf('_iter%0.3d',ii);
-        
+    
     if ii==0
         
         % fill x with nans, and get the montage with just the eye image
         x = nan(size(squeeze(sceneObject{1}.xHist(1,:))));
         xLast = x;
-        sceneObject{1}.saveEyeModelMontage(fileNameSuffix,true,false,false)        
-
+        sceneObject{1}.saveEyeModelMontage(fileNameSuffix,true,false,false)
+        
         % Get the values for this iteration
         modelPoseGaze = nan(size(sceneObject{1}.modelPoseGaze));
         rawErrors = nan(size(sceneObject{1}.rawErrors));
-
-else
+        
+    else
         
         % Get this set of parameters
         x = squeeze(sceneObject{1}.xHist(ii,:));
@@ -76,7 +76,7 @@ else
         % Get the values for this iteration
         modelPoseGaze = sceneObject{1}.modelPoseGaze;
         rawErrors = sceneObject{1}.rawErrors;
-
+        
     end
     
     fileName = [videoStemName '_sceneGeometry_eyeModelMontage' fileNameSuffix '.png'];
@@ -102,7 +102,7 @@ else
     
     % Plot the ability of the rotation values assigned to each eyePose to map
     % to the list of gaze targets
-        
+    
     % Plot gaze error
     nexttile([1 1])
     plot(gazeTargets(1,:),gazeTargets(2,:),'ok','MarkerSize',10); hold on;
@@ -121,13 +121,13 @@ else
     axis off
     text(0,0.8,sprintf('Iteration %0.3d',ii),'FontSize',14,'HorizontalAlignment','center');
     text(-1,0.6,'Eye','FontSize',12,'HorizontalAlignment','left');
-
+    
     str = addColor(sprintf('corneal axial length [mm]: $%2.2f',x(5)),x(5) == xLast(5));
     text(-0.9,0.4,str,'FontSize',12,'HorizontalAlignment','left');
-
-    str = addColor(sprintf('k1, k2 [D]: $%2.2f, %2.2f',x(6:7)),all(x(6:7) == xLast(6:7)));    
+    
+    str = addColor(sprintf('k1, k2 [D]: $%2.2f, %2.2f',x(6:7)),all(x(6:7) == xLast(6:7)));
     text(-0.9,0.2,str,'FontSize',12,'HorizontalAlignment','left');
-
+    
     str = addColor(sprintf('torsion, tilt, tip [deg]: $%2.2f, %2.2f, %2.2f',x(8:10)),all(x(8:10) == xLast(8:10)));
     text(-0.9,0.0,str,'FontSize',12,'HorizontalAlignment','left');
     
@@ -160,9 +160,9 @@ else
     % Setup or update the gif
     if ii==0
         gif(gifSaveName,'frame',figHandle);
-        for jj=1:10; gif('frame',figHandle); end        
+        for jj=1:10; gif('frame',figHandle); end
     elseif ii==size(xHist,1)
-        for jj=1:30; gif('frame',figHandle); end        
+        for jj=1:30; gif('frame',figHandle); end
     else
         gif('frame',figHandle);
         gif('frame',figHandle);
@@ -174,10 +174,10 @@ close all
 
 
 function str = addColor(str,flag)
-    if flag
-        str = strrep(str,'$','');
-    else
-        str = strrep(str,'$','\color[rgb]{1,0,0}');
-    end
+if flag
+    str = strrep(str,'$','');
+else
+    str = strrep(str,'$','\color[rgb]{1,0,0}');
+end
 
 end
