@@ -103,6 +103,13 @@ fprintf('The median jacknife SEM for estimation of the ele rotation center with 
 fprintf('The median jacknife SEM for estimation of k1 with 3 gaze cal measures is %2.2f \n',nanmedian(sqrt(3).*nanstd(k1')));
 fprintf('The median jacknife SEM for estimation of k2 with 3 gaze cal measures is %2.2f \n',nanmedian(sqrt(3).*nanstd(k2')));
 
+% Report the correlation between train and test error
+fprintf('Correlation between train and test error: %2.2f \n',corr(nanmedian(gazeErrorTrain,2),nanmedian(gazeErrorTest,2),'Rows','pairwise'));
+
+% Report the identity of the subjects with test error > 1
+badSubs = find(nanmedian(gazeErrorTest,2)>1);
+fprintf('The two subjects with test gaze error > 1 are: TOME_30%d and TOME30%d \n',badSubs);
+
 % Now take the median across the four estimates of the rotation centers,
 % each of which used a sub-set of 3 of the measurments.
 aziCenterP1 = nanmedian(aziCenterP1,2);
