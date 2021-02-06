@@ -15,7 +15,7 @@ rotArrowHandlesVec = gobjects(0);
 S = quadric.scale(quadric.unitSphere,[sphereRadius sphereRadius sphereRadius]);
 S = quadric.translate(S,c);
 boundingBox = [c(1)-sphereRadius c(1)+sphereRadius c(2)-sphereRadius c(2)+sphereRadius c(3)-sphereRadius c(3)+sphereRadius];
-rotArrowHandlesBit(end+1) = quadric.plotSurface(S, boundingBox, color, 1);
+rotArrowHandlesBit(end+1) = quadric.plotImplicitSurface(S, boundingBox, color, 1);
 
 % Now add the three segments of the arc. Switch on the dimension around
 % which the arrow rotates
