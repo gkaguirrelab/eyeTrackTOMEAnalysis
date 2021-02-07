@@ -40,7 +40,9 @@ sw = 1;
 % Rotation arrow around z
 c = [0 0 350];
 cArc = c + [0 0 -l*2.5];
-rotArrow = addRotArrow(cArc,3,l/2,'r',sw);
+[a,b] = addRotArrow(cArc,3,l/2,'r',sw);
+delete(a(2));
+delete(b);
 view(-90,90);
 
 % Save it here
@@ -50,12 +52,14 @@ export_fig(figHandle,fileName,'-r1200','-opengl');
 
 
 % Remove the arrow
-delete(rotArrow);
+delete(a(1));
 
 % Rotation arrow around y
 c = [0 -75 0];
 cArc = c + [0 l*2.5 0];
-yRot = addRotArrow(cArc,2,l/2,'r',sw);
+[a,b] = addRotArrow(cArc,2,l/2,'r',sw);
+delete(a(2));
+delete(b);
 view(-180,0);
 
 % Save it here
@@ -64,12 +68,14 @@ fileName = ['~/Desktop/Pitch.png'];
 export_fig(figHandle,fileName,'-r1200','-opengl');
 
 % Remove the arrow
-delete(rotArrow);
+delete(a(1));
 
 % Rotation arrow around x
 c = [75 0 0];
 cArc = c + [-l*2.5 0 0];
-addRotArrow(cArc,1,l/2,'r',sw);
+[a,b] = addRotArrow(cArc,1,l/2,'r',sw);
+delete(a(2));
+delete(b);
 view(-90,0);
 
 % Save it here
